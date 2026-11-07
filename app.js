@@ -79,8 +79,8 @@ function interferencePanel(a,b,r){return `<div class="impact-grid"><div class="i
 function pairViewResult(a,b){const r=pairResult(a,b);return `<section class="card result"><div class="report-eyebrow">NSD / DIRECTIONAL INTERFERENCE REPORT</div><h2>${esc(r.title)}</h2><div class="pills"><span class="pill">관계 원형 ${r.typeId+1}/12</span><span class="pill">반응 결 ${r.postureId+1}/8</span><span class="pill">96개 기본 유형 조합</span></div><p class="report-sub">${esc(a.name)} (${esc(a.role)}) × ${esc(b.name)} (${esc(b.role)})</p><div class="comparison-swatches">${spectrumCard(a,true)}${spectrumCard(b,true)}</div>
 <div class="section"><h3>01. 방향에 따라 달라지는 영향</h3>${interferencePanel(a,b,r.fromAToB)}${interferencePanel(b,a,r.fromBToA)}<p class="micro" style="margin-top:10px">0~100 표시는 감각적 자극과 완충을 비교하는 비공식 창작 지표이며 실제 부하도 변화량이 아닙니다.</p></div>
 ${lineSection(2,'두 감각이 처음 부딪히는 장면',esc(r.primary))}
-${lineSection(3,`${esc(a.name)}이 ${esc(b.name)}에게 미치는 영향`,esc(r.fromA))}
-${lineSection(4,`${esc(b.name)}이 ${esc(a.name)}에게 미치는 영향`,esc(r.fromB))}
+${lineSection(3,`${esc(a.name)}이(가) ${esc(b.name)}에게 미치는 영향`,esc(r.fromA))}
+${lineSection(4,`${esc(b.name)}이(가) ${esc(a.name)}에게 미치는 영향`,esc(r.fromB))}
 ${lineSection(5,'닮은 리듬과 충돌하는 지점',esc(r.support)+' '+esc(r.risk))}
 ${lineSection(6,'직군별 가이딩·부하도 고려사항',esc(r.role))}
 ${lineSection(7,'게이트 종료 이후의 여운',esc(r.after))}
