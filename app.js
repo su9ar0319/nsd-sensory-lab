@@ -72,7 +72,7 @@ ${lineSection(7,'가이딩 이후에도 남는 감각',esc(t.after))}
 ${lineSection(8,'직군에 따른 현장 해석',esc(t.role))}
 <div class="section"><h3>09. 여덟 장면에 남은 선택</h3><p class="sub">선택한 행동을 통해 위기에서 드러나는 판단과 대응 방식을 살펴봅니다.</p>${acts}</div>
 <div class="section"><h3>10. 여섯 개의 감각 좌표</h3>${statBars(p)}</div>
-<div class="row actions"><button class="btn soft" onclick="pairFrom('${esc(p.id)}')">이 캐릭터로 2인 분석 →</button><button class="btn ghost" onclick="window.print()">인쇄 · PDF 저장</button></div></section>`;}
+<div class="row actions"><button class="btn soft" onclick="pairFrom('${esc(p.id)}')">이 캐릭터로 2인 분석 →</button><button class="btn ghost" onclick="copyAIAnalysis('individual','${esc(p.id)}')">AI 분석 패키지 복사</button><button class="btn ghost" onclick="window.print()">인쇄 · PDF 저장</button></div></section>`;}
 function pairFrom(id){state.choiceA=id;state.choiceB=allProfiles().find(x=>x.id!==id)?.id||'';switchTo('pair');}
 function pairView(){const all=allProfiles();if(!state.choiceA)state.choiceA=all[0]?.id||'';if(!state.choiceB)state.choiceB=all.find(x=>x.id!==state.choiceA)?.id||'';const a=byId(state.choiceA),b=byId(state.choiceB);return `<section class="card no-print"><div class="kicker">SENSORY INTERFERENCE / PAIR</div><h2>2인 감각 간섭 분석</h2><p class="sub">두 캐릭터의 반응을 선택하면 A→B, B→A의 자극과 완충 효과를 각각 해석합니다.</p><div class="columns"><div><label class="field-label">대상자 A</label><select class="field" onchange="choiceChange('choiceA',this.value)">${optionsHtml(state.choiceA)}</select></div><div><label class="field-label">대상자 B</label><select class="field" onchange="choiceChange('choiceB',this.value)">${optionsHtml(state.choiceB)}</select></div></div></section>${a&&b&&a.id!==b.id?pairViewResult(a,b):'<section class="card empty">서로 다른 두 캐릭터를 선택해 주세요.</section>'}`;}
 function interferencePanel(a,b,r){return `<div class="impact-grid"><div class="impact-item"><span>${esc(a.name)} → ${esc(b.name)}</span><div class="impact-values"><b>자극 ${r.stimulation}</b><b>완충 ${r.buffer}</b></div><div class="impact-bars"><i style="width:${r.stimulation}%"></i><em style="width:${r.buffer}%"></em></div></div></div>`;}
@@ -84,9 +84,9 @@ ${lineSection(4,`${esc(b.name)}이(가) ${esc(a.name)}에게 미치는 영향`,e
 ${lineSection(5,'닮은 리듬과 충돌하는 지점',esc(r.support)+' '+esc(r.risk))}
 ${lineSection(6,'직군별 가이딩·부하도 고려사항',esc(r.role))}
 ${lineSection(7,'게이트 종료 이후의 여운',esc(r.after))}
-<div class="section"><h3>08. 두 사람의 감각 좌표</h3><div class="metrics">${DOMAINS.map((d,i)=>`<div class="metric"><b>${esc(d.short)}</b><div class="track"><i style="width:${mean([a.axes[i],b.axes[i]])*10}%"></i></div><span>${fixed(range(a.axes[i],b.axes[i]))}Δ</span></div>`).join('')}</div></div><div class="row actions"><button class="btn ghost" onclick="window.print()">결과 인쇄 · PDF</button><button class="btn soft" onclick="copyCurrentLink('pair')">페어 조합 링크 복사</button></div></section>`;}
+<div class="section"><h3>08. 두 사람의 감각 좌표</h3><div class="metrics">${DOMAINS.map((d,i)=>`<div class="metric"><b>${esc(d.short)}</b><div class="track"><i style="width:${mean([a.axes[i],b.axes[i]])*10}%"></i></div><span>${fixed(range(a.axes[i],b.axes[i]))}Δ</span></div>`).join('')}</div></div><div class="row actions"><button class="btn ghost" onclick="window.print()">결과 인쇄 · PDF</button><button class="btn soft" onclick="copyCurrentLink('pair')">페어 조합 링크 복사</button><button class="btn ghost" onclick="copyAIAnalysis('pair')">AI 분석 패키지 복사</button></div></section>`;}
 function groupView(){const all=allProfiles();for(const k of ['choiceA','choiceB','choiceC'])if(!state[k])state[k]=all.find(p=>!['choiceA','choiceB','choiceC'].filter(x=>x!==k).map(x=>state[x]).includes(p.id))?.id||'';const ps=['choiceA','choiceB','choiceC'].map(k=>byId(state[k]));return `<section class="card no-print"><div class="kicker">SENSORY INTERFERENCE / GROUP</div><h2>3인 연계 분석</h2><p class="sub">세 사람이 각자의 감각을 유지하면서 함께 움직일 때 드러나는 신호·완충·회복의 균형을 읽습니다. 관계의 형태는 미리 정하지 않습니다.</p><div class="columns three">${['choiceA','choiceB','choiceC'].map((k,i)=>`<div><label class="field-label">대상자 ${'ABC'[i]}</label><select class="field" onchange="choiceChange('${k}',this.value)">${optionsHtml(state[k])}</select></div>`).join('')}</div></section>${ps.every(Boolean)&&new Set(ps.map(p=>p.id)).size===3?groupViewResult(ps):'<section class="card empty">서로 다른 세 캐릭터를 선택해 주세요.</section>'}`;}
-function groupViewResult(ps){const r=trioResult(ps);return `<section class="card result"><div class="report-eyebrow">NSD / THREE-WAY INTERFERENCE REPORT</div><h2>${esc(r.title)}</h2><p class="report-sub">${ps.map(p=>esc(p.name)).join(' · ')} / 세 사람의 감각을 함께 관찰한 보고서</p><div class="comparison-swatches three">${ps.map(p=>spectrumCard(p,true)).join('')}</div>${lineSection(1,'세 사람이 공유하는 감각',esc(r.description))}${lineSection(2,'누가 먼저 감지하고 누가 완충하는가',esc(r.roles))}${lineSection(3,'세 사람의 회복 조건',esc(r.risk))}<div class="section"><h3>04. 세 관계의 양방향 기록</h3>${r.pairs.map(x=>`<div class="memory-card"><b>${esc(x.name)}</b><p>${esc(x.text)}</p></div>`).join('')}</div><div class="section"><h3>05. 공통점과 차이점</h3><div class="pills"><span class="pill">공통: ${esc(DOMAINS[r.common].short)}</span><span class="pill">차이: ${esc(DOMAINS[r.variable].short)}</span></div><p style="margin-top:12px">비슷한 반응은 서로를 빠르게 이해하는 실마리가 되고, 다른 반응은 역할을 나누거나 새로운 대응 방식을 찾는 계기가 됩니다.</p></div><div class="row actions"><button class="btn ghost" onclick="window.print()">그룹 결과 인쇄 · PDF</button><button class="btn soft" onclick="copyCurrentLink('group')">그룹 조합 링크 복사</button></div></section>`;}
+function groupViewResult(ps){const r=trioResult(ps);return `<section class="card result"><div class="report-eyebrow">NSD / THREE-WAY INTERFERENCE REPORT</div><h2>${esc(r.title)}</h2><p class="report-sub">${ps.map(p=>esc(p.name)).join(' · ')} / 세 사람의 감각을 함께 관찰한 보고서</p><div class="comparison-swatches three">${ps.map(p=>spectrumCard(p,true)).join('')}</div>${lineSection(1,'세 사람이 공유하는 감각',esc(r.description))}${lineSection(2,'누가 먼저 감지하고 누가 완충하는가',esc(r.roles))}${lineSection(3,'세 사람의 회복 조건',esc(r.risk))}<div class="section"><h3>04. 세 관계의 양방향 기록</h3>${r.pairs.map(x=>`<div class="memory-card"><b>${esc(x.name)}</b><p>${esc(x.text)}</p></div>`).join('')}</div><div class="section"><h3>05. 공통점과 차이점</h3><div class="pills"><span class="pill">공통: ${esc(DOMAINS[r.common].short)}</span><span class="pill">차이: ${esc(DOMAINS[r.variable].short)}</span></div><p style="margin-top:12px">비슷한 반응은 서로를 빠르게 이해하는 실마리가 되고, 다른 반응은 역할을 나누거나 새로운 대응 방식을 찾는 계기가 됩니다.</p></div><div class="row actions"><button class="btn ghost" onclick="window.print()">그룹 결과 인쇄 · PDF</button><button class="btn soft" onclick="copyCurrentLink('group')">그룹 조합 링크 복사</button><button class="btn ghost" onclick="copyAIAnalysis('group')">AI 분석 패키지 복사</button></div></section>`;}
 function helpView(){return `<section class="card"><div class="kicker">FIELD MANUAL / SENSORY ANALYSIS</div><h2>이용 안내</h2><p>감각 간섭 보고서는 센티넬과 가이드가 현장에서 감각적 자극에 반응하고, 다른 사람의 상태에 개입하며, 이후 회복하는 방식을 살펴봅니다.</p><div class="divider"></div><h3>01. 캐릭터 설문</h3><p>공통 성향 16개·직군 전용 성향 24개(1~10점), 공통 상황 4개·직군 전용 상황 4개에 응답해 주세요. 직군을 바꾸면 전용 질문과 선택지가 바뀌며, 실제로 겪지 않은 장면은 해당 캐릭터의 예상 선택을 기준으로 답해 주세요.</p><h3>02. 개인 감각 보고서</h3><p>감각 수용, 자극 발산, 이상 징후 감지, 완충 개입, 경계 조율, 잔여감각 회복의 여섯 축을 읽습니다. 각 축의 높낮이와 조합에서 캐릭터의 반응 특성을 살펴볼 수 있습니다.</p><h3>03. 공개 기록</h3><p>공개에 동의한 캐릭터는 누구나 1인 결과를 볼 수 있습니다. 수정과 삭제는 등록한 사람만 수행할 수 있습니다. 원문 점수 응답은 공개하지 않습니다.</p><h3>04. 2인 간섭 분석</h3><p>둘을 선택하면 A→B, B→A의 영향이 각각 달라지는 이유를 해석합니다. 조합은 센티넬×센티넬, 센티넬×가이드, 가이드×가이드 모두 지원합니다.</p><h3>05. 3인 연계 분석</h3><p>세 사람에게서 나타나는 공통 감각, 징후 감지·완충·경계의 역할, 각각의 양방향 관계를 다룹니다.</p><h3>가이딩과 감각 간섭에 관하여</h3><p>가이딩은 가이드가 수행하는 별도의 행위로 가이딩 잔량을 소모합니다. 가이딩 잔량이 0이 되면 공명 고갈 상태가 됩니다. 감각 간섭 분석에서는 지원 전후의 반응, 감각적 피로, 회복 속도의 차이를 함께 살펴봅니다.</p><div class="notice">브라우저 기록을 삭제하면 익명 로그인으로 등록한 캐릭터를 수정할 권한을 잃을 수 있습니다. 중요한 기록은 <b>원본 백업</b>을 보관해 주세요.</div><div class="row" style="margin-top:22px"><button class="btn" onclick="switchTo('survey')">검사 시작하기</button><button class="btn ghost" onclick="switchTo('public')">공개 기록 열람</button></div></section>`;}
 function exportProfiles(){const rows=state.owned.filter(p=>p.isPublic).map(safePublic);if(rows.length===0){toast('공개에 동의한 캐릭터가 없습니다. 개인용 원본은 별도로 백업할 수 있습니다.',true);return;}const payload={format:'NSD_SENSORY_V2_PUBLIC',createdAt:new Date().toISOString(),profiles:rows};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='NSD_감각간섭보고서_공개기록.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1200);toast(`${rows.length}개 캐릭터의 공개용 분석 프로필을 내보냈습니다. (원문 응답 제외)`);}
 function exportEditable(){if(!state.owned.length){toast('백업할 내 기록이 없습니다.',true);return;}const payload={format:'NSD_SENSORY_V2_PRIVATE',createdAt:new Date().toISOString(),profiles:state.owned.map(p=>({...p,ownerUid:undefined}))};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='NSD_감각간섭보고서_내원본_비공개.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1200);toast('원본 응답까지 포함한 개인 백업을 저장했습니다. 타인에게 공유하지 마세요.');}
@@ -96,6 +96,137 @@ async function importProfiles(file){if(!file)return;try{const data=JSON.parse(aw
  setLocal(STORAGE.owned,state.owned);setLocal(STORAGE.imported,state.imported);if(state.cloud)await refreshCloud();render();toast(`${valid.length}명 가져오기가 완료되었습니다. ${isPrivate?'개인 원본은 비공개로 복원했습니다.':'공유용 분석 프로필을 추가했습니다.'}`);
  }catch(err){toast('가져오기 실패: '+err.message,true);}}
 async function copyCurrentLink(mode){const ids=mode==='pair'?[state.choiceA,state.choiceB]:[state.choiceA,state.choiceB,state.choiceC];const link=new URL(window.location.href);link.hash=`${mode}/${ids.join('/')}`;try{await navigator.clipboard.writeText(link.href);toast('조합 링크를 복사했습니다. 상대에게도 등록된 캐릭터만 표시됩니다.');}catch(_){prompt('이 링크를 복사해 주세요.',link.href);}}
+function aiScorecardProfile(p, label) {
+  const sig = signature(p);
+  const rows = [
+    `### ${label}: ${p.name} (${p.role})`,
+    `감각 서명: ${sig.name} | ${sig.subtitle}`,
+    `대표 감각 축: ${sig.primary} | 상대적으로 낮은 감각 축: ${sig.low}`,
+    "",
+    "6축 점수 (1~10점)",
+    ...DOMAINS.map((d, i) => `- ${d.short}: ${fixed(p.axes[i], 2)}점 | 낮은 방향 '${d.lo}' ↔ 높은 방향 '${d.hi}'`),
+  ];
+  if (Array.isArray(p.facets) && p.facets.length === 12) {
+    rows.push("", "세부 점수 (1~10점; 같은 축 질문을 둘로 나눈 문항군 평균)");
+    DOMAINS.forEach((d, i) => rows.push(`- ${d.short}: 문항군 1 ${fixed(p.facets[i * 2], 2)}점 / 문항군 2 ${fixed(p.facets[i * 2 + 1], 2)}점`));
+  }
+  rows.push("", "8개 현장 상황의 선택과 근거");
+  getScenarios(p.role).forEach((scene, i) => {
+    const choice = Number(p.choices[i]);
+    const option = scene.opts?.[choice];
+    rows.push(`${i + 1}. ${scene.title}`);
+    rows.push(`   상황: ${scene.story}`);
+    rows.push(`   선택 ${"ABCD"[choice] || "-"}: ${option?.[0] || "기록 없음"}`);
+    if (option?.[2]) rows.push(`   반응 단서: ${option[2]}`);
+  });
+  return rows.join("\n");
+}
+
+function buildAIScorecard(mode, id) {
+  let members;
+  if (mode === "individual") {
+    const p = byId(id);
+    members = p ? [p] : [];
+  } else if (mode === "pair") {
+    members = [byId(state.choiceA), byId(state.choiceB)];
+  } else if (mode === "group") {
+    members = [byId(state.choiceA), byId(state.choiceB), byId(state.choiceC)];
+  } else {
+    return "";
+  }
+  if (members.some(p => !p) || new Set(members.map(p => p.id)).size !== members.length || members.length !== ({individual:1,pair:2,group:3}[mode])) return "";
+  const titles = {individual:"1인 감각 서명 분석",pair:"2인 감각 간섭 분석",group:"3인 연계 분석"};
+  const intro = [
+    `# NSD 감각 간섭 보고서 — ${titles[mode]}용 AI 분석 패키지`,
+    "아래 자료는 캐릭터 설문으로 계산한 점수표와 해석 기준입니다. 자료만으로 세부 성향을 추론해 주세요.",
+    "",
+    "## 1. NSD 세계관과 검사 배경",
+    "- 센티넬은 감각 자극과 부하도 상승, 폭주 전조에 대응합니다.",
+    "- 가이드는 가이딩을 수행하며 '가이딩 잔량'을 소모합니다. 가이딩 잔량이 0이 되면 '공명 고갈' 상태가 됩니다.",
+    "- 가이딩은 모든 두 사람 사이에서 자동으로 일어나는 연결이 아닙니다. 센티넬·가이드 사이에 상시 정신 링크나 이를 끊는 행위가 있다고 가정하지 마세요.",
+    "- 감각 간섭은 동행하는 인물들이 주고받는 자극, 완충, 경계, 회복 방식에 대한 분석 표현입니다. 센티넬끼리 또는 가이드끼리도 서로의 반응을 비교할 수 있습니다.",
+    "",
+    "## 2. 설문 구성과 점수 해석",
+    "- 캐릭터마다 공통 10점 척도 16문항 + 직군 전용 10점 척도 24문항 + 공통 상황 4개 + 직군 전용 상황 4개, 총 48문항에 응답합니다.",
+    "- 센티넬/가이드는 전용 질문의 내용이 다르지만, 6축은 같은 기준으로 환산하여 비교합니다.",
+    "- 6축 점수는 해당 축의 척도 응답(역채점 반영) 평균에 상황 선택의 소규모 보정을 더한 1~10점 값입니다.",
+    "- 세부 점수 12개는 각 축의 질문을 두 문항군으로 나눈 평균입니다. 별개의 독립적인 능력 점수가 아닙니다.",
+    "- 점수가 높다고 반드시 좋은 능력이나 성격을 뜻하지 않습니다. 높음/낮음은 그 축의 두 반응 방향을 나타냅니다.",
+    "- 아래 상황 선택은 실제 응답자가 선택한 행동입니다. 상황의 맥락과 선택 이유의 단서를 우선 참고하세요.",
+    "- 이 패키지에는 원본 40문항의 개별 점수는 포함하지 않습니다. 제시되지 않은 개별 응답이나 성격을 확정하지 마세요.",
+    "",
+    "6개 감각 축의 정의",
+    ...DOMAINS.map((d, i) => `${i + 1}. ${d.short}: ${d.desc} | 낮은 방향: ${d.lo} / 높은 방향: ${d.hi}`),
+    "",
+    "## 3. 캐릭터별 기록",
+    ...members.map((p, i) => aiScorecardProfile(p, String.fromCharCode(65 + i))),
+    ""
+  ];
+  if (mode === "pair") {
+    const [a,b] = members, r=pairResult(a,b);
+    intro.push(
+      "## 4. 두 사람의 방향별 계산 결과",
+      `관계 유형: ${r.title} (관계 원형 ${r.typeId+1}/12, 반응 결 ${r.postureId+1}/8)`,
+      `가장 비슷한 감각 축: ${DOMAINS[r.common].short}`,
+      `가장 다른 감각 축: ${DOMAINS[r.difference].short}`,
+      `${a.name} → ${b.name}: 자극 ${r.fromAToB.stimulation}, 완충 ${r.fromAToB.buffer}, 차이 ${r.fromAToB.delta>=0?"+":""}${r.fromAToB.delta}`,
+      `${b.name} → ${a.name}: 자극 ${r.fromBToA.stimulation}, 완충 ${r.fromBToA.buffer}, 차이 ${r.fromBToA.delta>=0?"+":""}${r.fromBToA.delta}`,
+      "두 방향은 별도 계산합니다. 자극은 한 사람이 상대에게 전하는 표현·감각 반응이 상대의 수용성과 만날 때의 강도, 완충은 위기 대응과 징후 파악·경계 조율이 상대에게 제공하는 조절 여지입니다.",
+      "자극·완충 수치는 각 인물의 6축 점수에 기반한 비교 지표(5~95 범위)이며 실제 게임 부하도 증감값이 아닙니다.",
+      ""
+    );
+  }
+  if (mode === "group") {
+    const t=trioResult(members);
+    const pairs=[[members[0],members[1]],[members[0],members[2]],[members[1],members[2]]];
+    intro.push("## 4. 세 사람의 비교 결과",
+      `세 사람이 가장 비슷한 감각 축: ${DOMAINS[t.common].short}`,
+      `세 사람의 차이가 가장 큰 감각 축: ${DOMAINS[t.variable].short}`,
+      "아래 세 쌍은 서로 다른 방향으로 자극·완충을 계산합니다.",
+      ...pairs.flatMap(([a,b])=>{
+        const ab=interaction(a,b), ba=interaction(b,a), r=pairResult(a,b);
+        return [`- ${a.name} ↔ ${b.name} | 관계 유형: ${r.title}`,
+          `  ${a.name} → ${b.name}: 자극 ${ab.stimulation}, 완충 ${ab.buffer}, 차이 ${ab.delta>=0?"+":""}${ab.delta}`,
+          `  ${b.name} → ${a.name}: 자극 ${ba.stimulation}, 완충 ${ba.buffer}, 차이 ${ba.delta>=0?"+":""}${ba.delta}`];
+      }),
+      "자극·완충은 각 인물의 6축에서 산출한 비교 지표(5~95 범위)입니다. 셋이 함께할 때의 효과를 단순 합산하지 마세요.",
+      "관찰 역할 참고: '전조 감지'가 높은 인물은 징후 관찰, '완충 개입'이 높은 인물은 자극 조절, '경계 조율'이 높은 인물은 동의와 범위 확인에 더 익숙할 수 있습니다. 실제 역할은 고정되지 않습니다.",
+      "");
+  }
+  const prompts = [
+    "## 5. AI에게 요청하는 분석",
+    "결과물을 자연스러운 한국어 존댓말 보고서로 작성해 주세요. 항목별로 수치와 상황 선택을 근거로 제시하되, 결과 문장에 반복적인 면책·제작자 설명을 넣지 마세요.",
+    "설정에 없는 정신적 링크, 능력, 공식 부하도 수치 변화, 사건, 인물 관계(연애·혈연 등)를 멋대로 만들어 확정하지 마세요. 불확실한 부분은 가능성으로 표현해 주세요.",
+    "성향을 좋음/나쁨으로 단순 순위화하지 말고, 강점과 약점이 상황에 따라 어떻게 뒤바뀌는지 자세히 풀어 주세요."
+  ];
+  if (mode === "individual") prompts.push("특히 감각 수용·표현·위기 반응·지원 수용/제공·회복을 연결하여 개인의 행동 패턴과 예상되는 갈등·성장 지점을 분석해 주세요.");
+  if (mode === "pair") prompts.push("특히 A→B와 B→A를 분리하여 자극과 완충의 비대칭성, 오해하기 쉬운 순간, 효과적인 협력과 충돌 상황, 관계의 변화를 구체적으로 설명해 주세요.");
+  if (mode === "group") prompts.push("특히 세 쌍의 방향별 차이와 세 사람 전체의 역할 분담, 한 사람이 빠졌을 때 변화할 수 있는 역학, 함께 위기를 맞을 때의 강점과 취약점을 분석해 주세요.");
+  return [...intro,...prompts].join("\n");
+}
+
+async function copyAIAnalysis(mode, id) {
+  const text=buildAIScorecard(mode,id);
+  if(!text) {toast("분석할 캐릭터를 먼저 선택해 주세요.",true);return;}
+  try {
+    if(!navigator.clipboard?.writeText) throw Error("clipboard unavailable");
+    await navigator.clipboard.writeText(text);
+    toast("AI 분석 패키지 복사 완료! AI 채팅에 붙여넣어 보세요.");
+  } catch (_) {
+    try {
+      const ta=document.createElement("textarea");
+      ta.value=text;ta.style.cssText="position:fixed;left:-9999px;top:0;";
+      document.body.appendChild(ta);ta.focus();ta.select();
+      const ok=document.execCommand("copy");
+      ta.remove();
+      if(!ok) throw Error("copy failed");
+      toast("AI 분석 패키지 복사 완료! AI 채팅에 붙여넣어 보세요.");
+    } catch (_) {
+      prompt("아래 AI 분석용 점수표를 전체 복사해 주세요.",text);
+    }
+  }
+}
+
 function handleUrlHash(){const parts=location.hash.slice(1).split('/');if(parts[0]==='pair'&&parts.length===3){state.choiceA=parts[1];state.choiceB=parts[2];state.tab='pair';}else if(parts[0]==='group'&&parts.length===4){state.choiceA=parts[1];state.choiceB=parts[2];state.choiceC=parts[3];state.tab='group';}}
 // Optional Firebase: activation requires firebase-config.js and cloud initialization.
 async function initializeFirebase(){const cfg=window.NSD_SENSORY_FIREBASE_CONFIG || window.NSD_FIREBASE_CONFIG;if(!cfg?.apiKey||!cfg?.projectId)return;state.cloudState='connecting';try{
