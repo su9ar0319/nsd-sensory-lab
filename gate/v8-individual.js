@@ -240,7 +240,7 @@ function gateV8Sections(p){
  const partner="이 인물과 동행하는 사람에게 가장 중요한 것은 "+h.request+"입니다. "+h2.request+"의 역할이 함께 있으면 도움이 될 수 있습니다. 반대로 "+gateV8AsFact(h.cost)+" 모르고 접근하면 서로를 오해하기 쉽습니다. "+(q[3].choice.axis===6?"도움을 거절한 동료 앞에서 거절 자체를 확인하는 선택을 했으므로, 직접 개입하기보다 가능한 지원 형태부터 합의하는 방식이 적합할 수 있습니다.":q[3].choice.axis===7?"도움의 필요성과 실제 지원 가능한 양을 함께 이야기하는 편이므로, 요청의 범위가 모호한 동료와 먼저 합의가 필요합니다.":q[3].choice.axis===3?"도움을 거절한 상대에게 위험 정보를 설명하는 쪽을 택했으므로, 설명이 설득이나 강요로 바뀌지 않도록 거리를 조절해야 합니다.":"동료가 도움을 거절할 때 직접 지원 대신 주변을 안정시키는 선택을 했으므로, 보이지 않는 지원까지 동의 범위에 포함할지 합의하는 편이 좋습니다.");
  const recovery="작전이 끝난 뒤에도 이 인물이 같은 속도로 움직인다고 가정해서는 안 됩니다. "+(p.axes[11]>=7?"사후 회복 점수가 높아 종료 이후의 상태 확인을 중요한 판단 절차로 보는 편입니다.":"사후 회복이 주력 성향에 비해 덜 선명하므로, 다음 임무 전에 상태를 점검하는 절차를 팀 차원에서 확보하면 도움이 됩니다.")+" "+(p.axes[7]>=7?"남겨 둔 자원의 양과 실제 회복된 상태는 다르기 때문에 다시 투입할 조건을 따로 확인하는 편입니다.":"자원 배분을 판단할 때 다음 단계에 필요한 여력을 별도로 계산하는 동료와 협력하면 좋습니다.")+" "+(p.role==="가이드"?"가이딩 중 다른 위협이 커지는 상황에서는 ":"가이딩이 늦어질 가능성이 생기면 ")+sceneSentence(scene4)+" "+(p.role==="가이드"?"가이딩을 수행했다면 가이딩 잔량을 확인해야 하며, 잔량이 0이면 공명 고갈 상태가 됩니다.":"현재 부하도와 감각 부담을 확인하지 않고 안정되었다고 단정해서는 안 됩니다.");
  const distinct="겉으로는 "+gateV7Josa(nm(high.i),"이","가")+" 가장 뚜렷한 인물처럼 보이지만, 이 성향 하나로는 설명하기 어렵습니다. "+gateV7Josa(nm(runner.i),"이","가")+" 함께 작동하는 방식과 가장 낮게 나온 "+gateV7Josa(nm(low.i),"이","가")+" 개입하는 조건을 나누어 봐야 합니다. "+gateV8Polite(lo.weak)+". "+(e.top[2].v>=6.8?"세 번째로 강하게 나타난 "+nm(e.top[2].i)+" 역시 주력 두 성향만으로는 예측하기 어려운 행동을 만들 수 있습니다.":"그 밖의 전술 축은 상대적으로 덜 선명하므로, 모든 상황에서 안정적으로 같은 능력을 발휘한다고 판단하기보다 선택을 관찰할 여지가 남습니다.")+" 대원들의 전진이 겹칠 때는 "+sceneSentence(q[2])+" 한편 동료의 상태를 다시 살펴야 하는 상황에서는 "+sceneSentence(q[6])+" 서로 다른 장면에서 무엇을 우선하는지 비교하면, 한 인물 안에서 전술의 기준이 달라지는 지점을 읽을 수 있습니다.";
- const cross=integrated.text||"기존 감각·색채 보고서와 연결되지 않아도 이 전술 해석은 독립적으로 성립합니다. 다만 감각적 반응이나 삶의 가치관에 관한 세부 해석은 이 검사만으로 확정하지 않습니다.";
+ const cross=integrated.text;
  const key=gateV8Agreement(p,e);
  const line=pri.quote;
  return {e,high,runner,low,pri,other,integrated,title:GATE_AXES[high.i].type+" · "+GATE_AXES[runner.i].short+" 연계형",subtitle:pri.id+" 우선 / "+other.id+" 동반",intro:"이 인물의 작전에서는 "+gateV7Josa(nm(high.i),"과","와")+" "+gateV7Josa(nm(runner.i),"이","가")+" 두드러집니다. 실제 선택에서 무엇을 먼저 지키고 어느 순간 판단을 바꾸는지 살피면, 이 인물의 전술이 더욱 선명해집니다.",core,sceneCards,tensionText,reconstruction,partner,recovery,distinct,cross,key,line};
@@ -253,7 +253,7 @@ function gateV8Reader(p){
  const sc=s.sceneCards.map((x,i)=>panel("SCENE "+String(i+1).padStart(2,"0")+" · "+x.scene,x.text)).join("");
  const evidence=s.e.top.map(v=>'<span class="gate-v7-chip">'+h(GATE_AXES[v.i].name)+' '+gateFixed(v.v)+'</span>').join("");
  const choiceEvidence=s.e.choices.map((c,i)=>'<li><b>Q'+String(i+17).padStart(2,"0")+'</b> '+h(c.scene.title)+' · '+h(c.label)+'</li>').join("");
- const matched="감각 보고서 "+(s.integrated.sensory?"연결됨":"미연결 / 현재 공개 기록 불러오기 불가")+" · 색채 보고서 "+(s.integrated.chroma?"연결됨":"미연결 / 현재 공개 기록 불러오기 불가");
+ const matched=[s.integrated.sensory?"감각 간섭 기록 연동":null,s.integrated.chroma?"색채·잔향 기록 연동":null].filter(Boolean).join(" · ");
  return '<section class="surface gate-v7-report" id="gatePersonal"><div class="eyebrow">NSD / INDIVIDUAL OPERATIONAL STUDY · V8</div><div class="gate-v7-cover"><small>'+h(p.role)+' / INDIVIDUAL GATE REPORT</small><h2>'+h(p.name)+' · '+h(s.title)+'</h2><p>'+h(s.intro)+'</p><p class="gate-v8-subline">'+h(s.subtitle)+'</p></div>'+
  chapter("01","MOTIVE","이 인물이 움직이는 이유")+panel("주력 전술과 행동 동기",s.core)+
  chapter("02","FIELD CHOICES","현장에서 실제로 고른 선택")+'<div class="gate-v7-scenes">'+sc+'</div>'+
@@ -262,9 +262,9 @@ function gateV8Reader(p){
  chapter("05","INTERFERENCE","2인·3인 동행자가 알아야 할 것")+panel("협력과 갈등의 실제 조건",s.partner)+panel("미리 합의할 내용",s.key)+
  chapter("06","AFTER ACTION","철수와 회복, 다음 게이트")+panel("작전 종료 이후의 판단",s.recovery)+
  chapter("07","DISTINCTION","비슷한 유형이라도 다른 이유")+panel("다른 캐릭터와 갈라지는 선택",s.distinct)+
- chapter("08","CROSS REPORT","감각·색채 기록과의 교차 해석")+panel("연동 자료에서 얻을 수 있는 보조 근거",s.cross)+
- chapter("09","VOICE","이 캐릭터가 남길 법한 한마디")+'<blockquote class="gate-v7-quote">'+h(s.line)+'</blockquote>'+
- '<details class="gate-v7-evidence"><summary>연구자용 수치 및 상황 선택 확인</summary><div class="gate-v7-chips">'+evidence+'</div><p>'+h(matched)+'</p><h4>8개 상황 응답 원문</h4><ol class="gate-v8-choice-evidence">'+choiceEvidence+'</ol><p></p></details>'+
+ (s.cross?chapter("08","CROSS REPORT","감각·색채 기록과의 교차 해석")+panel("감각과 가치관이 작전에 남기는 흔적",s.cross):"")+
+ chapter(s.cross?"09":"08","VOICE","이 캐릭터가 남길 법한 한마디")+'<blockquote class="gate-v7-quote">'+h(s.line)+'</blockquote>'+
+ '<details class="gate-v7-evidence"><summary>연구자용 수치 및 상황 선택 확인</summary><div class="gate-v7-chips">'+evidence+'</div>'+(matched?'<p>'+h(matched)+'</p>':"")+'<h4>8개 상황 응답 원문</h4><ol class="gate-v8-choice-evidence">'+choiceEvidence+'</ol></details>'+
  '<div class="row actions"><button class="btn primary" onclick="gateFromSolo(\''+h(p.id)+'\',\'pair\')">2인 동행 분석</button><button class="btn light" onclick="gateFromSolo(\''+h(p.id)+'\',\'trio\')">3인 작전 시뮬레이션</button><button class="btn light" onclick="window.print()">인쇄 · PDF</button></div></section>';
 }
 function gateV8Solo(p){
