@@ -660,3 +660,72 @@ const GATE_V13_ROLE_SCENES=[
     }
   }
 ];
+
+
+/* Twelve selectable briefings, each grounded in one of eight actual answered
+ * survey scenarios. Alternate scene framing is decided from other real responses.
+ * Roles retain their own action branches for the final four survey scenarios. */
+const GATE_V13_SCENES=[
+ ...GATE_V12_SCENES.map((scene,i)=>({...scene,questionIndex:i})),
+ ...GATE_V13_ALT_SCENES,
+ ...GATE_V13_ROLE_SCENES
+];
+function gateV13ScenarioRank(ps){
+ const result=[];
+ for(let q=0;q<8;q++){
+  const choices=ps.map(p=>gateV8Choice(p,q));
+  const axisCodes=choices.map(o=>o.choice.axis);
+  const scores=axisCodes.map((code,i)=>Number.isFinite(ps[i].axes[code])?ps[i].axes[code]:5);
+  const axesSpread=Math.max(...scores)-Math.min(...scores);
+  const axisDiversity=new Set(axisCodes).size;
+  const choiceDiversity=new Set(ps.map(p=>gateV12SafeChoice(p,q))).size;
+  const mismatches=ps.filter((p,i)=>scores[i]<5.1).length;
+  const motiveCount=ps.reduce((total,p,i)=>{
+   const best=p.axes.indexOf(Math.max(...p.axes));
+   return total+(best===axisCodes[i]?1:0);
+  },0);
+  const score=(axisDiversity-1)*2.12+
+   (choiceDiversity-1)*.64+
+   axesSpread*.25+
+   mismatches*.22+
+   motiveCount*.21+
+   (q===5?.29:0)+(q===6?.24:0)+(q===7?.15:0);
+  result.push({questionIndex:q,score,axesSpread,axisDiversity});
+ }
+ return result.sort((a,b)=>b.score-a.score||a.questionIndex-b.questionIndex);
+}
+function gateV13SceneFor(ps){
+ const chosen=gateV13ScenarioRank(ps)[0];
+ const q=chosen.questionIndex;
+ if(q>=4)return GATE_V13_SCENES[q+4];
+ // Two distinct operation events may test the same choice; the alternative
+ // depends on other answers, not on any profile name or ID.
+ const companionResponses=ps.reduce((total,p,i)=>
+  total+gateV12SafeChoice(p,4+(q+i)%4)+(p.choices[(q+1)%4]??0),0);
+ const variant=companionResponses%2;
+ return GATE_V13_SCENES[q+(variant?4:0)];
+}
+gateV12Conversation=function(ps,group){
+ if(!Array.isArray(ps)||ps.length<2||ps.length>3||ps.some(p=>
+  !p||!Array.isArray(p.choices)||p.choices.length<8||!Array.isArray(p.axes)||p.axes.length<12
+ ))return null;
+ const scene=gateV13SceneFor(ps),idx=scene.questionIndex;
+ const a=gateV12SafeChoice(ps[0],idx),b=gateV12SafeChoice(ps[1],idx);
+ const roleScene=!!scene.roleReply;
+ const first=roleScene?scene.first[ps[0].role]?.[a]:scene.first[a];
+ const second=scene.reply[a][b]+(roleScene?" "+(scene.roleReply[ps[1].role]?.[b]||""):"");
+ const lines=[
+  {name:ps[0].name,role:ps[0].role,text:first},
+  {name:ps[1].name,role:ps[1].role,text:second}
+ ];
+ if(ps.length===3){
+  const c=gateV12SafeChoice(ps[2],idx);
+  const third=scene.third[b][c]+(roleScene?" "+(scene.roleThird[ps[2].role]?.[c]||""):"");
+  lines.push({name:ps[2].name,role:ps[2].role,text:third});
+ }
+ return {id:scene.id,title:scene.title,situation:scene.situation,sceneIndex:GATE_V13_SCENES.indexOf(scene),questionIndex:idx,lines};
+};
+// These builders are already used by pair/trio reports and AI package copying.
+// The visual layout and one-turn-per-character format remain untouched.
+if(typeof gateRender==="function"&&typeof gateState!=="undefined"&&
+ (gateState.tab==="pair"||gateState.tab==="trio"))gateRender();
