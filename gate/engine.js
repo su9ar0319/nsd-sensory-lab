@@ -155,8 +155,9 @@ function gateTrio(ps){
    const p=ps[i],active=p.role==="센티넬";
    const guideChoice=p.choices[8+stage];
    // 가이딩은 자동 발생하지 않습니다. 이 모형에서는 관련 행동을 명시적으로 선택했을 때만 잔량을 소모합니다.
-   const guiding=!active&&((stage===0&&guideChoice===1)||(stage===1&&guideChoice===1)||(stage===3&&guideChoice===0)||(stage===4&&guideChoice===1)||(stage===5&&guideChoice===1)||(stage===6&&guideChoice===1));
-   const drain=active?Math.max(3,Math.round(pressure*.14+p.axes[5]*.5-p.axes[7]*.35)):guiding?Math.max(3,Math.round(pressure*.13+p.axes[6]*.2-p.axes[7]*.45)):0;
+   const requestedGuiding=!active&&((stage===0&&guideChoice===1)||(stage===1&&guideChoice===1)||(stage===3&&guideChoice===0)||(stage===4&&guideChoice===1)||(stage===5&&guideChoice===1)||(stage===6&&guideChoice===1));
+   const guiding=requestedGuiding&&old.value>0;
+   const drain=active?Math.max(3,Math.round(pressure*.14+p.axes[5]*.5-p.axes[7]*.35)):guiding?Math.min(old.value,Math.max(3,Math.round(pressure*.13+p.axes[6]*.2-p.axes[7]*.45))):0;
    const recovery=stage===6?Math.max(3,Math.round(p.axes[11]*1.3)):0;
    const value=active?Math.round(gateClamp(old.value+drain-recovery)):Math.round(gateClamp(old.value-drain+recovery));
    localResource.push({name:p.name,role:p.role,before:old.value,after:value,change:active?value-old.value:old.value-value,kind:active?"부하도 모형":"가이딩 잔량 모형",guiding});
