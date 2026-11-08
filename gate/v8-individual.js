@@ -352,7 +352,7 @@ function gateV8Reader(p){
  (s.cross?chapter("08","CROSS REPORT","감각·색채 기록과의 교차 해석")+panel("감각과 가치관이 작전에 남기는 흔적",s.cross):"")+
  chapter(s.cross?"09":"08","VOICE","이 캐릭터가 남길 법한 한마디")+'<blockquote class="gate-v7-quote">'+h(s.line)+'</blockquote>'+
  '<details class="gate-v7-evidence"><summary>연구자용 수치 및 상황 선택 확인</summary><div class="gate-v7-chips">'+evidence+'</div>'+(matched?'<p>'+h(matched)+'</p>':"")+'<h4>8개 상황 응답 원문</h4><ol class="gate-v8-choice-evidence">'+choiceEvidence+'</ol></details>'+
- '<div class="row actions"><button class="btn primary" onclick="gateFromSolo(\''+h(p.id)+'\',\'pair\')">2인 동행 분석</button><button class="btn light" onclick="gateFromSolo(\''+h(p.id)+'\',\'trio\')">3인 작전 시뮬레이션</button><button class="btn light" onclick="window.print()">인쇄 · PDF</button></div></section>';
+ '<div class="row actions"><button class="btn primary" onclick="gateFromSolo(\''+h(p.id)+'\',\'pair\')">2인 동행 분석</button><button class="btn light" onclick="gateFromSolo(\''+h(p.id)+'\',\'trio\')">3인 작전 시뮬레이션</button></div></section>';
 }
 function gateV8Solo(p){
  const r=gateV8Sections(p);
