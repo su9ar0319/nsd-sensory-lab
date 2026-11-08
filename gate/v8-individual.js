@@ -208,7 +208,7 @@ function gateV8Agreement(p,e){
   변경:"상황에 따라 전술을 바꾸는 편이므로, 변경 내용을 언제 누구에게 알릴지 미리 정해 두는 편이 좋습니다.",
   귀환:"작전 이후까지 살피는 경향이 있으므로, 귀환 이후 상태 확인과 다음 투입 기준을 같이 합의해야 합니다."
  };
- const change=q[0]===q[1]?"초기 보고와 진입 상황에서 비슷한 대응 속도를 보인다는 점도 참고할 만합니다.":"초기 정보가 충돌할 때와 진입 지점에서 예상 밖의 신호를 만났을 때 서로 다른 접근을 택하므로, 대응을 전환할 시점도 함께 맞추는 것이 좋습니다.";
+ const change=e.choices[0].choice.axis===e.choices[1].choice.axis?"초기 보고와 진입 상황에서 비슷한 대응 속도를 보인다는 점도 참고할 만합니다.":"초기 정보가 충돌할 때와 진입 지점에서 예상 밖의 신호를 만났을 때 서로 다른 접근을 택하므로, 대응을 전환할 시점도 함께 맞추는 것이 좋습니다.";
  return support+" "+movement+" "+critical+" "+reserve+" "+emphasis[priority]+" "+change;
 }
 function gateV8Sections(p){
