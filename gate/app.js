@@ -256,7 +256,7 @@ async function gateStartCloud(){
   const cred=await authLib.signInAnonymously(auth),uid=cred.user.uid;
   const ownRef=id=>fireLib.doc(db,"gateUsers",uid,"records",id),publicRef=id=>fireLib.doc(db,"gatePublicProfiles",id);
   gateState.cloud={
-   async save(p){const batch=fireLib.writeBatch(db);batch.set(ownRef(p.id),{...p,ownerUid:uid});if(p.isPublic)batch.set(publicRef(p.id),{...gatePublicRecord(p),ownerUid:uid});else batch.delete(publicRef(p.id));await batch.commit()},
+   async save(p){const batch=fireLib.writeBatch(db);batch.set(ownRef(p.id),{...p,ownerUid:uid});if(p.isPublic)batch.set(publicRef(p.id),{...gatePublicRecord(p),ownerUid:uid});else if(gateState.directory.some(x=>x.id===p.id))batch.delete(publicRef(p.id));await batch.commit()},
    async remove(p){const batch=fireLib.writeBatch(db);batch.delete(ownRef(p.id));if(p.isPublic)batch.delete(publicRef(p.id));await batch.commit()},
    async refresh(){
     const own=await fireLib.getDocs(fireLib.collection(db,"gateUsers",uid,"records"));
