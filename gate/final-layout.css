@@ -70,6 +70,8 @@
  .surface.report .gate-field-scene-grid > .analysis-card{padding:17px 16px}
 }
 @media print{
+ .surface.report .role-grid,
+ .surface.report .resource-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
  .surface.report .gate-field-scene-grid > .analysis-card,
  .surface.report .gate-report-cards--5 > .analysis-card{
   break-inside:avoid;
