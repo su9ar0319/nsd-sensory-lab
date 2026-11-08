@@ -33,6 +33,7 @@ const GATE_V7_SENSORY_MOTIVES=[
 function gateV7Josa(word,withFinal,withoutFinal){
  const text=String(word??"").trim();
  if(!text)return text;
+ if(/[0-9]$/.test(text)){const ending=[true,true,false,true,false,false,true,true,true,false][Number(text.slice(-1))];return text+(ending?withFinal:withoutFinal)}
  const cp=text.charCodeAt(text.length-1),final=(cp>=0xAC00&&cp<=0xD7A3)?(cp-0xAC00)%28:null;
  return text+(final===null?withoutFinal:final?withFinal:withoutFinal);
 }
