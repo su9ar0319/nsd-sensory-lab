@@ -110,7 +110,7 @@ function gateV8Integrated(p){
  if(sensory){
   const top=GATE_V8_SENSORY_AXIS[sensory.top],related=sensoryWithTactical[sensory.top],axis=GATE_AXES[related].name,score=p.axes[related];
   const nearby=sensory.secondScore>=sensory.score-.9?" "+GATE_V8_SENSORY_AXIS[sensory.second]+"도 비슷하게 두드러져, 두 감각 반응이 상황에 따라 번갈아 나타날 수 있습니다.":"";
-  const contrast=score>=7?gateV7Josa(axis,"이","가")+"도 높은 편입니다. 감각을 받아들이는 방식과 작전에서 택하는 대응이 서로 맞물리는 장면을 살펴볼 만합니다.":score<=4.5?gateV7Josa(axis,"은","는")+" 상대적으로 낮게 나타납니다. 감각의 민감함과 실제 작전에서 앞세우는 판단 기준이 서로 다를 수 있다는 점이 흥미롭습니다.":gateV7Josa(axis,"은","는")+" 중간 수준입니다. 감각 반응이 강해도 현장에서는 다른 전술을 먼저 택할 여지가 있습니다.";
+  const contrast=score>=7?axis+"도 높은 편입니다. 감각을 받아들이는 방식과 작전에서 택하는 대응이 서로 맞물리는 장면을 살펴볼 만합니다.":score<=4.5?gateV7Josa(axis,"은","는")+" 상대적으로 낮게 나타납니다. 감각의 민감함과 실제 작전에서 앞세우는 판단 기준이 서로 다를 수 있다는 점이 흥미롭습니다.":gateV7Josa(axis,"은","는")+" 중간 수준입니다. 감각 반응이 강해도 현장에서는 다른 전술을 먼저 택할 여지가 있습니다.";
   pieces.push("감각 간섭 기록에서는 "+gateV7Josa(top,"이","가")+" 두드러집니다."+nearby+" 게이트 작전에서 이에 대응하는 "+contrast+(typeof sensory.facetGap==="number"&&sensory.facetGap>=2?" 같은 감각 축 안에서도 반응의 편차가 있어, 긴장이 높아질수록 행동이 한 방향으로만 고정되지는 않을 듯합니다.":""));
  }
  if(chroma){
