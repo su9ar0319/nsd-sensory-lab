@@ -146,7 +146,7 @@ function gateDirectionalView(d){
 }
 
 function gateAnalyticCards(cards,type){
- return `<div class="analysis-grid">${cards.map((x,i)=>`<article class="analysis-card ${type}"><span class="label">${type==="positive"?"SYNERGY":"RISK"} / ${String(i+1).padStart(2,"0")}</span><h4>${gateEsc(x.title)}</h4>${type==="positive"?`<div class="analysis-chunk"><b>활성 조건</b><p>${gateEsc(x.condition)}</p></div><div class="analysis-chunk"><b>실제 효과</b><p>${gateEsc(x.action||x.effect)}</p></div><div class="analysis-chunk"><b>깨지는 순간</b><p>${gateEsc(x.break)}</p></div>`:`<div class="analysis-chunk"><b>발동 계기</b><p>${gateEsc(x.trigger)}</p></div><div class="analysis-chunk"><b>확대 경로</b><p>${gateEsc(x.chain)}</p></div><div class="analysis-chunk"><b>대응 방법</b><p>${gateEsc(x.mitigation||x.counter)}</p></div>`}</article>`).join("")}</div>`;
+ return `<div class="analysis-grid gate-report-cards gate-report-cards--${cards.length}">${cards.map((x,i)=>`<article class="analysis-card ${type}"><span class="label">${type==="positive"?"SYNERGY":"RISK"} / ${String(i+1).padStart(2,"0")}</span><h4>${gateEsc(x.title)}</h4>${type==="positive"?`<div class="analysis-chunk"><b>활성 조건</b><p>${gateEsc(x.condition)}</p></div><div class="analysis-chunk"><b>실제 효과</b><p>${gateEsc(x.action||x.effect)}</p></div><div class="analysis-chunk"><b>깨지는 순간</b><p>${gateEsc(x.break)}</p></div>`:`<div class="analysis-chunk"><b>발동 계기</b><p>${gateEsc(x.trigger)}</p></div><div class="analysis-chunk"><b>확대 경로</b><p>${gateEsc(x.chain)}</p></div><div class="analysis-chunk"><b>대응 방법</b><p>${gateEsc(x.mitigation||x.counter)}</p></div>`}</article>`).join("")}</div>`;
 }
 
 function gateRenderPair(){
@@ -159,7 +159,7 @@ function gateRenderPair(){
   <div class="chapter"><span>02 / SYNERGY</span><h3>위험 구역에서 열리는 공동 대응</h3></div>${gateAnalyticCards(r.synergies,"positive")}
   <div class="chapter"><span>03 / RISK</span><h3>작전 실패로 이어지는 위험 연쇄</h3></div>${gateAnalyticCards(r.debuffs,"negative")}
   <div class="chapter"><span>04 / RESOURCE</span><h3>직군과 자원 관리</h3></div><div class="sub-report">${gateEsc(r.resources)}</div>
-  <div class="chapter"><span>05 / FIELD SCENES</span><h3>세 가지 게이트 위험 대응</h3></div><div class="analysis-grid">${r.scenes.map((o,i)=>`<article class="analysis-card"><span class="label">CASE ${i+1}</span><h4>${gateEsc(o.title)}</h4><p>${gateEsc(o.text)}</p></article>`).join("")}</div>
+  <div class="chapter"><span>05 / FIELD SCENES</span><h3>세 가지 게이트 위험 대응</h3></div><div class="analysis-grid gate-field-scene-grid">${r.scenes.map((o,i)=>`<article class="analysis-card"><span class="label">CASE ${i+1}</span><h4>${gateEsc(o.title)}</h4><p>${gateEsc(o.text)}</p></article>`).join("")}</div>
   ${typeof gateV12PairBlock==="function"?gateV12PairBlock(a,b):""}
   <div class="row actions"><button class="btn primary" onclick="gateCopyAI('pair')">AI 분석 패키지 복사</button><button class="btn light" onclick="gateShareMode('pair')">조합 링크 복사</button><button class="btn light" onclick="window.print()">인쇄 · PDF</button></div></section>`;
  }
