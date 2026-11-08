@@ -44,7 +44,7 @@ gatePair=function(a,b){
  if(result.directions&&result.directions.length===2){
   result.directions.forEach((d,i)=>{
    const source=i===0?a:b,target=i===0?b:a,src=gateV8Brief(source),dst=gateV8Brief(target);
-   d.sections[0].text=add(d.sections[0].text,"진입 지점에서 "+gateEngineJosa(source.name,"은","는")+" '"+src.choices[1].label+"'를 선택했습니다. 판단 이유는 "+src.choices[1].hint+". 한편 "+gateEngineJosa(target.name,"은","는")+" '"+dst.choices[1].label+"'를 선택했으며, "+dst.choices[1].hint+". 두 선택이 시작되는 순서를 맞추는 것이 중요합니다.");
+   d.sections[0].text=add(d.sections[0].text,"진입 지점에서 "+gateEngineJosa(source.name,"은","는")+" '"+src.choices[1].label+"'를 선택했습니다. 판단 이유는 "+gateV8Polite(src.choices[1].hint)+". 한편 "+gateEngineJosa(target.name,"은","는")+" '"+dst.choices[1].label+"'를 선택했으며, "+gateV8Polite(dst.choices[1].hint)+". 두 선택이 시작되는 순서를 맞추는 것이 중요합니다.");
    d.sections[1].text=add(d.sections[1].text,""+gateEngineJosa(source.name,"은","는")+" '"+src.core.id+"'에, "+gateEngineJosa(target.name,"은","는")+" '"+dst.core.id+"'에 무게를 두므로 같은 지시도 서로 다른 이유로 받아들일 수 있습니다.");
    d.sections[2].text=add(d.sections[2].text,"지원 거절 상황에서는 "+gateEngineJosa(source.name,"이","가")+" '"+src.choices[3].label+"'를, "+gateEngineJosa(target.name,"이","가")+" '"+dst.choices[3].label+"'를 선택했습니다. 이때 동의와 자원 상한을 하나의 조건으로 섞지 않고 분리해 확인해야 합니다.");
    d.sections[3].text=add(d.sections[3].text,e.shared+" "+e.bound);
