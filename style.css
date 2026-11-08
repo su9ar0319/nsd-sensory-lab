@@ -26,3 +26,37 @@
 .impact-grid{display:grid;gap:12px;margin-top:13px}.impact-item{border:1px solid #e4e5f3;background:#f8f8fd;padding:15px;border-radius:12px}.impact-item>span{font-weight:800;color:#383d6c;font-size:14px}.impact-values{display:flex;gap:20px;font-size:12px;margin:8px 0;color:#505783}.impact-bars{display:grid;gap:5px}.impact-bars i,.impact-bars em{display:block;height:9px;max-width:100%;border-radius:99px;background:#818ac5}.impact-bars em{background:#90b8af}
 @media(max-width:480px){.spectrum.tiny{padding:12px;min-height:149px}.spectrum.tiny h3{font-size:14px}.spectrum.tiny p{font-size:10px}.comparison-swatches.three .spectrum.tiny{min-height:155px;padding:10px}.comparison-swatches.three .spectrum.tiny h3{font-size:12px}.comparison-swatches.three .spectrum.tiny p{display:none}}
 @media print{.spectrum,.impact-item{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+/* 2인·3인 심화 결과지: 방향, 시너지, 제3자 영향 */
+.direction-story{background:#fafaff;border:1px solid #e2e4f4;border-radius:15px;padding:17px 19px;margin:14px 0 6px}
+.direction-story-heading{border-bottom:1px solid #e1e4f1;padding-bottom:13px;margin-bottom:4px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.direction-story-heading .report-eyebrow{width:100%}
+.direction-story-heading h4{font-size:17px;color:#31375e;margin:0;flex:1}
+.direction-state{font-size:11px;font-weight:800;color:#545c93;background:#eaecfa;padding:4px 10px;border-radius:100px}
+.direction-part{border-bottom:1px solid #e9eaf4;padding:14px 0}
+.direction-part:last-child{border:0;padding-bottom:2px}
+.direction-part b{display:block;color:#4d5483;font-size:12px;margin-bottom:7px}
+.direction-part p{font-size:14px;line-height:1.94;margin:0}
+.analysis-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-top:13px}
+.analysis-card{border-radius:12px;border:1px solid #dce4ef;background:#fafbff;padding:17px;min-width:0}
+.analysis-card.synergy{border-left:4px solid #659b91;background:#f5faf8}
+.analysis-card.debuff{border-left:4px solid #c88d92;background:#fff9f9}
+.analysis-card-meta{font-size:10px;font-weight:900;letter-spacing:.12em;color:#68748a;margin-bottom:8px}
+.analysis-card h4{font-size:14px;line-height:1.6;color:#34416c;margin:0 0 8px}
+.analysis-card p{font-size:13px;line-height:1.85;margin:0}
+.analysis-roles{display:grid;gap:11px;margin-top:14px}
+.analysis-role{display:flex;align-items:start;gap:13px;background:#f5f6fc;border:1px solid #e0e3f2;border-radius:12px;padding:16px}
+.analysis-role-index{display:flex;align-items:center;justify-content:center;flex:0 0 33px;height:33px;background:#e5e9fa;color:#394371;font-weight:900;border-radius:10px}
+.analysis-role b{display:block;color:#353d71;font-size:14px;margin-bottom:7px}
+.analysis-role p{font-size:13px;line-height:1.85;margin:0}
+.stage-card{border-left:3px solid #828dc3;padding:18px}
+.tri-pair{border:1px solid #dee2ef;border-radius:15px;padding:17px 19px;margin:13px 0;background:#fdfdff}
+.tri-pair h4{font-size:16px;margin:0 0 9px;color:#333b70}
+.tri-pair>.sub{margin-bottom:13px}
+.tri-direction{margin:13px 0;padding:13px 14px;background:#f5f6fc;border-radius:10px}
+.tri-direction b{display:block;font-size:12px;color:#424b87;margin-bottom:7px}
+.tri-direction p,.tri-third p{font-size:13px;line-height:1.95;margin:0}
+.tri-third{border-top:1px solid #e3e5ef;padding:14px 3px 0;margin-top:14px}
+.tri-third b{display:block;font-size:13px;color:#4a7770;margin-bottom:8px}
+@media(max-width:650px){.analysis-card-grid{grid-template-columns:1fr}.direction-story{padding:14px}.tri-pair{padding:14px}.direction-story-heading h4{font-size:15px}}
+@media print{.analysis-card,.analysis-role,.direction-story,.tri-pair,.stage-card{break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}.analysis-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
