@@ -135,7 +135,7 @@ function gateTrio(ps){
  let state=ps.map(p=>({id:p.id,name:p.name,role:p.role,value:p.role==="가이드"?Math.round(gateClamp(89-p.axes[5]*1.4+p.axes[7]*1.5)):Math.round(gateClamp(17+p.axes[5]*2.2-p.axes[7]*1.2))}));
  const stages=[];
  for(let stage=0;stage<7;stage++){
-  const riskBias=[-6,7,13,18,24,13,-11][stage];
+  const riskBias=[9,18,26,40,55,48,22][stage];
   const rolescore=stage===0?gateMean(ps.map(p=>p.axes[1])):stage===1?detect.axes[0]:stage===2?gateMean(ps.map(p=>p.axes[0])):stage===3?gateMean(ps.map(p=>p.axes[8])):stage===4?sustain.axes[7]:stage===5?lead.axes[10]:gateMean(ps.map(p=>p.axes[11]));
   const choices=ps.map(p=>gateChoice(p,stage<7?stage:7));
   const choiceAxes=ps.map(p=>gateScenarios(p.role)[stage].opts[p.choices[stage]].axis);
@@ -143,20 +143,20 @@ function gateTrio(ps){
   const shared=gateMean(ps.map(p=>p.axes[4]));
   const readiness=Math.round(rolescore*5+shared*1.4+(aligned?5:0));
   const currentThreat=threat;
-  const pressure=Math.round(gateClamp(threat+riskBias-readiness*.33+Math.max(0,stage-1)*3));
+  const pressure=Math.round(gateClamp(15+riskBias+threat*.35-readiness*.20));
   const successStep=readiness>=pressure-2;
   if(successStep)success++;else cohesion=gateClamp(cohesion-7);
   const localResource=[];
   state=state.map((old,i)=>{
    const p=ps[i],active=p.role==="센티넬";
-   const drain=active?Math.max(3,Math.round(pressure*.09+p.axes[5]*.5-p.axes[7]*.35)):Math.max(3,Math.round(pressure*.10+p.axes[6]*.2-p.axes[7]*.45));
+   const drain=active?Math.max(3,Math.round(pressure*.14+p.axes[5]*.5-p.axes[7]*.35)):Math.max(3,Math.round(pressure*.13+p.axes[6]*.2-p.axes[7]*.45));
    const recovery=stage===6?Math.max(3,Math.round(p.axes[11]*1.3)):0;
    const value=active?Math.round(gateClamp(old.value+drain-recovery)):Math.round(gateClamp(old.value-drain+recovery));
    localResource.push({name:p.name,role:p.role,before:old.value,after:value,change:active?value-old.value:old.value-value,kind:active?"부하도 모형":"가이딩 잔량 모형"});
    return {...old,value};
   });
   const critical=state.some(p=>p.role==="센티넬"?p.value>=86:p.value<=14);
-  threat=Math.round(gateClamp(pressure+(successStep?-10:10)+(critical?9:0)-((stage===5&&lead.axes[10]>7)?9:0)));
+  threat=Math.round(gateClamp(threat*.65+pressure*.35+(successStep?-5:7)+(critical?9:0)-((stage===5&&lead.axes[10]>7)?6:0)));
   cohesion=Math.round(gateClamp(cohesion+(successStep?3:-3)+(aligned?2:0)));
   const actor=ps[stage%3],roleText=stage===0?`정보가 먼저 모이면 ${lead.name}이(가) 초기 역할을 확정하고 ${detect.name}이(가) 확인할 신호를 좁힙니다.`:stage===1?`${detect.name}의 정찰이 첫 진입의 리듬을 정합니다. 관찰 범위가 겹치지 않도록 다른 대원은 후방을 살필 수 있습니다.`:stage===2?`처음 확인되지 않은 기척이 드러납니다. ${detect.name}이(가) 포착한 정보가 ${lead.name}에게 전달되는 순서가 중요합니다.`:stage===3?`행동이 엇갈리면 ${lead.name}은(는) 기존 배치를 유지할지 다른 방법을 택할지 선택해야 합니다.`:stage===4?`${sustain.name}은(는) 자원 사용의 한계를 확인합니다. 높은 부하도나 낮은 잔량은 위험을 높일 수 있습니다.`:stage===5?`목표를 이어갈지 철수할지 ${lead.name}이(가) 근거를 정리하고 각자의 의사를 확인해야 합니다.`:`작전이 끝나도 ${sustain.name}의 사후 상태 점검은 별개로 진행해야 합니다.`;
   const consequence=critical?`자원 임계 상태에 가까운 대원이 감지되어 후속 단계의 위험에 추가 영향을 줍니다.`:successStep?`이 단계의 판단이 일정 부분 맞아떨어져 다음 단계의 위협이 낮아지는 흐름입니다.`:`판단이 엇갈리거나 현장의 압박이 높아져 다음 단계에 부담이 남습니다.`;
