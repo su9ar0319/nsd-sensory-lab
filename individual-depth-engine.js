@@ -13,7 +13,7 @@ function soloCrosses(p){
    lo<4.5?`두 축 모두 조심스럽게 나타나므로 다른 사람이 행동을 기대하는 순간에도 한발 물러설 여지가 있습니다.`:
    `두 점수는 ${fixed(a[i])}점과 ${fixed(a[j])}점입니다. 상황이 바뀌면 두 감각 중 먼저 움직이는 쪽도 달라질 수 있습니다.`;
   return {title:`${DOMAINS[i].short} × ${DOMAINS[j].short}`,text:`${text} ${suffix}`,rank:d*.8+Math.max(0,hi-6)+Math.max(0,4.5-lo)+(idx===1?.5:0)};
- }).sort((x,y)=>y.rank-x.rank).slice(0,3);
+ }).sort((x,y)=>y.rank-x.rank).slice(0,2);
 }
 
 function soloFacets(p){
@@ -24,7 +24,7 @@ function soloFacets(p){
    gap>=1?`비슷한 감각을 다루는 질문에도 반응의 세기가 조금씩 달라집니다. 익숙한 상황에서는 자연스러운 선택이 낯선 상황에서는 망설임으로 바뀌는 식의 변화가 가능해집니다.`:
    `문항의 표현이 달라져도 유사한 방향으로 응답했습니다. 이 감각에서는 기본 리듬이 비교적 일정하므로, 다른 모습을 보여 주려면 환경이나 동료의 반응이 어떻게 달라졌는지에 주목하는 편이 좋습니다.`;
   return {title:`${d.short}의 내부 온도차`,gap,text:`같은 축의 두 문항군 평균은 ${fixed(l)}점과 ${fixed(r)}점으로 ${fixed(gap)}점 차이입니다. ${core} 전체 축 점수 ${fixed(a[i])}점만으로 보이지 않는 세부적인 반응의 차이를 읽을 수 있습니다.`};
- }).sort((x,y)=>y.gap-x.gap).slice(0,2);
+ }).sort((x,y)=>y.gap-x.gap).slice(0,1);
 }
 
 function soloDecisions(p){
@@ -83,7 +83,6 @@ function soloCooperation(p){
  return [
   {title:"동료에게 전하면 좋은 신호",text:`${speak} 실제 첫 혼선 장면에서는 '${clue(0)}'라는 방향을 선택했습니다. 이 반응을 보고 체계에 반영하면, 표현의 강도보다 정보의 명확성이 중요해집니다.`},
   {title:"지원의 범위를 함께 정하는 방법",text:`${help} 도움을 거절한 상대를 마주했을 때는 '${clue(1)}'라는 선택을 했다는 점도 함께 고려해야 합니다.`},
-  {title:"다시 움직일 시점을 정하는 방법",text:`${rest} 직군별 사후 상황에서는 '${clue(p.role==="센티넬"?7:6)}'라는 반응이 나타납니다.`}
  ];
 }
 
