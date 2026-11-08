@@ -1,0 +1,104 @@
+/* NSD Sensory / balanced final report layout.
+   Three narratives form a complete row; five cards use a balanced 3+2 composition.
+   No text truncation, hidden evidence, or changes to report calculations. */
+.card.result .solo-depth-grid.solo-depth-count-1{grid-template-columns:minmax(0,1fr)}
+.card.result .solo-depth-grid.solo-depth-count-3{
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:12px;
+ align-items:stretch;
+}
+.card.result .solo-depth-grid > .solo-depth-card{
+ min-width:0;
+ height:100%;
+ overflow-wrap:anywhere;
+}
+.card.result .analysis-card-grid.sensory-analysis-count-3{
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:12px;
+}
+.card.result .analysis-card-grid.sensory-analysis-count-5{
+ grid-template-columns:repeat(6,minmax(0,1fr));
+ gap:12px;
+ align-items:stretch;
+}
+.card.result .analysis-card-grid.sensory-analysis-count-5 > .analysis-card{grid-column:span 2}
+.card.result .analysis-card-grid.sensory-analysis-count-5 > .analysis-card:nth-last-child(-n+2){grid-column:span 3}
+.card.result .analysis-card-grid > .analysis-card{
+ min-width:0;
+ height:100%;
+ overflow-wrap:anywhere;
+}
+.card.result .analysis-roles{
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ align-items:stretch;
+ gap:12px;
+}
+.card.result .analysis-roles > .analysis-role{min-width:0;height:100%;overflow-wrap:anywhere}
+.card.result .sensory-scene-grid,
+.card.result .sensory-trio-detail-grid{
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ align-items:stretch;
+ gap:12px;
+ margin-top:12px;
+}
+.card.result .sensory-stage-grid{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ align-items:stretch;
+ gap:12px;
+ margin-top:12px;
+}
+.card.result .sensory-choice-grid{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ align-items:stretch;
+ gap:12px;
+ margin-top:12px;
+}
+.card.result .sensory-scene-grid > .memory-card,
+.card.result .sensory-trio-detail-grid > .memory-card,
+.card.result .sensory-stage-grid > .memory-card,
+.card.result .sensory-choice-grid > .memory-card{
+ margin:0;
+ min-width:0;
+ height:100%;
+ overflow-wrap:anywhere;
+}
+@media(max-width:1050px){
+ .card.result .analysis-card-grid.sensory-analysis-count-5{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .card.result .analysis-card-grid.sensory-analysis-count-5 > .analysis-card,
+ .card.result .analysis-card-grid.sensory-analysis-count-5 > .analysis-card:nth-last-child(-n+2){grid-column:auto}
+ .card.result .analysis-card-grid.sensory-analysis-count-5 > .analysis-card:last-child{grid-column:1/-1}
+}
+@media(max-width:960px){
+ .card.result .solo-depth-grid.solo-depth-count-3,
+ .card.result .analysis-card-grid.sensory-analysis-count-3,
+ .card.result .analysis-roles,
+ .card.result .sensory-scene-grid,
+ .card.result .sensory-trio-detail-grid{
+  grid-template-columns:minmax(0,1fr);
+ }
+}
+@media(max-width:680px){
+ .card.result .analysis-card-grid.sensory-analysis-count-5,
+ .card.result .sensory-stage-grid,
+ .card.result .sensory-choice-grid{
+  grid-template-columns:minmax(0,1fr);
+ }
+ .card.result .analysis-card-grid.sensory-analysis-count-5 > .analysis-card,
+ .card.result .analysis-card-grid.sensory-analysis-count-5 > .analysis-card:nth-last-child(-n+2),
+ .card.result .analysis-card-grid.sensory-analysis-count-5 > .analysis-card:last-child{grid-column:auto}
+}
+@media print{
+ .card.result .solo-depth-card,
+ .card.result .analysis-card,
+ .card.result .sensory-scene-grid > .memory-card,
+ .card.result .sensory-trio-detail-grid > .memory-card,
+ .card.result .sensory-stage-grid > .memory-card,
+ .card.result .sensory-choice-grid > .memory-card{
+  break-inside:avoid;
+  page-break-inside:avoid;
+ }
+}
