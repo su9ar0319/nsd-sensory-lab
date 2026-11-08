@@ -58,7 +58,7 @@ function gateV8Polite(fragment){
   ["커진다","커집니다"],["줄어든다","줄어듭니다"],
   ["본다","봅니다"],["한다","합니다"],["된다","됩니다"],
   ["좋다","좋습니다"],["쉽다","쉽습니다"],
-  ["있다","있습니다"],["없다","없습니다"],["이다","입니다"]
+  ["있다","있습니다"],["없다","없습니다"],["정보다","정보입니다"],["이다","입니다"]
  ];
  return String(fragment).split(/(\.\s*)/).map(part=>{
   const trimmed=part.trimEnd(),spaces=part.slice(trimmed.length);
