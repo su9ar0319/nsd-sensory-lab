@@ -341,7 +341,7 @@ function gateV8Reader(p){
  const evidence=s.e.top.map(v=>'<span class="gate-v7-chip">'+h(GATE_AXES[v.i].name)+' '+gateFixed(v.v)+'</span>').join("");
  const choiceEvidence=s.e.choices.map((c,i)=>'<li><b>Q'+String(i+17).padStart(2,"0")+'</b> '+h(c.scene.title)+' · '+h(c.label)+'</li>').join("");
  const matched=[s.integrated.sensory?"감각 간섭 기록 연동":null,s.integrated.chroma?"색채·잔향 기록 연동":null].filter(Boolean).join(" · ");
- return '<section class="surface gate-v7-report" id="gatePersonal"><div class="eyebrow">NSD / INDIVIDUAL OPERATIONAL STUDY · V11</div><div class="gate-v7-cover"><small>'+h(p.role)+' / INDIVIDUAL GATE REPORT</small><h2>'+h(p.name)+' · '+h(s.title)+'</h2><p>'+h(s.intro)+'</p><p class="gate-v8-subline">'+h(s.subtitle)+'</p></div>'+
+ return '<section class="surface gate-v7-report" id="gatePersonal"><div class="eyebrow">NSD / INDIVIDUAL REPORT · GATE · V11</div><div class="gate-v7-cover"><small>'+h(p.role)+' / INDIVIDUAL GATE REPORT</small><h2>'+h(p.name)+' · '+h(s.title)+'</h2><p>'+h(s.intro)+'</p><p class="gate-v8-subline">'+h(s.subtitle)+'</p></div>'+
  chapter("01","MOTIVE","이 인물이 움직이는 이유")+panel("주력 전술과 행동 동기",s.core)+
  chapter("02","FIELD CHOICES","현장에서 실제로 고른 선택")+'<div class="gate-v7-scenes">'+sc+'</div>'+
  chapter("03","INNER TENSION","장점과 취약함이 동시에 나타나는 지점")+panel("행동의 균열",s.tensionText)+
