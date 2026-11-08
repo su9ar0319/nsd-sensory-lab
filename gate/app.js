@@ -106,10 +106,10 @@ async function gateRemove(id){
 
 function gateProfileList(profiles,kind){
  if(!profiles.length)return `<div class="empty">표시할 캐릭터가 아직 없어요.</div>`;
- return `<div class="profile-list">${profiles.map(p=>`<div class="profile-row"><div><b>${gateEsc(p.name)}</b><span>${gateEsc(p.role)} · ${gateEsc(gateSignature(p).name)}</span></div><div class="row"><button class="btn light" onclick="gateChoose('${p.id}')">1인 보기</button>${kind==="own"?`<button class="btn small" onclick="gateEdit('${p.id}')">수정</button>${p.localOnly?`<button class="btn small" onclick="gateV7RetrySave('${p.id}')">Firebase 저장 재시도</button>`:""}<button class="btn small danger" onclick="gateRemove('${p.id}')">삭제</button>`:""}</div></div>`).join("")}</div>`;
+ return `<div class="profile-list">${profiles.map(p=>`<div class="profile-row"><div><b>${gateEsc(p.name)}</b><span>${gateEsc(p.role)} · ${gateEsc(gateSignature(p).name)}</span></div><div class="row"><button class="btn light" onclick="gateChoose('${p.id}','${kind}')">1인 보기</button>${kind==="own"?`<button class="btn small" onclick="gateEdit('${p.id}')">수정</button>${p.localOnly?`<button class="btn small" onclick="gateV7RetrySave('${p.id}')">Firebase 저장 재시도</button>`:""}<button class="btn small danger" onclick="gateRemove('${p.id}')">삭제</button>`:""}</div></div>`).join("")}</div>`;
 }
 
-function gateChoose(id){gateState.selected=id;gateRender();document.getElementById("gatePersonal")?.scrollIntoView({behavior:"smooth",block:"start"})}
+function gateChoose(id,kind){if(kind==="public"){if(!gateState.directory.some(p=>p.id===id&&gateValid(p)))return;gateState.publicSelected=id}else{gateState.selected=id}gateRender();document.getElementById("gatePersonal")?.scrollIntoView({behavior:"smooth",block:"start"})}
 
 function gateLibrary(){
  const selected=gateGet(gateState.selected),own=gateState.own.filter(gateValid),imported=gateState.imported.filter(gateValid);
@@ -185,7 +185,7 @@ function gateRenderTrio(){
 
 function gatePublicView(){
  const list=gateState.directory.filter(gateValid);
- return `<section class="surface"><div class="row between"><div><div class="eyebrow">PUBLIC OPERATIVE DIRECTORY</div><h2>공개 전술 기록</h2><p class="muted">본인이 공개를 선택한 캐릭터의 프로필을 열람하고 동행 분석에 사용할 수 있습니다.</p></div><button class="btn light" onclick="gateCloudRefresh(true)">공개 목록 새로고침</button></div><p class="fine">연결 상태: ${gateEsc(gateState.cloudState)} · 기존 감각 간섭 연구소와 다른 컬렉션을 사용합니다. 서버 권한 설정에 따라 온라인 공유가 제한될 수 있습니다.</p>${list.length?gateProfileList(list,"public"):'<p class="empty">현재 열람할 수 있는 공개 프로필이 없어요. 공유 링크 또는 JSON으로 다른 캐릭터를 가져올 수도 있습니다.</p>'}</section>`;
+ return `<section class="surface"><div class="row between"><div><div class="eyebrow">PUBLIC OPERATIVE DIRECTORY</div><h2>공개 전술 기록</h2><p class="muted">본인이 공개를 선택한 캐릭터의 프로필을 열람하고 동행 분석에 사용할 수 있습니다.</p></div><button class="btn light" onclick="gateCloudRefresh(true)">공개 목록 새로고침</button></div><p class="fine">연결 상태: ${gateEsc(gateState.cloudState)} · 기존 감각 간섭 연구소와 다른 컬렉션을 사용합니다. 서버 권한 설정에 따라 온라인 공유가 제한될 수 있습니다.</p>${list.length?gateProfileList(list,"public"):'<p class="empty">현재 열람할 수 있는 공개 프로필이 없어요. 공유 링크 또는 JSON으로 다른 캐릭터를 가져올 수도 있습니다.</p>'}</section>${list.find(p=>p.id===gateState.publicSelected)?gateRenderSolo(list.find(p=>p.id===gateState.publicSelected)):""}`;
 }
 
 function gateExport(){
