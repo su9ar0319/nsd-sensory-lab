@@ -1,0 +1,24 @@
+/* V8 narrative hierarchy: preserve C theme charcoal + crimson, improve longform reading. */
+.gate-v8-subline{
+ display:inline-block!important;width:auto;max-width:100%;
+ margin:13px 0 0!important;padding:5px 12px;
+ color:#F3D7D5!important;background:rgba(162,62,67,.25);
+ border:1px solid rgba(222,143,143,.35);border-radius:4px;
+ font-size:11px!important;letter-spacing:.045em;font-weight:750
+}
+.gate-v7-report .gate-v7-cover h2{font-weight:850}
+.gate-v7-report .gate-v7-panel p{line-height:2.05}
+.gate-v7-report .gate-v7-scenes .gate-v7-panel p{line-height:1.95}
+.gate-v7-report .gate-v7-panel+.gate-v7-panel{margin-top:9px}
+.gate-v7-report .gate-v7-panel strong{color:#772E35}
+.gate-v7-report .gate-v7-chapter{border-top:1px solid #EBE6E2;padding-top:16px}
+.gate-v7-report .gate-v7-chapter:first-of-type{border-top:0}
+@media(max-width:700px){
+ .gate-v7-report .gate-v7-scenes{grid-template-columns:1fr}
+ .gate-v7-report .gate-v7-cover h2{font-size:22px}
+ .gate-v7-report .gate-v7-panel{padding:18px}
+}
+@media print{
+ .gate-v7-report .gate-v7-chapter{break-after:avoid}
+ .gate-v8-subline{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
