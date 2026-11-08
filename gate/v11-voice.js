@@ -287,7 +287,7 @@ function gateV11ChooseVoice(p,sections){
   const evidence=(scale-avg)*.46+topMatch+secondMatch+boosts[order];
   return {index,score:evidence,order};
  }).sort((a,b)=>b.score-a.score||a.order-b.order);
- const chosen=ranked[0],key=chosen.index===5?p.role+"5":String(chosen.index);
+ const chosen=ranked[0],key=chosen.index===5?(p.role==="가이드"?"guide5":"sentinel5"):String(chosen.index);
  const choices=group[key],answer=p.choices[chosen.index];
  return Array.isArray(choices)&&choices[answer]?choices[answer]:sections.line;
 }
