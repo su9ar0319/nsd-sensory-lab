@@ -15,33 +15,29 @@ function directionLayers(src,dst,avoid){
  const supp=pickNonrepeat(SYNERGY_DB.cues.support[supportType],seed,"support",avoid?.parts[2]?.paragraph);
  const effectType=v.delta>10?"debuff":v.delta< -10?"synergy":"mixed";
  const impact=pickNonrepeat(SYNERGY_DB.cues.effect[effectType],seed,"effect",avoid?.parts[4]?.paragraph);
- const roleType=src.role==="센티넬"&&dst.role==="센티넬"?"SS":src.role==="가이드"&&dst.role==="가이드"?"GG":"SG";
- const roleLine=pickNonrepeat(SYNERGY_DB.cues.role[roleType],seed,"role",avoid?.parts[3]?.paragraph);
  const all=getScenarios(src.role);
  const roleIndex=4+(Math.round(src.axes[1]*5+dst.axes[0]*7+src.axes[3]*3)%4);
  const commonIndex=(Math.round(src.axes[2]*3+dst.axes[4]*7))%4;
  const sourceScene=all[roleIndex],receiveScene=getScenarios(dst.role)[commonIndex];
  const sourceAct=sourceScene?.opts?.[src.choices[roleIndex]]?.[0]||"상황을 살핀다";
  const receiveAct=receiveScene?.opts?.[dst.choices[commonIndex]]?.[0]||"상황을 살핀다";
- const targetReading=dst.axes[0]>=6.8?`${dst.name}은(는) 작은 자극도 폭넓게 받아들이므로 ${src.name}의 행동이 오래 남을 여지가 있습니다.`:
-    dst.axes[0]<4.5?`${dst.name}은(는) 필요한 신호만 선별하려 해 ${src.name}의 뜻이 명확하게 전달되어야 합니다.`:
-    `${dst.name}은(는) 상황에 따라 자극의 강도를 조절하기 때문에 전달 시점이 반응을 좌우합니다.`;
  const roleDetail=src.role==="가이드"&&dst.role==="센티넬"?
    `${src.name}은(는) 자신의 가이딩 잔량과 ${dst.name}의 부하도 변화를 함께 확인할 필요가 있습니다. 가이딩을 수행한다면 그 범위와 종료 시점도 당사자와 합의해야 합니다.`:
-  src.role==="센티넬"&&dst.role==="가이드"?
-   `${src.name}이(가) 부하도 상승을 알리는 순간 ${dst.name}의 가이딩 잔량도 확인해야 합니다. 불편함을 숨기면 지원자가 필요한 시점을 가늠하기 어려워집니다.`:
-  src.role==="가이드"?
-   `${src.name}은(는) ${dst.name}과(와) 다른 가이딩 잔량을 지닙니다. 지원 순서를 정할 때 ${src.name}의 현재 여력을 별도로 확인하고, ${dst.name}의 지원 가능성까지 이미 확보된 자원처럼 계산하지 않는 편이 좋습니다.`:
-   `센티넬인 ${src.name}은(는) ${dst.name}의 상태를 자신의 부하도와 따로 살펴야 합니다. ${src.name}이(가) 주변 자극을 조정하거나 외부 가이딩 지원을 요청하는 식으로 행동할 수 있으며, ${dst.name}의 감각 부담을 무조건 대신 해결하는 관계는 아닙니다.`;
+   src.role==="센티넬"&&dst.role==="가이드"?
+   `${src.name}이(가) 부하도 상승을 알리는 순간 ${dst.name}의 가이딩 잔량도 확인해야 합니다. 불편함을 숨기면 지원자가 필요한 시점을 가늠하기 어려워집니다.`:"";
  const ending=v.delta>10?
   `${src.name}→${dst.name}에서는 자극 ${v.stimulation}에 비해 완충 ${v.buffer}이 낮아 부담이 앞서기 쉽습니다. ${impact}`:
   v.delta< -10?`${src.name}→${dst.name}에서는 완충 ${v.buffer}이 자극 ${v.stimulation}보다 높게 나타나 상대가 숨 돌릴 여지가 있습니다. ${impact}`:
   `${src.name}→${dst.name}에서는 자극 ${v.stimulation}과 완충 ${v.buffer}이 비슷해 실제 행동의 시점에 따라 영향이 바뀔 수 있습니다. ${impact}`;
+ const detectComparison=gap>1.3?
+   `${src.name}의 전조 감지는 ${fixed(src.axes[2])}점으로 ${dst.name}보다 ${fixed(gap)}점 높습니다.`:
+   gap< -1.3?`${src.name}의 전조 감지는 ${fixed(src.axes[2])}점으로 ${dst.name}보다 ${fixed(-gap)}점 낮습니다.`:
+   `${src.name}의 전조 감지는 ${fixed(src.axes[2])}점으로 상대와 비슷한 수준입니다.`;
  const parts=[
- {label:"01 · 발신자의 행동이 상대에게 닿는 방식",paragraph:`${src.name}의 표현 강도는 ${fixed(src.axes[1])}점이고 ${dst.name}의 감각 수용은 ${fixed(dst.axes[0])}점입니다. ${rx} ${targetReading}`},
- {label:"02 · 경고를 발견하는 순서",paragraph:`전조 감지는 ${src.name} ${fixed(src.axes[2])}점, ${dst.name} ${fixed(dst.axes[2])}점입니다. ${detect} ${src.name}의 관찰이 ${dst.name}에게 구체적인 근거와 함께 전달된다면, 두 사람은 어떤 정보를 먼저 확인할지 조율할 수 있습니다.`},
- {label:"03 · 완충이 도움이 되거나 부담이 되는 순간",paragraph:`${src.name}의 완충 개입 ${fixed(src.axes[3])}점과 경계 조율 ${fixed(src.axes[4])}점이 동시에 작용합니다. ${supp} ${src.name}이(가) 제안하는 지원의 범위와 ${dst.name}이(가) 실제 원하는 도움의 범위가 만나면서 이 점수의 차이가 구체적인 행동으로 드러납니다.`},
- {label:"04 · 실제 선택에서 보이는 차이",paragraph:`${src.name}은(는) '${sourceScene.title}'에서 '${sourceAct}'를 선택했고, ${dst.name}은(는) '${receiveScene.title}'에서 '${receiveAct}'를 선택했습니다. ${roleLine} ${roleDetail}`},
+ {label:"01 · 발신자의 행동이 상대에게 닿는 방식",paragraph:`${src.name}의 표현 강도는 ${fixed(src.axes[1])}점이고 ${dst.name}의 감각 수용은 ${fixed(dst.axes[0])}점입니다. ${rx}`},
+ {label:"02 · 경고를 발견하는 순서",paragraph:`${detectComparison} ${detect}`},
+ {label:"03 · 완충이 도움이 되거나 부담이 되는 순간",paragraph:`${src.name}의 완충 개입은 ${fixed(src.axes[3])}점, 경계 조율은 ${fixed(src.axes[4])}점입니다. ${supp}`},
+ {label:"04 · 실제 선택에서 보이는 차이",paragraph:`${src.name}은(는) '${sourceScene.title}'에서 '${sourceAct}'를 선택했고, ${dst.name}은(는) '${receiveScene.title}'에서 '${receiveAct}'를 선택했습니다. ${roleDetail}`.trim()},
  {label:"05 · 이 방향의 시너지와 역효과",paragraph:ending}
  ];
  return {src:src.name,dst:dst.name,stimulation:v.stimulation,buffer:v.buffer,delta:v.delta,kind:effectType,parts,body:parts.map(x=>x.paragraph).join("\n\n")};
