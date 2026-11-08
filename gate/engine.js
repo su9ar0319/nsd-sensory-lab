@@ -3,6 +3,7 @@
 function gateEngineJosa(word,withFinal,withoutFinal){
  const text=String(word??"").trim();
  if(!text)return text;
+ if(/[0-9]$/.test(text)){const ending=[true,true,false,true,false,false,true,true,true,false][Number(text.slice(-1))];return text+(ending?withFinal:withoutFinal)}
  const c=text.charCodeAt(text.length-1);
  const jong=(c>=0xAC00&&c<=0xD7A3)?(c-0xAC00)%28:null;
  return text+(jong===null?withoutFinal:jong?withFinal:withoutFinal);
