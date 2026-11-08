@@ -135,7 +135,7 @@ async function gateV7RetrySave(id){
 }
 
 function gateV7Nav(){
- const items=[["home","연구 안내"],["survey","24~28문항 검사"],["mine","내 기록"],["public","공개 기록"],["pair","2인 전술 분석"],["trio","3인 작전 시뮬레이션"]];
+ const items=[["home","이용 안내"],["survey","설문 조사"],["mine","개인 기록"],["public","공개 기록"],["pair","2인 분석"],["trio","3인 분석"]];
  const node=document.getElementById("nav");if(node)node.innerHTML=items.map(x=>'<button type="button" class="'+(gateState.tab===x[0]?"active":"")+'" onclick="gateSwitch(\''+x[0]+'\')">'+x[1]+'</button>').join("");
 }
 function gateV7Choice(p,i){
