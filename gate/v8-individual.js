@@ -303,7 +303,7 @@ function gateV8Sections(p){
  const q=e.choices,scenes=gateV8PickScenes(p,e);
  const nm=i=>GATE_AXES[i].name;
  const sceneSentence=(c)=>gateV8Polite(c.hint)+".";
- const sceneCards=scenes.map((c,i)=>({title:["진입과 첫 판단","위험 속에서 바뀌는 선택","직군별 한계와 대응"][i],scene:c.scene.title,choice:c.label,text:sceneSentence(c)+" "+gateV8FieldAssessment(p,c)}));
+ const sceneCards=scenes.map((c,i)=>({title:["진입과 첫 판단","위험 속에서 바뀌는 선택","직군별 한계와 대응"][i],scene:c.scene.title,choice:c.label,text:gateV8FieldAssessment(p,c)}));
  const close=pri.rank-other.rank;
  const motive="가장 두드러진 동기는 '"+pri.id+"'에 가깝습니다. "+pri.kind+"이 있습니다. "+gateV8Polite(pri.cause)+". "+(close<.6?"다만 '"+other.id+"'의 동기도 비슷한 비중으로 나타납니다. 따라서 하나의 이유로만 행동을 설명하면 판단의 중요한 절반을 놓칠 수 있습니다.":"뒤이어 '"+other.id+"' 성향이 선택의 방향을 조정하는 경우가 있습니다.");
  const core="이 인물은 "+gateV7Josa(nm(high.i),"을","를")+" 바탕으로 "+gateV8Polite(h.method)+". 그 밑바탕에는 이런 판단이 놓여 있습니다. "+gateV8Polite(h.intent)+". "+(runner.v>=high.v-.9?"여기에 "+gateV7Josa(nm(runner.i),"이","가")+" 근접한 비중으로 나타나, "+gateV8Polite(h2.method)+". 두 접근은 같은 목표에 기여할 수도 있지만 항상 같은 속도로 움직이지는 않습니다.":"보조적으로 드러나는 "+gateV7Josa(nm(runner.i),"은","는")+" 주력 판단을 수정하거나 뒷받침하는 방식으로 작동할 수 있습니다. "+gateV8Polite(h2.method)+".")+" "+motive;
