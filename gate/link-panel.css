@@ -1,0 +1,141 @@
+/* NSD GATE — linked public-record step, minimal consistent V2 UI.
+ * Structure only; all existing score, Firebase and opt-in semantics remain unchanged.
+ */
+.gate-link-panel{
+ border:1px solid #E3DEDA;
+ border-radius:12px;
+ padding:30px 32px 26px;
+ background:#FFFFFF;
+ box-shadow:0 8px 26px rgba(25,23,25,.04);
+}
+.gate-link-heading{margin:0 0 26px}
+.gate-link-heading .eyebrow{font-size:10px;letter-spacing:.17em;color:#A23E43}
+.gate-link-heading h2{font-size:clamp(21px,2.7vw,26px);line-height:1.35;margin:9px 0 10px}
+.gate-link-heading .muted{margin:0;max-width:850px;font-size:13px;line-height:1.85;color:#746E70}
+.gate-link-fields{display:grid;gap:18px 22px}
+.gate-link-identity{
+ grid-template-columns:minmax(0,1fr) minmax(174px,210px);
+ padding-bottom:23px;
+ border-bottom:1px solid #EAE6E2;
+ margin:0 0 22px
+}
+.gate-link-field{
+ display:flex!important;flex-direction:column;gap:8px;
+ min-width:0;margin:0;
+ color:#494548!important;font-weight:750!important;font-size:12px!important
+}
+.gate-link-label{font-weight:800;line-height:1.5;color:#474144;font-size:12px}
+.gate-link-field>.field,
+.gate-link-field>input.field,
+.gate-link-field>select.field{
+ box-sizing:border-box;
+ display:block;
+ width:100%;min-width:0;
+ height:44px;min-height:44px;
+ margin:0!important;
+ padding:0 13px;
+ background:#FFFFFF!important;
+ color:#292629!important;
+ border:1px solid #D8D2CE!important;
+ border-radius:7px!important;
+ box-shadow:none!important;
+ font-weight:550!important;
+ font-size:13px!important;
+ font-family:inherit;
+ line-height:normal;
+ transition:border-color .15s,box-shadow .15s;
+}
+.gate-link-field>.field:hover{border-color:#BBB1AC!important}
+.gate-link-field>.field:focus{
+ border-color:#A23E43!important;
+ outline:none!important;
+ box-shadow:0 0 0 3px rgba(162,62,67,.13)!important
+}
+.gate-link-field>.field::placeholder{color:#A29A96;opacity:1}
+.gate-link-subtitle{
+ display:flex;align-items:center;gap:10px;
+ font-size:14px;font-weight:850;letter-spacing:-.02em;color:#292729;
+}
+.gate-link-subtitle small{
+ color:#8B8583;
+ background:#F4F1EF;
+ border:1px solid #E9E5E2;
+ border-radius:4px;
+ font-size:10px;font-weight:700;letter-spacing:0;
+ padding:2px 7px
+}
+.gate-link-source-heading{margin:0 0 14px}
+.gate-link-source-heading p{margin:5px 0 0;font-size:12px;color:#89817E}
+.gate-link-controls{
+ margin:0 0 22px;
+ display:flex;align-items:center;gap:12px;
+ flex-wrap:wrap;
+}
+.gate-link-controls button.btn{
+ height:42px;padding:0 14px;border-radius:7px;
+ border:1px solid #DCD5D1;background:#F7F5F2;
+ color:#393536;font-size:12px;box-shadow:none;
+ white-space:normal
+}
+.gate-link-controls button.btn:hover:not(:disabled){
+ border-color:#B7A9A6;background:#F0ECE9
+}
+.gate-link-controls>small{
+ display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+ font-size:11px;color:#746F6D;line-height:1.5;
+}
+.gate-link-status-dot{
+ display:inline-block;flex:0 0 6px;
+ height:6px;width:6px;border-radius:50%;background:#A8A3A0
+}
+.gate-link-source-count{
+ display:inline-flex;align-items:center;
+ font-weight:750;font-variant-numeric:tabular-nums;
+ color:#5A5556;
+ border:1px solid #E7E2DF;background:#FAF8F6;
+ padding:4px 8px;border-radius:5px
+}
+.gate-link-search{display:flex!important;max-width:none;margin-bottom:16px}
+.gate-link-reports{grid-template-columns:repeat(2,minmax(0,1fr))}
+.gate-link-note{
+ margin:20px 0 0;
+ padding:12px 15px;
+ border:1px solid #E7E1DC!important;
+ border-left:3px solid #A23E43!important;
+ border-radius:6px!important;
+ background:#F8F6F3!important;
+ color:#615B5E!important;
+ font-size:12px;
+ line-height:1.9
+}
+.gate-link-public{
+ margin-top:20px;
+ padding:18px 0 0;
+ border-top:1px solid #EAE5E1;
+ display:flex;align-items:center;gap:10px;
+ font-size:13px;color:#393539;
+ cursor:pointer
+}
+.gate-link-public input{
+ width:17px;height:17px;
+ margin:0;
+ accent-color:#A23E43;
+ flex:0 0 17px
+}
+.gate-link-public span{line-height:1.6}
+@media(max-width:760px){
+ .gate-link-panel{padding:23px 20px 20px}
+ .gate-link-heading{margin-bottom:21px}
+ .gate-link-fields{gap:15px}
+ .gate-link-identity{grid-template-columns:minmax(0,1fr) minmax(135px,175px)}
+}
+@media(max-width:530px){
+ .gate-link-panel{padding:22px 17px 18px}
+ .gate-link-identity,.gate-link-reports{grid-template-columns:1fr}
+ .gate-link-fields{gap:15px}
+ .gate-link-source-heading{margin-top:3px}
+ .gate-link-controls>small{width:100%}
+ .gate-link-controls button.btn{width:100%}
+}
+@media(prefers-reduced-motion:reduce){.gate-link-field>.field{transition:none}}
+@media print{.gate-link-panel{display:none!important}}
