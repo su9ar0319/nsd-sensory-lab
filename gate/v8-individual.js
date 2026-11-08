@@ -73,15 +73,30 @@ function gateV8Evidence(p){
 function gateV8Source(p,type){
  const raw=typeof gateV7FindLinked==="function"?gateV7FindLinked(p,type):null;
  if(!raw||!Array.isArray(raw.axes)||raw.axes.length!==6||raw.axes.some(x=>!Number.isFinite(x)))return null;
- const idx=raw.axes.map((v,i)=>({i,v})).sort((a,b)=>b.v-a.v||a.i-b.i)[0];
- return {name:raw.name,id:raw.id,role:raw.role,top:idx.i,score:idx.v,raw};
+ const order=raw.axes.map((v,i)=>({i,v})).sort((a,b)=>b.v-a.v||a.i-b.i);
+ const facets=Array.isArray(raw.facets)?raw.facets:[];
+ const gap=(facets.length===12&&Number.isFinite(facets[order[0].i*2])&&Number.isFinite(facets[order[0].i*2+1]))?Math.abs(facets[order[0].i*2]-facets[order[0].i*2+1]):null;
+ return {name:raw.name,id:raw.id,role:raw.role,top:order[0].i,second:order[1].i,score:order[0].v,secondScore:order[1].v,facetGap:gap,raw};
 }
 const GATE_V8_SENSORY_AXIS=["자극을 받아들이는 방식","표현이 주변에 전해지는 방식","작은 변화에 반응하는 방식","안정화와 개입을 시도하는 방식","거리와 동의를 정하는 방식","현장 이후에 남는 감각"];
 const GATE_V8_COLOR_AXIS=["선택과 대가를 받아들이는 방식","상처와 보호를 다루는 방식","상실과 기억에 머무는 방식","죄책감 이후 변화를 택하는 방식","신뢰와 취약함을 내보이는 방식","다시 삶을 이어 가는 방식"];
 function gateV8Integrated(p){
  const sensory=gateV8Source(p,"sensory"),chroma=gateV8Source(p,"chroma"),pieces=[];
- if(sensory)pieces.push("연결된 감각 보고서에서는 "+GATE_V8_SENSORY_AXIS[sensory.top]+"에 비교적 높은 응답이 나타납니다. 이 단서는 게이트에서 같은 행동을 하더라도 자극을 받아들이는 과정이 다를 수 있다는 해석에 참고됩니다. 다만 실제 정찰 능력이나 부하도·가이딩 잔량으로 환산하지 않습니다.");
- if(chroma)pieces.push("연결된 색채 보고서에서는 "+GATE_V8_COLOR_AXIS[chroma.top]+"이 상대적으로 두드러집니다. 이는 어떤 선택을 중요하게 여길 수 있는지 설명하는 보조 단서이며, 아래의 전술적 행동은 신규 게이트 설문의 응답을 기준으로 판단합니다.");
+ const sensorToTactical=[0,3,0,9,6,11],colorToTactical=[1,6,11,8,4,11];
+ if(sensory){
+  const related=sensorToTactical[sensory.top],tac=p.axes[related];
+  const second=sensory.secondScore>=sensory.score-.9?" "+GATE_V8_SENSORY_AXIS[sensory.second]+"도 비슷한 비중이어서, 한 가지 감각 반응만으로 모든 상황을 설명하지 않는 편이 정확합니다.":"";
+  const comparison=tac>=7?"게이트 설문에서는 관련된 "+GATE_AXES[related].name+"도 높은 편이므로 두 검사에서 비슷한 반응 방향을 살펴볼 수 있습니다.":tac<=4.5?"그러나 게이트 설문에서 "+GATE_AXES[related].name+"은 상대적으로 낮습니다. 감각적 특징이 곧 작전 능력으로 이어지지는 않는다는 차이를 함께 읽어야 합니다.":"게이트 설문의 "+GATE_AXES[related].name+"은 이 감각 특성만으로 확정할 수 없으므로 실제 상황 선택을 중심으로 비교합니다.";
+  const facet=typeof sensory.facetGap==="number"&&sensory.facetGap>=2?" 같은 감각 축 안에서도 세부 문항군의 차이가 나타나므로 일관된 반응만 가정하지 않는 편이 좋습니다.":"";
+  pieces.push("연결된 감각 보고서에서는 "+GATE_V8_SENSORY_AXIS[sensory.top]+"이 비교적 높게 나타납니다."+second+" "+comparison+facet+" 이 자료는 실제 정찰 능력이나 부하도·가이딩 잔량으로 환산하지 않습니다.");
+ }
+ if(chroma){
+  const related=colorToTactical[chroma.top],tac=p.axes[related];
+  const second=chroma.secondScore>=chroma.score-.9?" "+GATE_V8_COLOR_AXIS[chroma.second]+"도 중요한 비중으로 나타나, 단일한 가치관으로 판단을 단정하기 어렵습니다.":"";
+  const comparison=tac>=7?"신규 전술 설문에서도 관련된 "+GATE_AXES[related].name+" 성향이 높으므로 행동의 이유를 함께 읽어볼 수 있습니다.":tac<=4.5?"하지만 게이트 설문의 "+GATE_AXES[related].name+"은 상대적으로 낮습니다. 마음속 가치관과 실제 위기에서의 선택이 항상 같은 방향은 아닐 수 있습니다.":"게이트 설문에서는 "+GATE_AXES[related].name+"과 이어지는지 추가 상황 선택으로 비교할 여지가 있습니다.";
+  const facet=typeof chroma.facetGap==="number"&&chroma.facetGap>=2?" 해당 색채 축에서도 문항군 사이의 차이가 있으므로 내적 동기가 한 가지 방식으로만 표현된다고 볼 수 없습니다.":"";
+  pieces.push("연결된 색채 보고서에서는 "+GATE_V8_COLOR_AXIS[chroma.top]+"이 상대적으로 두드러집니다."+second+" "+comparison+facet+" 색채 결과는 가치관과 선택 동기의 보조 근거이며 전술 능력 점수를 변경하지 않습니다.");
+ }
  return {sensory,chroma,text:pieces.join(" ")};
 }
 function gateV8PickScenes(p,e){
@@ -98,11 +113,11 @@ function gateV8Sections(p){
  const e=gateV8Evidence(p),pri=e.priorities[0],other=e.priorities[1],high=e.top[0],runner=e.top[1],low=e.top[e.top.length-1],h=GATE_V8_AXIS_TEXT[high.i],h2=GATE_V8_AXIS_TEXT[runner.i],lo=GATE_V8_AXIS_TEXT[low.i],integrated=gateV8Integrated(p);
  const q=e.choices,scenes=gateV8PickScenes(p,e);
  const nm=i=>GATE_AXES[i].name;
- const sceneSentence=(c)=>"「"+c.scene.title+"」에서 '"+c.label+"'를 고른 것은 "+c.hint+"는 판단의 단서입니다.";
+ const sceneSentence=(c)=>"「"+c.scene.title+"」에서 '"+c.label+"'를 선택했습니다. 이때 "+c.hint+".";
  const sceneCards=scenes.map((c,i)=>({title:["진입과 첫 판단","위험 속에서 바뀌는 선택","직군별 한계와 대응"][i],scene:c.scene.title,choice:c.label,text:sceneSentence(c)+" "+(c.choice.axis===high.i?"평소 주력 전술 성향과도 맞닿아 있지만, 이 선택 하나만으로 모든 상황에서 같은 행동을 한다고 단정할 수는 없습니다.":c.choice.axis===low.i?"평소 낮게 나타난 전술 축과 다른 선택을 한 장면입니다. 필요할 때 예외적으로 이 방식에 무게를 둘 가능성이 있습니다.":"주력 성향 이외의 전술 판단을 사용한 장면이므로, 환경 변화에 따라 행동의 이유가 달라질 수 있습니다.")}));
  const close=pri.rank-other.rank;
- const motive="가장 두드러진 동기는 '"+pri.id+"'에 가깝습니다. "+pri.kind+". "+pri.cause+". "+(close<.6?"다만 '"+other.id+"'의 동기도 비슷한 비중으로 나타납니다. 따라서 하나의 이유로만 행동을 설명하면 판단의 중요한 절반을 놓칠 수 있습니다.":"뒤이어 '"+other.id+"' 성향이 선택의 방향을 조정하는 경우가 있습니다.");
- const core="이 인물은 "+nm(high.i)+"을 바탕으로 "+h.method+". 이는 "+h.intent+"는 생각과 연결됩니다. "+(runner.v>=high.v-.9?"여기에 "+nm(runner.i)+"이 근접한 비중으로 나타나, "+h2.method+". 두 접근은 같은 목표에 기여할 수도 있지만 항상 같은 속도로 움직이지는 않습니다.":"보조적으로 드러나는 "+nm(runner.i)+"은 주력 판단을 수정하거나 뒷받침하는 방식으로 작동할 수 있습니다. "+h2.method+".")+" "+motive;
+ const motive="가장 두드러진 동기는 '"+pri.id+"'에 가깝습니다. "+pri.kind+"이 있습니다. "+pri.cause+". "+(close<.6?"다만 '"+other.id+"'의 동기도 비슷한 비중으로 나타납니다. 따라서 하나의 이유로만 행동을 설명하면 판단의 중요한 절반을 놓칠 수 있습니다.":"뒤이어 '"+other.id+"' 성향이 선택의 방향을 조정하는 경우가 있습니다.");
+ const core="이 인물은 "+gateV7Josa(nm(high.i),"을","를")+" 바탕으로 "+h.method+". 그 밑바탕에는 이런 판단이 놓여 있습니다. "+h.intent+". "+(runner.v>=high.v-.9?"여기에 "+nm(runner.i)+"이 근접한 비중으로 나타나, "+h2.method+". 두 접근은 같은 목표에 기여할 수도 있지만 항상 같은 속도로 움직이지는 않습니다.":"보조적으로 드러나는 "+nm(runner.i)+"은 주력 판단을 수정하거나 뒷받침하는 방식으로 작동할 수 있습니다. "+h2.method+".")+" "+motive;
  const s1=sceneCards[0],s2=sceneCards[1],s3=sceneCards[2];
  const tension=e.swing[0],diff=Math.abs(tension.score),strong=diff>=2.5,margin=diff>=1.25;
  const contrastText=strong?"전술 축의 차이가 비교적 크게 나타나므로":"두 성향의 차이가 아주 크게 벌어진 것은 아니지만";
