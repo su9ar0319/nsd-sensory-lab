@@ -169,7 +169,7 @@ function gateTrio(ps){
    const drain=active?Math.max(3,Math.round(pressure*.14+p.axes[5]*.5-p.axes[7]*.35)):guiding?Math.min(old.value,Math.max(3,Math.round(pressure*.13+p.axes[6]*.2-p.axes[7]*.45))):0;
    const recovery=stage===6?Math.max(3,Math.round(p.axes[11]*1.3)):0;
    const value=active?Math.round(gateClamp(old.value+drain-recovery)):Math.round(gateClamp(old.value-drain+recovery));
-   localResource.push({name:p.name,role:p.role,before:old.value,after:value,change:active?value-old.value:old.value-value,kind:active?"부하도 모형":"가이딩 잔량 모형",guiding});
+   localResource.push({name:p.name,role:p.role,before:old.value,after:value,change:active?value-old.value:old.value-value,kind:active?"부하도":"가이딩 잔량",guiding});
    return {...old,value};
   });
   const critical=state.some(p=>p.role==="센티넬"?p.value>=86:p.value<=14);
