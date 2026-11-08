@@ -17,6 +17,10 @@
 이 저장소의 \`gate/index.html\`은 기존 \`../firebase-config.js\`를 그대로 불러옵니다.
 신규 공개 정보는 \`gatePublicProfiles\`, 원본 본인 정보는 \`gateUsers/{uid}/records\`에 저장합니다.
 
+**플러그인 불필요:** Firebase 콘솔에서 Firestore Database → Rules에 접속하세요.
+현재 콘솔 규칙이 기존 색채·감각 통합판과 동일하다면 `gate/firestore-v7-combined.rules` 전체를 붙여 넣고 `게시(Publish)`하면 됩니다.
+콘솔 규칙에 다른 최신 변경 사항이 있다면 전체 교체하지 말고 `gate/firestore-v7-additions.rules.txt`의 두 `match` 블록만 기존 `match /databases/{database}/documents` 내부에 추가하세요.
+
 Firebase 실시간 저장을 사용하려면 기존 Firestore Security Rules 안에
 \`gate/firestore-v7-additions.rules.txt\`의 두 \`match\` 블록을 추가한 후 Firebase 콘솔에서 게시해야 합니다.
 기존 감각·색채 규칙은 삭제하거나 대체하지 마세요.
