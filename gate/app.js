@@ -280,4 +280,4 @@ function gateInit(){
  gateImportHash();gateRender();gateStartCloud();
 }
 
-gateInit();
+// Bootstrap is handled by v7-ui.js after survey and scoring overrides are loaded.
