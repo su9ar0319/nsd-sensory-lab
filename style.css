@@ -60,3 +60,7 @@
 .tri-third b{display:block;font-size:13px;color:#4a7770;margin-bottom:8px}
 @media(max-width:650px){.analysis-card-grid{grid-template-columns:1fr}.direction-story{padding:14px}.tri-pair{padding:14px}.direction-story-heading h4{font-size:15px}}
 @media print{.analysis-card,.analysis-role,.direction-story,.tri-pair,.stage-card{break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}.analysis-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* 시너지·역효과 카드의 조건과 결과를 읽기 쉽게 구분 */
+.analysis-condition{display:inline-block;font-size:11px;font-weight:900;letter-spacing:.02em;padding:2px 7px;margin:2px 4px 2px 0;border-radius:5px;background:#e5eee8;color:#3e685b}
+.analysis-card.debuff .analysis-condition{background:#f3e7e8;color:#8b4e5a}
