@@ -79,3 +79,24 @@
 .solo-depth-card p{font-size:13px;line-height:1.91;margin:0;overflow-wrap:anywhere;word-break:keep-all}
 @media(max-width:670px){.solo-depth-grid{grid-template-columns:1fr}.solo-depth-card{padding:16px}}
 @media print{.solo-depth-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.solo-depth-card{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+/* 1인 결과: 01~08 요약 카드 / 09~17 심층 기록의 두 단계 구성 */
+.solo-chapter{margin:30px 0 16px;padding:19px 21px 18px;border:1px solid #e0e3f0;border-radius:13px;background:linear-gradient(120deg,#f4f5fc,#fbfbff)}
+.solo-chapter-overline{font-size:10px;letter-spacing:.15em;font-weight:900;color:#777fb4;margin-bottom:6px}
+.solo-chapter h3{font-size:19px;line-height:1.4;color:#343969;margin:0 0 6px}
+.solo-chapter p{font-size:13px;color:#626b83;line-height:1.8;margin:0}
+.solo-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.solo-summary-card{display:flex;flex-direction:column;gap:8px;min-width:0;border:1px solid #e1e4f0;border-radius:13px;padding:17px 18px;background:#fff;break-inside:avoid}
+.solo-summary-card:nth-child(4n+2),.solo-summary-card:nth-child(4n+3){background:#f9f9fd}
+.solo-summary-meta{display:flex;justify-content:space-between;align-items:center;gap:9px;min-height:29px}
+.solo-summary-meta>span:first-child{font-size:10px;font-weight:900;letter-spacing:.1em;color:#8a91b1}
+.solo-summary-score{display:flex;align-items:baseline;gap:3px;white-space:nowrap;color:#454d85}
+.solo-summary-score strong{font-size:21px;line-height:1;font-weight:900;font-variant-numeric:tabular-nums}
+.solo-summary-score span{font-size:10px;color:#8990af}
+.solo-summary-tag{font-size:11px;font-weight:800;color:#585e92;background:#ededf9;padding:4px 9px;border-radius:100px;white-space:nowrap}
+.solo-summary-card h4{font-size:14px;line-height:1.5;margin:0;color:#343e70}
+.solo-summary-card p{font-size:13px;line-height:1.83;margin:0;overflow-wrap:anywhere;word-break:keep-all}
+.solo-summary-track{height:4px;background:#eef0f8;overflow:hidden;border-radius:99px;margin-top:auto}
+.solo-summary-track i{display:block;height:100%;background:#9298ca;border-radius:99px}
+@media(max-width:680px){.solo-chapter{padding:16px;margin:24px 0 13px}.solo-summary-grid{grid-template-columns:1fr}.solo-summary-card{padding:16px 17px}.solo-summary-score strong{font-size:19px}}
+@media print{.solo-chapter,.solo-summary-card{-webkit-print-color-adjust:exact;print-color-adjust:exact}.solo-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.solo-chapter{break-after:avoid}}
