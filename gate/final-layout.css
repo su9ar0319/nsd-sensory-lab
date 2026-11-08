@@ -1,0 +1,78 @@
+/* NSD Gate / final release: balanced card sets across 1-, 2-, and 3-operative reports.
+   Scope rules to reports only. Keep scoring, saved profiles and radio untouched. */
+.surface.report .analysis-grid.gate-field-scene-grid{
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:13px;
+ align-items:stretch;
+}
+.surface.report .gate-field-scene-grid > .analysis-card{
+ min-width:0;
+ height:100%;
+ display:flex;
+ flex-direction:column;
+ padding:19px 18px;
+ overflow-wrap:anywhere;
+}
+.surface.report .gate-field-scene-grid > .analysis-card h4{
+ line-height:1.55;
+ margin-bottom:10px;
+}
+.surface.report .gate-field-scene-grid > .analysis-card p{
+ word-break:keep-all;
+ line-height:1.9;
+ margin-top:0;
+}
+.surface.report .gate-report-cards--5{
+ display:grid;
+ grid-template-columns:repeat(6,minmax(0,1fr));
+ gap:13px;
+ align-items:stretch;
+}
+.surface.report .gate-report-cards--5 > .analysis-card{
+ min-width:0;
+ grid-column:span 2;
+ height:100%;
+ overflow-wrap:anywhere;
+}
+.surface.report .gate-report-cards--5 > .analysis-card:nth-last-child(-n+2){
+ grid-column:span 3;
+}
+.surface.report .gate-report-cards--4{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:13px;
+}
+.surface.report .gate-report-cards .analysis-chunk{
+ min-width:0;
+}
+@media (max-width:1030px){
+ .surface.report .gate-report-cards--5{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .surface.report .gate-report-cards--5 > .analysis-card,
+ .surface.report .gate-report-cards--5 > .analysis-card:nth-last-child(-n+2){grid-column:auto}
+ .surface.report .gate-report-cards--5 > .analysis-card:last-child{grid-column:1/-1}
+}
+@media (max-width:900px){
+ .surface.report .analysis-grid.gate-field-scene-grid{
+  grid-template-columns:minmax(0,1fr);
+ }
+}
+@media (max-width:680px){
+ .surface.report .gate-report-cards--5,
+ .surface.report .gate-report-cards--4{
+  grid-template-columns:minmax(0,1fr);
+ }
+ .surface.report .gate-report-cards--5 > .analysis-card,
+ .surface.report .gate-report-cards--5 > .analysis-card:nth-last-child(-n+2),
+ .surface.report .gate-report-cards--5 > .analysis-card:last-child{
+  grid-column:auto;
+ }
+ .surface.report .gate-field-scene-grid > .analysis-card{padding:17px 16px}
+}
+@media print{
+ .surface.report .gate-field-scene-grid > .analysis-card,
+ .surface.report .gate-report-cards--5 > .analysis-card{
+  break-inside:avoid;
+  page-break-inside:avoid;
+ }
+}
