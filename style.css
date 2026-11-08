@@ -67,3 +67,15 @@
 
 /* 조건별 해설 2번째 라벨은 항상 다음 줄에서 시작 */
 .analysis-break{display:block;height:0;margin-top:11px;}
+
+/* 1인 심화 보고서: 추가 해석 카드. 기존 2인·3인 레이아웃에는 영향 없음. */
+.solo-depth-section .sub{margin-bottom:13px}
+.solo-depth-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.solo-depth-card{position:relative;min-width:0;border:1px solid #dfe4f0;border-radius:13px;background:#fafbff;padding:19px 19px 18px;break-inside:avoid}
+.solo-depth-card:nth-child(3n+2){background:#f7faf9;border-color:#dce9e5}
+.solo-depth-card:nth-child(3n+3){background:#fbf9ff;border-color:#e6e0f0}
+.solo-depth-number{font-size:10px;font-weight:850;letter-spacing:.13em;color:#8790b4;margin-bottom:9px}
+.solo-depth-card h4{color:#343d72;font-size:14px;line-height:1.6;margin:0 0 10px}
+.solo-depth-card p{font-size:13px;line-height:1.91;margin:0;overflow-wrap:anywhere;word-break:keep-all}
+@media(max-width:670px){.solo-depth-grid{grid-template-columns:1fr}.solo-depth-card{padding:16px}}
+@media print{.solo-depth-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.solo-depth-card{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
