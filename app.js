@@ -76,47 +76,60 @@ ${lineSection(8,'직군에 따른 현장 해석',esc(t.role))}
 function pairFrom(id){state.choiceA=id;state.choiceB=allProfiles().find(x=>x.id!==id)?.id||'';switchTo('pair');}
 function pairView(){const all=allProfiles();if(!state.choiceA)state.choiceA=all[0]?.id||'';if(!state.choiceB)state.choiceB=all.find(x=>x.id!==state.choiceA)?.id||'';const a=byId(state.choiceA),b=byId(state.choiceB);return `<section class="card no-print"><div class="kicker">SENSORY INTERFERENCE / PAIR</div><h2>2인 감각 간섭 분석</h2><p class="sub">두 캐릭터의 반응을 선택하면 A→B, B→A의 자극과 완충 효과를 각각 해석합니다.</p><div class="columns"><div><label class="field-label">대상자 A</label><select class="field" onchange="choiceChange('choiceA',this.value)">${optionsHtml(state.choiceA)}</select></div><div><label class="field-label">대상자 B</label><select class="field" onchange="choiceChange('choiceB',this.value)">${optionsHtml(state.choiceB)}</select></div></div></section>${a&&b&&a.id!==b.id?pairViewResult(a,b):'<section class="card empty">서로 다른 두 캐릭터를 선택해 주세요.</section>'}`;}
 function interferencePanel(a,b,r){return `<div class="impact-grid"><div class="impact-item"><span>${esc(a.name)} → ${esc(b.name)}</span><div class="impact-values"><b>자극 ${r.stimulation}</b><b>완충 ${r.buffer}</b></div><div class="impact-bars"><i style="width:${r.stimulation}%"></i><em style="width:${r.buffer}%"></em></div></div></div>`;}
+function sensoryCards(items,type){
+ return `<div class="analysis-card-grid">${items.map((p,i)=>`<div class="analysis-card ${type}"><div class="analysis-card-meta">${type==="synergy"?"SYNERGY":"RISK"} / ${String(i+1).padStart(2,"0")}</div><h4>${esc(p.title)}</h4><p>${esc(p.text)}</p></div>`).join("")}</div>`;
+}
+
+function directionView(d){
+ return `<div class="direction-story"><div class="direction-story-heading"><div class="report-eyebrow">DIRECTIONAL IMPACT</div><h4>${esc(d.src)} → ${esc(d.dst)}</h4><span class="direction-state">${d.kind==="synergy"?"완충 우세":d.kind==="debuff"?"자극 우세":"혼합 반응"}</span></div>${d.parts.map(p=>`<div class="direction-part"><b>${esc(p.label)}</b><p>${esc(p.paragraph)}</p></div>`).join("")}</div>`;
+}
+
 function pairViewResult(a,b){
  const r=pairDeepResult(a,b);
- const scenarioHtml=r.scenes.map(s=>`<div class="memory-card"><b>${esc(s.title)}</b><p>${esc(s.text)}</p></div>`).join("");
+ const scenarios=r.scenes.map(s=>`<div class="memory-card"><b>${esc(s.title)}</b><p>${esc(s.text)}</p></div>`).join("");
  return `<section class="card result"><div class="report-eyebrow">NSD / DIRECTIONAL INTERFERENCE REPORT</div><h2>${esc(r.title)}</h2>
- <div class="pills"><span class="pill">관계 원형 ${r.typeId+1}/12</span><span class="pill">반응 결 ${r.postureId+1}/8</span><span class="pill">양방향 감각 간섭 분석</span></div>
- <p class="report-sub">${esc(a.name)} (${esc(a.role)}) × ${esc(b.name)} (${esc(b.role)})</p>
- <div class="comparison-swatches">${spectrumCard(a,true)}${spectrumCard(b,true)}</div>
- <div class="section"><h3>01. 방향에 따라 달라지는 영향</h3>${interferencePanel(a,b,r.fromAToB)}${interferencePanel(b,a,r.fromBToA)}</div>
- ${lineSection(2,"첫 반응과 두 감각의 접점",esc(r.opening)+" "+esc(r.primary))}
- ${lineSection(3,`${esc(a.name)}이(가) ${esc(b.name)}에게 미치는 영향`,esc(r.fromA))}
- ${lineSection(4,`${esc(b.name)}이(가) ${esc(a.name)}에게 미치는 영향`,esc(r.fromB))}
- ${lineSection(5,"누가 먼저 경고를 알아차리는가",esc(r.signal))}
- ${lineSection(6,"지원의 시점과 닮은 리듬",esc(r.supportTiming)+" "+esc(r.support))}
- ${lineSection(7,"갈등이 되는 오해와 감각의 차이",esc(r.misreading)+" "+esc(r.risk))}
- ${lineSection(8,"도움과 동의의 경계",esc(r.decision))}
- ${lineSection(9,"직군별 부하도·가이딩 잔량과 역할",esc(r.resource))}
- <div class="section"><h3>10. 세 가지 동행 장면</h3><p class="sub">실제 설문에서 선택한 대응을 바탕으로 구성한 가능한 장면입니다.</p>${scenarioHtml}</div>
- ${lineSection(11,"게이트 이후 서로 다른 회복",esc(r.recovery)+" "+esc(r.after))}
- ${lineSection(12,"관계가 달라지는 순간",esc(r.turning))}
+ <div class="pills"><span class="pill">관계 원형 ${r.typeId+1}/12</span><span class="pill">반응 결 ${r.postureId+1}/8</span><span class="pill">양방향 시너지·역효과 분석</span></div>
+ <p class="report-sub">${esc(a.name)} (${esc(a.role)}) × ${esc(b.name)} (${esc(b.role)})</p><div class="comparison-swatches">${spectrumCard(a,true)}${spectrumCard(b,true)}</div>
+ <div class="section"><h3>01. 방향별 자극과 완충</h3>${interferencePanel(a,b,r.fromAToB)}${interferencePanel(b,a,r.fromBToA)}<p class="sub">두 방향의 영향은 같지 않을 수 있습니다. 전달하는 사람과 받아들이는 사람이 바뀌면 자극과 완충도 달라집니다.</p></div>
+ ${lineSection(2,"두 감각이 처음 마주치는 방식",esc(r.opening))}
+ <div class="section"><h3>03. ${esc(a.name)}이(가) ${esc(b.name)}에게 미치는 영향</h3>${directionView(r.directional[0])}</div>
+ <div class="section"><h3>04. ${esc(b.name)}이(가) ${esc(a.name)}에게 미치는 영향</h3>${directionView(r.directional[1])}</div>
+ <div class="section"><h3>05. 함께할 때 나타나는 시너지</h3><p class="sub">감지와 지원, 감각 수용 방식에서 서로를 보완할 수 있는 조건입니다.</p>${sensoryCards(r.synergies,"synergy")}</div>
+ <div class="section"><h3>06. 서로를 힘들게 할 수 있는 역효과</h3><p class="sub">자극이 누적되거나 지원이 어긋나는 상황에서 나타날 수 있는 부담입니다.</p>${sensoryCards(r.debuffs,"debuff")}</div>
+ <div class="section"><h3>07. 실제 선택을 연결한 세 가지 동행 장면</h3>${scenarios}</div>
+ ${lineSection(8,"경고의 속도가 달라질 때",esc(r.signal))}
+ ${lineSection(9,"지원과 동의 사이에서",esc(r.supportTiming)+" "+esc(r.decision))}
+ ${lineSection(10,"직군과 자원 관리",esc(r.resource))}
+ ${lineSection(11,"임무 이후의 감각과 회복",esc(r.recovery))}
+ ${lineSection(12,"관계의 균형이 달라지는 조건",esc(r.turning))}
  <div class="section"><h3>13. 두 사람의 감각 좌표</h3><div class="metrics">${DOMAINS.map((d,i)=>`<div class="metric"><b>${esc(d.short)}</b><div class="track"><i style="width:${mean([a.axes[i],b.axes[i]])*10}%"></i></div><span>${fixed(range(a.axes[i],b.axes[i]))}Δ</span></div>`).join("")}</div></div>
  <div class="row actions"><button class="btn ghost" onclick="window.print()">결과 인쇄 · PDF</button><button class="btn soft" onclick="copyCurrentLink('pair')">페어 조합 링크 복사</button><button class="btn ghost" onclick="copyAIAnalysis('pair')">AI 분석 패키지 복사</button></div></section>`;
 }
 function groupView(){const all=allProfiles();for(const k of ['choiceA','choiceB','choiceC'])if(!state[k])state[k]=all.find(p=>!['choiceA','choiceB','choiceC'].filter(x=>x!==k).map(x=>state[x]).includes(p.id))?.id||'';const ps=['choiceA','choiceB','choiceC'].map(k=>byId(state[k]));return `<section class="card no-print"><div class="kicker">SENSORY INTERFERENCE / GROUP</div><h2>3인 연계 분석</h2><p class="sub">세 사람이 각자의 감각을 유지하면서 함께 움직일 때 드러나는 신호·완충·회복의 균형을 읽습니다. 관계의 형태는 미리 정하지 않습니다.</p><div class="columns three">${['choiceA','choiceB','choiceC'].map((k,i)=>`<div><label class="field-label">대상자 ${'ABC'[i]}</label><select class="field" onchange="choiceChange('${k}',this.value)">${optionsHtml(state[k])}</select></div>`).join('')}</div></section>${ps.every(Boolean)&&new Set(ps.map(p=>p.id)).size===3?groupViewResult(ps):'<section class="card empty">서로 다른 세 캐릭터를 선택해 주세요.</section>'}`;}
 function groupViewResult(ps){
  const r=trioDeepResult(ps);
- const rolesHtml=r.assignments.map((a,i)=>`<div class="memory-card"><b>${"ABC"[i]}. ${esc(a.label)} · ${esc(a.name)} (${fixed(a.score)}점)</b><p>${esc(a.reason)}</p></div>`).join("");
- const scenesHtml=r.scenes.map(s=>`<div class="memory-card"><b>${esc(s.title)}</b><p>${esc(s.text)}</p></div>`).join("");
- const pairsHtml=r.pairDetails.map(p=>`<div class="memory-card"><b>${esc(p.name)}</b><p>${esc(p.data)}</p><p>${esc(p.text)}</p></div>`).join("");
- const fallbackHtml=r.fallback.map(p=>`<div class="memory-card"><b>${esc(p.title)}</b><p>${esc(p.text)}</p></div>`).join("");
+ const roles=r.assignments.map((a,i)=>`<div class="analysis-role"><div class="analysis-role-index">${"ABC"[i]}</div><div><b>${esc(a.label)} · ${esc(a.name)} (${fixed(a.score)}점)</b><p>${esc(a.reason)}</p></div></div>`).join("");
+ const stages=r.scenes.map((s,i)=>`<div class="memory-card stage-card"><b>${esc(s.title)}</b><p>${esc(s.text)}</p></div>`).join("");
+ const pairs=r.pairDetails.map(p=>`<div class="tri-pair">
+ <h4>${esc(p.name)}</h4><div class="sub">${esc(p.data)}</div>
+ <div class="tri-direction"><b>${esc(p.first)} → ${esc(p.second)}</b><p>${esc(p.forward)}</p></div>
+ <div class="tri-direction"><b>${esc(p.second)} → ${esc(p.first)}</b><p>${esc(p.backward)}</p></div>
+ <div class="tri-third"><b>${esc(p.third.name)}의 제3자 영향 · ${esc(p.third.label)}</b><p>${esc(p.third.text)}</p></div>
+ </div>`).join("");
+ const chains=r.failureChains.map(x=>`<div class="memory-card"><b>${esc(x.title)}</b><p>${esc(x.text)}</p></div>`).join("");
+ const fallback=r.fallback.map(x=>`<div class="memory-card"><b>${esc(x.title)}</b><p>${esc(x.text)}</p></div>`).join("");
  return `<section class="card result"><div class="report-eyebrow">NSD / THREE-WAY INTERFERENCE REPORT</div><h2>${esc(r.title)}</h2>
- <p class="report-sub">${ps.map(p=>esc(p.name)).join(" · ")} / 세 사람의 감각을 함께 관찰한 보고서</p>
+ <p class="report-sub">${ps.map(p=>esc(p.name)).join(" · ")} / 세 사람의 양방향 감각과 동행 구조</p>
  <div class="comparison-swatches three">${ps.map(p=>spectrumCard(p,true)).join("")}</div>
- ${lineSection(1,"세 사람이 공유하는 감각",esc(r.description))}
- <div class="section"><h3>02. 세 사람의 역할 배치</h3><p class="sub">한 사람이 세 역할을 모두 맡는 대신, 세 사람의 감각 점수를 함께 비교해 각각 하나씩 배치한 협력 시안입니다.</p>${rolesHtml}</div>
- ${lineSection(3,"직군 조합과 지원 구조",esc(r.makeup))}
- ${lineSection(4,"압박이 커질 때 팀 전체의 반응",esc(r.pressure))}
- <div class="section"><h3>05. 4단계 게이트 동행 시뮬레이션</h3><p class="sub">캐릭터의 성향과 역할 배치에서 예상할 수 있는 장면들입니다.</p>${scenesHtml}</div>
- <div class="section"><h3>06. 세 쌍의 양방향 감각 간섭</h3>${pairsHtml}</div>
- <div class="section"><h3>07. 한 대원이 이탈하거나 쉬게 된다면</h3>${fallbackHtml}</div>
- ${lineSection(8,"종료 후 남는 감각과 회복 시간",esc(r.recovery))}
- ${lineSection(9,"다음 동행에서의 발전 가능성",esc(r.outlook))}
+ ${lineSection(1,"세 사람이 공통으로 받아들이는 감각",esc(r.description))}
+ <div class="section"><h3>02. 서로 다른 세 사람의 역할 배치</h3><p class="sub">모든 역할을 한 명에게 몰지 않고, 세 사람의 점수와 현장 선택을 함께 비교한 배치입니다.</p><div class="analysis-roles">${roles}</div></div>
+ <div class="section"><h3>03. 세 사람이 만들 수 있는 시너지</h3>${sensoryCards(r.teamSynergies,"synergy")}</div>
+ <div class="section"><h3>04. 세 사람이 서로에게 줄 수 있는 부담과 역효과</h3>${sensoryCards(r.teamDebuffs,"debuff")}</div>
+ <div class="section"><h3>05. 여섯 단계의 동행 작전 기록</h3><p class="sub">서로 다른 반응이 만나면 같은 상황에서도 다음 행동이 달라질 수 있습니다.</p>${stages}</div>
+ <div class="section"><h3>06. 세 쌍, 여섯 방향의 감각 간섭</h3><p class="sub">둘 사이의 영향에 제3자가 더해졌을 때 관계가 완충되거나 자극이 커질 수 있습니다.</p>${pairs}</div>
+ <div class="section"><h3>07. 한 관계의 부담이 팀 전체로 번진다면</h3>${chains}</div>
+ <div class="section"><h3>08. 한 사람이 이탈하거나 쉬어야 한다면</h3>${fallback}</div>
+ ${lineSection(9,"임무 이후 남는 감각과 다음 동행",esc(r.recovery)+" "+esc(r.outlook))}
  <div class="section"><h3>10. 공통점과 감각 좌표</h3><div class="pills"><span class="pill">공통: ${esc(DOMAINS[r.common].short)}</span><span class="pill">차이: ${esc(DOMAINS[r.variable].short)}</span></div><div class="metrics">${DOMAINS.map((d,i)=>`<div class="metric"><b>${esc(d.short)}</b><div class="track"><i style="width:${mean(ps.map(p=>p.axes[i]))*10}%"></i></div><span>${fixed(Math.max(...ps.map(p=>p.axes[i]))-Math.min(...ps.map(p=>p.axes[i])))}Δ</span></div>`).join("")}</div></div>
  <div class="row actions"><button class="btn ghost" onclick="window.print()">그룹 결과 인쇄 · PDF</button><button class="btn soft" onclick="copyCurrentLink('group')">그룹 조합 링크 복사</button><button class="btn ghost" onclick="copyAIAnalysis('group')">AI 분석 패키지 복사</button></div></section>`;
 }
@@ -205,7 +218,7 @@ function buildAIScorecard(mode, id) {
       `${a.name} → ${b.name}: 자극 ${r.fromAToB.stimulation}, 완충 ${r.fromAToB.buffer}, 차이 ${r.fromAToB.delta>=0?"+":""}${r.fromAToB.delta}`,
       `${b.name} → ${a.name}: 자극 ${r.fromBToA.stimulation}, 완충 ${r.fromBToA.buffer}, 차이 ${r.fromBToA.delta>=0?"+":""}${r.fromBToA.delta}`,
       "두 방향은 별도 계산합니다. 자극은 한 사람이 상대에게 전하는 표현·감각 반응이 상대의 수용성과 만날 때의 강도, 완충은 위기 대응과 징후 파악·경계 조율이 상대에게 제공하는 조절 여지입니다.",
-      "자극·완충 수치는 각 인물의 6축 점수에 기반한 비교 지표(5~95 범위)이며 실제 게임 부하도 증감값이 아닙니다.", "두 사람의 주요 협력·갈등 해석:",`- 첫 반응: ${r.opening}`,`- 위험 신호 공유: ${r.signal}`,`- 지원 방식: ${r.supportTiming}`,`- 오해와 경계: ${r.misreading} ${r.decision}`,`- 회복: ${r.recovery}`, "상황별 장면:",...r.scenes.map(x=>`- ${x.title}: ${x.text}`),
+      "자극·완충 수치는 각 인물의 6축 점수에 기반한 비교 지표(5~95 범위)이며 실제 게임 부하도 증감값이 아닙니다.", "두 사람의 주요 협력·갈등 해석:",`- 첫 반응: ${r.opening}`,`- 위험 신호 공유: ${r.signal}`,`- 지원 방식: ${r.supportTiming}`,`- 오해와 경계: ${r.misreading} ${r.decision}`,`- 회복: ${r.recovery}`, "방향별 상세 해석:",...r.directional.flatMap(x=>[`### ${x.src} → ${x.dst}`, ...x.parts.map(p=>`- ${p.label}: ${p.paragraph}`)]), "시너지 후보:",...r.synergies.map(x=>`- ${x.title}: ${x.text}`), "역효과 후보:",...r.debuffs.map(x=>`- ${x.title}: ${x.text}`), "상황별 장면:",...r.scenes.map(x=>`- ${x.title}: ${x.text}`),
       ""
     );
   }
@@ -223,7 +236,7 @@ function buildAIScorecard(mode, id) {
           `  ${b.name} → ${a.name}: 자극 ${ba.stimulation}, 완충 ${ba.buffer}, 차이 ${ba.delta>=0?"+":""}${ba.delta}`];
       }),
       "자극·완충은 각 인물의 6축에서 산출한 비교 지표(5~95 범위)입니다. 셋이 함께할 때의 효과를 단순 합산하지 마세요.",
-      "세 사람의 역할 배치 제안 (감지·완충·경계 조율 담당은 각각 다른 인물):", ...t.assignments.map(x=>`- ${x.label}: ${x.name} (${fixed(x.score,2)}점) | ${x.action}`), "세 사람이 함께 움직이는 과정:",...t.scenes.map(x=>`- ${x.title}: ${x.text}`), "한 대원이 쉬어야 하는 상황:",...t.fallback.map(x=>`- ${x.title}: ${x.text}`), "이 역할 분담은 세 사람의 상대적인 특징을 기반으로 만든 협력 시안입니다.",
+      "세 사람의 역할 배치 제안 (감지·완충·경계 조율 담당은 각각 다른 인물):", ...t.assignments.map(x=>`- ${x.label}: ${x.name} (${fixed(x.score,2)}점) | ${x.action}`), "세 사람이 함께 움직이는 과정:",...t.scenes.map(x=>`- ${x.title}: ${x.text}`), "한 대원이 쉬어야 하는 상황:",...t.fallback.map(x=>`- ${x.title}: ${x.text}`), "이 역할 분담은 세 사람의 상대적인 특징을 기반으로 만든 협력 시안입니다.", "팀 전체의 시너지:",...t.teamSynergies.map(x=>`- ${x.title}: ${x.text}`), "팀 전체의 역효과:",...t.teamDebuffs.map(x=>`- ${x.title}: ${x.text}`), "세 관계의 여섯 방향과 제3자의 영향:",...t.pairDetails.flatMap(x=>[`- ${x.name}: ${x.data}`,`  ${x.first} → ${x.second}: ${x.forward}`,`  ${x.second} → ${x.first}: ${x.backward}`,`  ${x.third.name}의 개입: ${x.third.text}`]), "관계의 부담이 확산되는 상황:",...t.failureChains.map(x=>`- ${x.title}: ${x.text}`),
       "");
   }
   const prompts = [
