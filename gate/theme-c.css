@@ -255,3 +255,38 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
  .gate-v7-panel,.analysis-card,.stage{break-inside:avoid}
  .gate-v7-report{background:#fff}
 }
+
+
+/* Unified series header geometry: 01 Yellow / 02 Teal Blue / 03 Charcoal Red. */
+.shell{width:100%;max-width:1210px;padding:24px 25px 70px;margin:0 auto}
+.site-hero{
+ width:100%;min-height:250px;
+ display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
+ margin:0 0 18px;padding:35px 42px 32px;
+ border-radius:15px;
+}
+.site-hero .topline{font-size:10px;line-height:1.5;letter-spacing:.19em}
+.site-hero h1{
+ font-size:clamp(27px,3.4vw,39px);
+ line-height:1.3;margin:12px 0 10px;
+ max-width:850px
+}
+.site-hero p{font-size:14px;line-height:1.75;margin:0;max-width:760px}
+.site-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:20px;max-width:960px}
+.site-tags span{font-size:10.5px;line-height:1.5;padding:4px 10px}
+.site-hero::before{right:-36px;top:-82px;width:485px;height:370px}
+.site-hero::after{top:21px;right:36px;font-size:clamp(105px,16.5vw,203px)}
+@media(max-width:800px){
+ .shell{padding:14px 14px 60px}
+ .site-hero{min-height:248px;margin:0 0 15px;padding:30px 23px 27px;border-radius:12px}
+ .site-hero h1{font-size:clamp(26px,5.3vw,36px)}
+ .site-hero p{font-size:13px}
+ .site-hero::after{right:17px;top:42px;font-size:115px}
+}
+@media(max-width:490px){
+ .site-hero{min-height:258px;padding:27px 20px 24px}
+ .site-hero .topline{font-size:9px;letter-spacing:.11em}
+ .site-hero h1{font-size:27px}
+ .site-tags{gap:5px;margin-top:17px}
+ .site-tags span{font-size:9.5px;padding:3px 8px}
+}
