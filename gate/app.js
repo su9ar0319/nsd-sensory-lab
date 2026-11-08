@@ -75,10 +75,14 @@ async function gateSave(){
   gateState.own=[...gateState.own.filter(p=>p.id!==profile.id),profile];
   gatePersist();gateState.selected=profile.id;gateState.editId=null;
   if(gateState.cloud){try{await gateState.cloud.save(profile);profile.localOnly=false;gatePersist();await gateCloudRefresh(false)}catch(e){gateNotify("로컬 저장 완료 · 온라인 등록 실패: "+e.message,true)}}
-  gateState.tab="mine";gateRender();window.scrollTo({top:0,behavior:"smooth"});gateNotify("캐릭터 전술 기록을 저장했습니다!");
+  gateState.tab="mine";gateRender();window.scrollTo({top:0,behavior:"smooth"});gateNotify(profile.isPublic&&!gateState.cloud?"기록은 로컬에 저장됐어요. 온라인 공개는 서버 연결 후 등록할 수 있습니다.":"캐릭터 전술 기록을 저장했습니다!",profile.isPublic&&!gateState.cloud);
  }catch(e){gateNotify("결과 생성 실패: "+e.message,true)}finally{gateState.busy=false;gateProgress()}
 }
 
+function gateNew(){
+ if(gateCount()>0&&!confirm("기존 미저장 응답을 초기화하고 새 검사를 시작할까요?"))return;
+ gateState.editId=null;gateState.name="";gateState.role="센티넬";gateState.isPublic=false;gateState.answers=Array(48).fill(0);gateState.choices=Array(16).fill(-1);gateState.step=0;gateSwitch("survey");
+}
 function gateEdit(id){
  const p=gateState.own.find(x=>x.id===id);if(!p||!Array.isArray(p.answers)){gateNotify("수정 가능한 원본 설문이 없습니다.",true);return}
  gateState.editId=p.id;gateState.name=p.name;gateState.role=p.role;gateState.isPublic=!!p.isPublic;gateState.answers=p.answers.slice();gateState.choices=p.choices.slice();gateState.step=0;gateSwitch("survey");
@@ -98,7 +102,7 @@ function gateChoose(id){gateState.selected=id;gateRender();document.getElementBy
 
 function gateLibrary(){
  const selected=gateGet(gateState.selected),own=gateState.own.filter(gateValid),imported=gateState.imported.filter(gateValid);
- return `<section class="surface"><div class="row between"><div><div class="eyebrow">PRIVATE ARCHIVE</div><h2>내 전술 기록</h2><p class="muted">브라우저 저장 기록 ${own.length}개 · 가져온 프로필 ${imported.length}개</p></div><div class="row"><button class="btn light" onclick="gateExport()">JSON 백업</button><label class="btn light file-pick">JSON 가져오기<input type="file" accept=".json,application/json" onchange="gateImport(event)"></label><button class="btn primary" onclick="gateSwitch('survey')">새 검사</button></div></div>${gateProfileList(own,"own")}${imported.length?`<h3 class="mt">가져온 공유용 프로필</h3>${gateProfileList(imported,"imported")}`:""}</section>${selected?gateRenderSolo(selected):""}`;
+ return `<section class="surface"><div class="row between"><div><div class="eyebrow">PRIVATE ARCHIVE</div><h2>내 전술 기록</h2><p class="muted">브라우저 저장 기록 ${own.length}개 · 가져온 프로필 ${imported.length}개</p></div><div class="row"><button class="btn light" onclick="gateExport()">JSON 백업</button><label class="btn light file-pick">JSON 가져오기<input type="file" accept=".json,application/json" onchange="gateImport(event)"></label><button class="btn primary" onclick="gateNew()">새 검사</button></div></div>${gateProfileList(own,"own")}${imported.length?`<h3 class="mt">가져온 공유용 프로필</h3>${gateProfileList(imported,"imported")}`:""}</section>${selected?gateRenderSolo(selected):""}`;
 }
 
 function gateBar(label,value){
