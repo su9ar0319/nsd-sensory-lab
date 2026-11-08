@@ -1,0 +1,62 @@
+// NSD 제3차 게이트 연구소 V7 — 기존 Firestore 규칙의
+// match /databases/{database}/documents { ... } 블록 안에 두 match 블록을 추가하세요.
+// 1차 색채 / 2차 감각 규칙을 삭제하거나 덮어쓰지 마세요.
+match /gateUsers/{uid}/records/{recordId} {
+  allow get, list: if request.auth != null && request.auth.uid == uid;
+  allow create, update: if request.auth != null
+    && request.auth.uid == uid
+    && request.resource.data.ownerUid == uid
+    && request.resource.data.name is string
+    && request.resource.data.name.size() > 0
+    && request.resource.data.name.size() <= 40
+    && request.resource.data.role in ['센티넬', '가이드']
+    && request.resource.data.version == 'gate-operation-v7'
+    && request.resource.data.axes is list
+    && request.resource.data.axes.size() == 12
+    && request.resource.data.facets is list
+    && request.resource.data.facets.size() == 12
+    && request.resource.data.answers is list
+    && request.resource.data.answers.size() == 16
+    && request.resource.data.choices is list
+    && request.resource.data.choices.size() == 8
+    && request.resource.data.clarifiers is list
+    && request.resource.data.clarifiers.size() == 4;
+  allow delete: if request.auth != null && request.auth.uid == uid;
+}
+match /gatePublicProfiles/{recordId} {
+  allow get, list: if resource.data.isPublic == true;
+  allow create: if request.auth != null
+    && request.resource.data.ownerUid == request.auth.uid
+    && request.resource.data.isPublic == true
+    && request.resource.data.version == 'gate-operation-v7'
+    && request.resource.data.keys().hasOnly([
+      'id','name','role','version','axes','facets','choices',
+      'isPublic','updatedAt','ownerUid','linkRefs','scoreModel'
+    ])
+    && request.resource.data.name is string
+    && request.resource.data.name.size() > 0
+    && request.resource.data.name.size() <= 40
+    && request.resource.data.role in ['센티넬','가이드']
+    && request.resource.data.axes is list
+    && request.resource.data.axes.size() == 12
+    && request.resource.data.facets is list
+    && request.resource.data.facets.size() == 12
+    && request.resource.data.choices is list
+    && request.resource.data.choices.size() == 8
+    && request.resource.data.linkRefs is map;
+  allow update: if request.auth != null
+    && resource.data.ownerUid == request.auth.uid
+    && request.resource.data.ownerUid == resource.data.ownerUid
+    && request.resource.data.isPublic == true
+    && request.resource.data.version == 'gate-operation-v7'
+    && request.resource.data.keys().hasOnly([
+      'id','name','role','version','axes','facets','choices',
+      'isPublic','updatedAt','ownerUid','linkRefs','scoreModel'
+    ])
+    && request.resource.data.axes is list
+    && request.resource.data.axes.size() == 12
+    && request.resource.data.choices is list
+    && request.resource.data.choices.size() == 8;
+  allow delete: if request.auth != null
+    && resource.data.ownerUid == request.auth.uid;
+}
