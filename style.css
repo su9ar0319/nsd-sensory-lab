@@ -100,3 +100,10 @@
 .solo-summary-track i{display:block;height:100%;background:#9298ca;border-radius:99px}
 @media(max-width:680px){.solo-chapter{padding:16px;margin:24px 0 13px}.solo-summary-grid{grid-template-columns:1fr}.solo-summary-card{padding:16px 17px}.solo-summary-score strong{font-size:19px}}
 @media print{.solo-chapter,.solo-summary-card{-webkit-print-color-adjust:exact;print-color-adjust:exact}.solo-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.solo-chapter{break-after:avoid}}
+
+/* 감각 서명 세부 유형과 기존 18개 원형 계열 병행 표시 */
+.signature-family{display:inline-flex;align-self:flex-start;max-width:100%;font-size:10px;font-weight:850;line-height:1.4;letter-spacing:.01em;color:#f0efff;background:#ffffff27;border:1px solid #ffffff3a;border-radius:100px;padding:4px 10px;margin:-4px 0 7px;white-space:normal}
+.spectrum .sig-code{overflow-wrap:anywhere}
+.spectrum.tiny .signature-family{font-size:9px;padding:2px 7px;margin:-2px 0 5px}
+@media(max-width:480px){.spectrum.tiny .signature-family{font-size:8px}.spectrum.tiny .sig-code{font-size:8px}}
+@media print{.signature-family{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
