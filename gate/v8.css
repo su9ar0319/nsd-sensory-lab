@@ -22,3 +22,41 @@
  .gate-v7-report .gate-v7-chapter{break-after:avoid}
  .gate-v8-subline{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+
+
+/* Show exact chosen answers only when a reader explicitly expands research evidence. */
+.gate-v7-evidence h4{
+ margin:16px 0 8px;
+ color:#393335;
+ font-size:12px;
+ letter-spacing:.01em;
+}
+.gate-v8-choice-evidence{
+ list-style:none;
+ display:grid;
+ gap:7px;
+ padding:0;
+ margin:0 0 12px;
+}
+.gate-v8-choice-evidence li{
+ display:flex;
+ flex-wrap:wrap;
+ gap:7px;
+ align-items:baseline;
+ background:#FAF8F6;
+ padding:8px 10px;
+ border:1px solid #E7E1DC;
+ border-radius:6px;
+ font-size:12px;
+ color:#5D5558;
+ line-height:1.7;
+}
+.gate-v8-choice-evidence b{
+ color:#8D383E;
+ font-size:10px;
+ letter-spacing:.055em;
+ flex:none;
+}
+@media print{
+ .gate-v8-choice-evidence{break-inside:avoid}
+}
