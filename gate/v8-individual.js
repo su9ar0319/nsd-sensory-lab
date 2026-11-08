@@ -86,14 +86,14 @@ function gateV8Integrated(p){
  if(sensory){
   const related=sensorToTactical[sensory.top],tac=p.axes[related];
   const second=sensory.secondScore>=sensory.score-.9?" "+GATE_V8_SENSORY_AXIS[sensory.second]+"도 비슷한 비중이어서, 한 가지 감각 반응만으로 모든 상황을 설명하지 않는 편이 정확합니다.":"";
-  const comparison=tac>=7?"게이트 설문에서는 관련된 "+GATE_AXES[related].name+"도 높은 편이므로 두 검사에서 비슷한 반응 방향을 살펴볼 수 있습니다.":tac<=4.5?"그러나 게이트 설문에서 "+GATE_AXES[related].name+"은 상대적으로 낮습니다. 감각적 특징이 곧 작전 능력으로 이어지지는 않는다는 차이를 함께 읽어야 합니다.":"게이트 설문의 "+GATE_AXES[related].name+"은 이 감각 특성만으로 확정할 수 없으므로 실제 상황 선택을 중심으로 비교합니다.";
+  const comparison=tac>=7?"게이트 설문에서는 관련된 "+GATE_AXES[related].name+"도 높은 편이므로 두 검사에서 비슷한 반응 방향을 살펴볼 수 있습니다.":tac<=4.5?"그러나 게이트 설문에서 "+gateV7Josa(GATE_AXES[related].name,"은","는")+" 상대적으로 낮습니다. 감각적 특징이 곧 작전 능력으로 이어지지는 않는다는 차이를 함께 읽어야 합니다.":"게이트 설문의 "+gateV7Josa(GATE_AXES[related].name,"은","는")+" 이 감각 특성만으로 확정할 수 없으므로 실제 상황 선택을 중심으로 비교합니다.";
   const facet=typeof sensory.facetGap==="number"&&sensory.facetGap>=2?" 같은 감각 축 안에서도 세부 문항군의 차이가 나타나므로 일관된 반응만 가정하지 않는 편이 좋습니다.":"";
   pieces.push("연결된 감각 보고서에서는 "+GATE_V8_SENSORY_AXIS[sensory.top]+"이 비교적 높게 나타납니다."+second+" "+comparison+facet+" 이 자료는 실제 정찰 능력이나 부하도·가이딩 잔량으로 환산하지 않습니다.");
  }
  if(chroma){
   const related=colorToTactical[chroma.top],tac=p.axes[related];
   const second=chroma.secondScore>=chroma.score-.9?" "+GATE_V8_COLOR_AXIS[chroma.second]+"도 중요한 비중으로 나타나, 단일한 가치관으로 판단을 단정하기 어렵습니다.":"";
-  const comparison=tac>=7?"신규 전술 설문에서도 관련된 "+GATE_AXES[related].name+" 성향이 높으므로 행동의 이유를 함께 읽어볼 수 있습니다.":tac<=4.5?"하지만 게이트 설문의 "+GATE_AXES[related].name+"은 상대적으로 낮습니다. 마음속 가치관과 실제 위기에서의 선택이 항상 같은 방향은 아닐 수 있습니다.":"게이트 설문에서는 "+GATE_AXES[related].name+"과 이어지는지 추가 상황 선택으로 비교할 여지가 있습니다.";
+  const comparison=tac>=7?"신규 전술 설문에서도 관련된 "+GATE_AXES[related].name+" 성향이 높으므로 행동의 이유를 함께 읽어볼 수 있습니다.":tac<=4.5?"하지만 게이트 설문의 "+gateV7Josa(GATE_AXES[related].name,"은","는")+" 상대적으로 낮습니다. 마음속 가치관과 실제 위기에서의 선택이 항상 같은 방향은 아닐 수 있습니다.":"게이트 설문에서는 "+gateV7Josa(GATE_AXES[related].name,"과","와")+" 이어지는지 추가 상황 선택으로 비교할 여지가 있습니다.";
   const facet=typeof chroma.facetGap==="number"&&chroma.facetGap>=2?" 해당 색채 축에서도 문항군 사이의 차이가 있으므로 내적 동기가 한 가지 방식으로만 표현된다고 볼 수 없습니다.":"";
   pieces.push("연결된 색채 보고서에서는 "+GATE_V8_COLOR_AXIS[chroma.top]+"이 상대적으로 두드러집니다."+second+" "+comparison+facet+" 색채 결과는 가치관과 선택 동기의 보조 근거이며 전술 능력 점수를 변경하지 않습니다.");
  }
