@@ -139,11 +139,13 @@ function gateTrio(ps){
  for(let stage=0;stage<7;stage++){
   const riskBias=[9,18,26,40,55,48,22][stage];
   const rolescore=stage===0?gateMean(ps.map(p=>p.axes[1])):stage===1?detect.axes[0]:stage===2?gateMean(ps.map(p=>p.axes[0])):stage===3?gateMean(ps.map(p=>p.axes[8])):stage===4?sustain.axes[7]:stage===5?lead.axes[10]:gateMean(ps.map(p=>p.axes[11]));
-  const choices=ps.map(p=>gateChoice(p,stage<7?stage:7));
+  const choices=ps.map(p=>gateChoice(p,stage));
+  const roleChoices=ps.map(p=>gateChoice(p,8+stage));
   const choiceAxes=ps.map(p=>gateScenarios(p.role)[stage].opts[p.choices[stage]].axis);
   const aligned=new Set(choiceAxes).size===1;
   const shared=gateMean(ps.map(p=>p.axes[4]));
-  const readiness=Math.round(rolescore*5+shared*1.4+(aligned?5:0));
+  const roleAffinity=gateMean(ps.map(p=>p.axes[gateScenarios(p.role)[8+stage].opts[p.choices[8+stage]].axis]));
+  const readiness=Math.round(rolescore*3.8+shared*1.25+roleAffinity*.9+(aligned?4:0));
   const currentThreat=threat;
   const pressure=Math.round(gateClamp(15+riskBias+threat*.35-readiness*.20));
   const successStep=readiness>=pressure-2;
@@ -151,10 +153,13 @@ function gateTrio(ps){
   const localResource=[];
   state=state.map((old,i)=>{
    const p=ps[i],active=p.role==="센티넬";
-   const drain=active?Math.max(3,Math.round(pressure*.14+p.axes[5]*.5-p.axes[7]*.35)):Math.max(3,Math.round(pressure*.13+p.axes[6]*.2-p.axes[7]*.45));
+   const guideChoice=p.choices[8+stage];
+   // 가이딩은 자동 발생하지 않습니다. 이 모형에서는 관련 행동을 명시적으로 선택했을 때만 잔량을 소모합니다.
+   const guiding=!active&&((stage===0&&guideChoice===1)||(stage===1&&guideChoice===1)||(stage===3&&guideChoice===0)||(stage===4&&guideChoice===1)||(stage===5&&guideChoice===1)||(stage===6&&guideChoice===1));
+   const drain=active?Math.max(3,Math.round(pressure*.14+p.axes[5]*.5-p.axes[7]*.35)):guiding?Math.max(3,Math.round(pressure*.13+p.axes[6]*.2-p.axes[7]*.45)):0;
    const recovery=stage===6?Math.max(3,Math.round(p.axes[11]*1.3)):0;
    const value=active?Math.round(gateClamp(old.value+drain-recovery)):Math.round(gateClamp(old.value-drain+recovery));
-   localResource.push({name:p.name,role:p.role,before:old.value,after:value,change:active?value-old.value:old.value-value,kind:active?"부하도 모형":"가이딩 잔량 모형"});
+   localResource.push({name:p.name,role:p.role,before:old.value,after:value,change:active?value-old.value:old.value-value,kind:active?"부하도 모형":"가이딩 잔량 모형",guiding});
    return {...old,value};
   });
   const critical=state.some(p=>p.role==="센티넬"?p.value>=86:p.value<=14);
@@ -163,7 +168,7 @@ function gateTrio(ps){
   const actor=ps[stage%3],roleText=stage===0?`정보가 먼저 모이면 ${lead.name}이(가) 초기 역할을 확정하고 ${detect.name}이(가) 확인할 신호를 좁힙니다.`:stage===1?`${detect.name}의 정찰이 첫 진입의 리듬을 정합니다. 관찰 범위가 겹치지 않도록 다른 대원은 후방을 살필 수 있습니다.`:stage===2?`처음 확인되지 않은 기척이 드러납니다. ${detect.name}이(가) 포착한 정보가 ${lead.name}에게 전달되는 순서가 중요합니다.`:stage===3?`행동이 엇갈리면 ${lead.name}은(는) 기존 배치를 유지할지 다른 방법을 택할지 선택해야 합니다.`:stage===4?`${sustain.name}은(는) 자원 사용의 한계를 확인합니다. 높은 부하도나 낮은 잔량은 위험을 높일 수 있습니다.`:stage===5?`목표를 이어갈지 철수할지 ${lead.name}이(가) 근거를 정리하고 각자의 의사를 확인해야 합니다.`:`작전이 끝나도 ${sustain.name}의 사후 상태 점검은 별개로 진행해야 합니다.`;
   const consequence=critical?`자원 임계 상태에 가까운 대원이 감지되어 후속 단계의 위험에 추가 영향을 줍니다.`:successStep?`이 단계의 판단이 일정 부분 맞아떨어져 다음 단계의 위협이 낮아지는 흐름입니다.`:`판단이 엇갈리거나 현장의 압박이 높아져 다음 단계에 부담이 남습니다.`;
   const stageDetail=gatePick(GATE_NARRATIVES.stage[stage][successStep?0:1],ps.map(p=>p.id).join(","),"gate-stage",stage,pressure,successStep?"success":"risk");
-  stages.push({index:stage+1,title:GATE_STAGES[stage],beforeThreat:currentThreat,pressure,afterThreat:threat,cohesion,success:successStep,critical,summary:roleText+" "+stageDetail,consequence,actions:ps.map((p,i)=>({name:p.name,choice:choices[i]})),resources:localResource,lead:actor.name});
+  stages.push({index:stage+1,title:GATE_STAGES[stage],beforeThreat:currentThreat,pressure,afterThreat:threat,cohesion,success:successStep,critical,summary:roleText+" "+stageDetail,consequence,actions:ps.map((p,i)=>({name:p.name,choice:choices[i],roleChoice:roleChoices[i]})),resources:localResource,lead:actor.name});
  }
  const last=stages.at(-1),finalResources=state;
  const outcome=finalResources.some(p=>p.role==="센티넬"?p.value>=92:p.value<=8)?"긴급 철수 우선":success>=5&&last.afterThreat<58?"작전 목표 확보 가능":success>=3?"조건부 임무 종료":"재평가 및 철수 권장";
