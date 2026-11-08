@@ -145,7 +145,7 @@ function gateTrio(ps){
   const aligned=new Set(choiceAxes).size===1;
   const shared=gateMean(ps.map(p=>p.axes[4]));
   const roleAffinity=gateMean(ps.map(p=>p.axes[gateScenarios(p.role)[8+stage].opts[p.choices[8+stage]].axis]));
-  const readiness=Math.round(rolescore*3.8+shared*1.25+roleAffinity*.9+(aligned?4:0));
+  const readiness=Math.round(rolescore*4.5+shared*1.4+roleAffinity+(aligned?4:0));
   const currentThreat=threat;
   const pressure=Math.round(gateClamp(15+riskBias+threat*.35-readiness*.20));
   const successStep=readiness>=pressure-2;
