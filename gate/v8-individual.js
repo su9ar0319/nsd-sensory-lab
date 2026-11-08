@@ -183,7 +183,7 @@ function gateV8Sections(p){
  const arc=differentAxes===1?
   "상황이 달라져도 핵심 판단 기준이 크게 흔들리지 않는 편입니다. 같은 전술을 반복하는 것이 유리한지 현장 조건과 대조할 필요는 있습니다.":
   differentAxes===3?
-  "초반에는 "+GATE_AXES[q[0].choice.axis].name+", 진입 단계에는 "+GATE_AXES[q[1].choice.axis].name+", 위기 대응에는 "+GATE_AXES[q[5].choice.axis].name+"이 각각 강조됩니다. 이처럼 상황이 바뀔 때마다 전술의 무게중심도 달라집니다.":
+  "초반에는 "+GATE_AXES[q[0].choice.axis].name+", 진입 단계에는 "+GATE_AXES[q[1].choice.axis].name+", 위기 대응에는 "+gateV7Josa(GATE_AXES[q[5].choice.axis].name,"이","가")+" 각각 강조됩니다. 이처럼 상황이 바뀔 때마다 전술의 무게중심도 달라집니다.":
   "세 단계 중 일부에서 같은 전술 기준이 반복되지만, "+GATE_AXES[q[0].choice.axis].name+", "+GATE_AXES[q[1].choice.axis].name+", "+GATE_AXES[q[5].choice.axis].name+"이 모두 같은 비중으로 작동하지는 않습니다. 대응을 바꾸는 시점을 살펴보는 편이 정확합니다.";
  const reconstruction="설문 응답을 가상의 작전 흐름으로 이어 보면, 서로 다른 보고가 올라오는 초반에는 "+opening+" 이어 진입 지점에서 낯선 기척이 포착되면 "+entry+" "+(p.role==="가이드"?"가이딩 잔량이 예상보다 빠르게 줄어들 때는 ":"감각 과부하로 적의 위치를 놓친 순간에는 ")+crisis+" "+arc+" "+(p.role==="가이드"?
   "실제 가이딩 여부는 당사자의 동의와 남은 잔량에 따라 달라지며, 자동으로 연결되거나 소모된다고 가정하지 않습니다.":
