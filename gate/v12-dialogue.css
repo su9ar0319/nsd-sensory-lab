@@ -1,0 +1,95 @@
+/* NSD GATE / V12 short tactical radio dialogue. Purely presentational. */
+.gate-dialogue-heading{margin-top:23px}
+.gate-radio{
+ margin:12px 0 20px;
+ border:1px solid #DFDAD6;
+ border-radius:11px;
+ background:#FFF;
+ overflow:hidden;
+ box-shadow:0 6px 22px rgba(34,27,28,.045);
+}
+.gate-radio-meta{
+ display:flex;
+ align-items:center;
+ flex-wrap:wrap;
+ gap:10px;
+ padding:13px 19px;
+ background:#242426;
+ color:#E8E4E1;
+ font-size:10px;
+ letter-spacing:.10em;
+ font-weight:800;
+}
+.gate-radio-meta strong{
+ color:#FFF;
+ letter-spacing:0;
+ margin-left:auto;
+ font-size:11px;
+}
+.gate-radio-led{
+ display:inline-block;
+ width:7px;
+ height:7px;
+ border-radius:50%;
+ background:#C75C63;
+ box-shadow:0 0 0 3px rgba(199,92,99,.16);
+ flex:0 0 auto;
+}
+.gate-radio-lines{padding:6px 17px}
+.gate-radio-turn{
+ display:grid;
+ grid-template-columns:minmax(130px,185px) minmax(0,1fr);
+ align-items:start;
+ gap:17px;
+ padding:17px 2px;
+}
+.gate-radio-turn+.gate-radio-turn{border-top:1px solid #EAE5E1}
+.gate-radio-speaker{
+ display:flex;
+ flex-wrap:wrap;
+ align-items:center;
+ gap:6px 9px;
+ line-height:1.45;
+ padding-top:1px;
+ min-width:0;
+}
+.gate-radio-speaker strong{
+ font-weight:850;
+ font-size:13px;
+ color:#302B2E;
+ overflow-wrap:anywhere;
+}
+.gate-radio-speaker small{
+ font-size:10px;
+ font-weight:750;
+ color:#827A78;
+ background:#F4F1EE;
+ border:1px solid #E9E2DD;
+ padding:2px 6px;
+ border-radius:4px;
+}
+.gate-radio-index{
+ color:#A23E43;
+ font:800 10px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;
+ letter-spacing:.04em;
+}
+.gate-radio-turn p{
+ margin:0!important;
+ font-size:14px;
+ color:#494246;
+ line-height:1.95;
+ padding:0;
+ word-break:keep-all;
+}
+@media(max-width:660px){
+ .gate-radio-meta{padding:12px 14px;gap:8px}
+ .gate-radio-meta strong{margin-left:0;flex-basis:100%;padding-left:17px}
+ .gate-radio-lines{padding:4px 14px}
+ .gate-radio-turn{grid-template-columns:1fr;gap:6px;padding:14px 0}
+ .gate-radio-turn p{font-size:13px;padding-left:17px}
+}
+@media print{
+ .gate-radio{box-shadow:none;break-inside:avoid}
+ .gate-radio-meta{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .gate-radio-turn{break-inside:avoid}
+}
