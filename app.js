@@ -61,7 +61,10 @@ function publicLibraryView(){const p=publicProfiles().find(x=>x.id===state.publi
 function spectrumCard(p,small=false){const r=signature(p);return `<div class="spectrum ${small?'tiny':''}" style="background:linear-gradient(117deg,${r.bg1},${r.bg2})"><div class="kicker">SENSORY SIGNATURE / ${esc(p.role)}</div><h3>${esc(r.name)}</h3><p>${esc(r.subtitle)}</p><span class="sig-code">ID ${esc(r.code)}</span><div class="wave-line"></div></div>`;}
 function statBars(p){return `<div class="metrics">${p.axes.map((v,i)=>`<div class="metric"><b>${esc(DOMAINS[i].short)}</b><div class="track"><i style="width:${Math.round(v*10)}%"></i></div><span>${fixed(v)}</span></div>`).join('')}</div>`;}
 function lineSection(i,title,content){return `<div class="section"><h3>${String(i).padStart(2,'0')}. ${title}</h3><p>${content}</p></div>`;}
-function individualView(p){const r=signature(p),t=reportNarratives(p),name=esc(p.name),scenarios=getScenarios(p.role);const acts=[0,1,2,3,4,5,6,7].map(i=>`<div class="memory-card"><b>${esc(scenarios[i].title)}</b><p>“${esc(scenarios[i].opts[p.choices[i]][0])}”<br>${esc(scenarios[i].opts[p.choices[i]][2])}</p></div>`).join('');return `<section id="personalResult" class="card result"><div class="report-eyebrow">NSD / INDIVIDUAL SENSORY INTERFERENCE</div><h2>${name}의 감각 간섭 보고서</h2><p class="report-sub">${tag(p)} · 감각 수용과 위기 대응을 살펴보는 개인 기록</p><div class="columns hero-layout"><div>${spectrumCard(p)}</div><div class="sensory-panel"><div class="kicker">READING THE SIGNAL</div><h3>${esc(r.accent)}</h3><p>${esc(r.subtitle)}</p><div class="note-line"><b>강조</b><span>${esc(r.primary)}</span></div><div class="note-line"><b>여백</b><span>${esc(r.low)}</span></div><div class="note-line"><b>직군</b><span>${esc(p.role)}</span></div></div></div>
+function soloInsightCards(items){
+ return `<div class="solo-depth-grid">${items.map((x,i)=>`<article class="solo-depth-card"><div class="solo-depth-number">${String(i+1).padStart(2,"0")}</div><h4>${esc(x.title)}</h4><p>${esc(x.text)}</p></article>`).join("")}</div>`;
+}
+function individualView(p){const r=signature(p),t=reportNarratives(p),depth=individualDepthReport(p),name=esc(p.name),scenarios=getScenarios(p.role);const acts=[0,1,2,3,4,5,6,7].map(i=>`<div class="memory-card"><b>${esc(scenarios[i].title)}</b><p>“${esc(scenarios[i].opts[p.choices[i]][0])}”<br>${esc(scenarios[i].opts[p.choices[i]][2])}</p></div>`).join('');return `<section id="personalResult" class="card result"><div class="report-eyebrow">NSD / INDIVIDUAL SENSORY INTERFERENCE</div><h2>${name}의 감각 간섭 보고서</h2><p class="report-sub">${tag(p)} · 감각 수용과 위기 대응을 살펴보는 개인 기록</p><div class="columns hero-layout"><div>${spectrumCard(p)}</div><div class="sensory-panel"><div class="kicker">READING THE SIGNAL</div><h3>${esc(r.accent)}</h3><p>${esc(r.subtitle)}</p><div class="note-line"><b>강조</b><span>${esc(r.primary)}</span></div><div class="note-line"><b>여백</b><span>${esc(r.low)}</span></div><div class="note-line"><b>직군</b><span>${esc(p.role)}</span></div></div></div>
 ${lineSection(1,'이 감각 서명이 나타난 이유',esc(t.intro))}
 ${lineSection(2,'자극을 받아들이는 방법',esc(t.reception))}
 ${lineSection(3,'타인에게 전해지는 파장',esc(t.emission))}
@@ -70,8 +73,15 @@ ${lineSection(5,'위기에서의 완충 행동',esc(t.buffer))}
 ${lineSection(6,'선의와 간섭 사이의 경계',esc(t.boundary))}
 ${lineSection(7,'가이딩 이후에도 남는 감각',esc(t.after))}
 ${lineSection(8,'직군에 따른 현장 해석',esc(t.role))}
-<div class="section"><h3>09. 여덟 장면에 남은 선택</h3><p class="sub">선택한 행동을 통해 위기에서 드러나는 판단과 대응 방식을 살펴봅니다.</p>${acts}</div>
-<div class="section"><h3>10. 여섯 개의 감각 좌표</h3>${statBars(p)}</div>
+<div class="section solo-depth-section"><h3>09. 서로 다른 감각이 한 사람 안에서 만날 때</h3><p class="sub">6축을 하나씩 읽는 대신, 두 감각이 동시에 작용할 때 생기는 간격과 변화에 주목합니다.</p>${soloInsightCards(depth.crosses)}</div>
+<div class="section solo-depth-section"><h3>10. 같은 감각 안에서도 달라지는 반응</h3><p class="sub">각 축의 두 문항군 응답을 비교해 하나의 평균 뒤에 가려진 차이를 살펴봅니다.</p>${soloInsightCards(depth.facets)}</div>
+<div class="section solo-depth-section"><h3>11. 네 가지 장면으로 이어 읽는 판단의 흐름</h3><p class="sub">서로 다른 설문 선택을 이어 보면 같은 인물도 위험과 도움, 회복 앞에서 순서를 바꿀 수 있습니다.</p>${soloInsightCards(depth.decisions)}</div>
+<div class="section solo-depth-section"><h3>12. ${esc(p.role)}의 현장 자원과 세 번의 갈림길</h3><p class="sub">위기가 시작되는 때, 지원의 범위를 결정하는 때, 모든 일이 끝난 뒤를 구분해 읽습니다.</p>${soloInsightCards(depth.roleArc)}</div>
+<div class="section solo-depth-section"><h3>13. 타인에게 잘못 읽히기 쉬운 신호</h3><p class="sub">겉으로 보이는 행동과 실제 감각 부담이 늘 같은 방향으로 움직이지는 않습니다.</p>${soloInsightCards(depth.misreads)}</div>
+<div class="section solo-depth-section"><h3>14. 이 인물과 동행할 때 도움이 되는 대화</h3><p class="sub">누군가가 어떤 정보를 물어보고 어떤 선택권을 남겨야 할지 살펴봅니다.</p>${soloInsightCards(depth.cooperation)}</div>
+<div class="section solo-depth-section"><h3>15. 다른 선택이 이야기를 바꾸는 순간</h3><p class="sub">점수와 실제 선택에서 출발한 캐릭터 서사의 가능성입니다.</p>${soloInsightCards(depth.stories)}</div>
+<div class="section"><h3>16. 여덟 장면에 남은 선택</h3><p class="sub">선택한 행동을 통해 위기에서 드러나는 판단과 대응 방식을 살펴봅니다.</p>${acts}</div>
+<div class="section"><h3>17. 여섯 개의 감각 좌표</h3>${statBars(p)}</div>
 <div class="row actions"><button class="btn soft" onclick="pairFrom('${esc(p.id)}')">이 캐릭터로 2인 분석 →</button><button class="btn ghost" onclick="copyAIAnalysis('individual','${esc(p.id)}')">AI 분석 패키지 복사</button><button class="btn ghost" onclick="window.print()">인쇄 · PDF 저장</button></div></section>`;}
 function pairFrom(id){state.choiceA=id;state.choiceB=allProfiles().find(x=>x.id!==id)?.id||'';switchTo('pair');}
 function pairView(){const all=allProfiles();if(!state.choiceA)state.choiceA=all[0]?.id||'';if(!state.choiceB)state.choiceB=all.find(x=>x.id!==state.choiceA)?.id||'';const a=byId(state.choiceA),b=byId(state.choiceB);return `<section class="card no-print"><div class="kicker">SENSORY INTERFERENCE / PAIR</div><h2>2인 감각 간섭 분석</h2><p class="sub">두 캐릭터의 반응을 선택하면 A→B, B→A의 자극과 완충 효과를 각각 해석합니다.</p><div class="columns"><div><label class="field-label">대상자 A</label><select class="field" onchange="choiceChange('choiceA',this.value)">${optionsHtml(state.choiceA)}</select></div><div><label class="field-label">대상자 B</label><select class="field" onchange="choiceChange('choiceB',this.value)">${optionsHtml(state.choiceB)}</select></div></div></section>${a&&b&&a.id!==b.id?pairViewResult(a,b):'<section class="card empty">서로 다른 두 캐릭터를 선택해 주세요.</section>'}`;}
@@ -209,6 +219,13 @@ function buildAIScorecard(mode, id) {
     ...members.map((p, i) => aiScorecardProfile(p, String.fromCharCode(65 + i))),
     ""
   ];
+  if (mode === "individual") {
+    const d=individualDepthReport(members[0]);
+    intro.push("## 4. 개인 심화 해석", 
+      ...[["감각 축의 교차",d.crosses],["문항군별 반응 차이",d.facets],["상황 선택의 연쇄",d.decisions],["직군별 위기 대응",d.roleArc],["오해하기 쉬운 신호",d.misreads],["동행 시 의사소통",d.cooperation],["서사 갈림길",d.stories]]
+        .flatMap(([title,items])=>["### "+title,...items.map(x=>"- "+x.title+": "+x.text)]),
+      "");
+  }
   if (mode === "pair") {
     const [a,b] = members, r=pairDeepResult(a,b);
     intro.push(
