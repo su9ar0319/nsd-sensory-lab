@@ -13,7 +13,7 @@ const validProfile=p=>p&&p.version===LAB_VERSION&&['센티넬','가이드'].incl
 const allProfiles=()=>{const m=new Map();[...state.directory,...state.imported,...state.owned].filter(p=>!isBuiltInSample(p)&&validProfile(p)).forEach(p=>m.set(p.id,p));return [...m.values()].sort((a,b)=>a.name.localeCompare(b.name,'ko'));};
 const byId=id=>allProfiles().find(p=>p.id===id);
 const counted=()=>state.answers.filter(v=>v>=1&&v<=10).length+state.choices.filter(v=>v>=0&&v<4).length;
-function updateNav(){const tabs=[['help','이용 안내'],['survey','48문항 설문'],['library','내 기록'],['public','공개 기록'],['pair','2인 간섭 분석'],['group','3인 연계 분석']];$('nav').innerHTML=tabs.map(([id,label])=>`<button type="button" class="${state.tab===id?'active':''}" onclick="switchTo('${id}')">${label}</button>`).join('');}
+function updateNav(){const tabs=[['help','이용 안내'],['survey','설문 조사'],['library','개인 기록'],['public','공개 기록'],['pair','2인 분석'],['group','3인 분석']];$('nav').innerHTML=tabs.map(([id,label])=>`<button type="button" class="${state.tab===id?'active':''}" onclick="switchTo('${id}')">${label}</button>`).join('');}
 function switchTo(tab){state.tab=tab;render();window.scrollTo({top:0,behavior:'smooth'});}
 function render(){updateNav();$('main').innerHTML=state.tab==='survey'?surveyView():state.tab==='library'?libraryView():state.tab==='public'?publicLibraryView():state.tab==='pair'?pairView():state.tab==='group'?groupView():helpView();}
 function stepTitle(step){return ['공통 성향 1~8','공통 성향 9~16','직군 전용 1~8','직군 전용 9~16','직군 전용 17~24','현장 선택 여덟 장면'][step];}
