@@ -4,6 +4,17 @@ function gateEsc(x){return String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<"
 
 function gateLocal(k,fallback){try{return JSON.parse(localStorage.getItem(k))||fallback}catch(_){return fallback}}
 
+
+/** Firestore does not accept arrays nested directly inside arrays.
+ * Keep [common, role] pairs in memory; encode each pair as a map on the wire.
+ */
+function gateFirestoreEncode(p){
+ return {...p,facets:(p.facets||[]).map(pair=>Array.isArray(pair)?{first:Number(pair[0]),second:Number(pair[1])}:pair)};
+}
+function gateFirestoreDecode(p){
+ return {...p,facets:(p.facets||[]).map(pair=>Array.isArray(pair)?pair:[Number(pair.first),Number(pair.second)])};
+}
+
 function gatePersist(){localStorage.setItem("nsd_gate_v1_own",JSON.stringify(gateState.own));localStorage.setItem("nsd_gate_v1_imported",JSON.stringify(gateState.imported))}
 
 function gateId(){return "g-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,11)}
@@ -95,7 +106,7 @@ async function gateRemove(id){
 
 function gateProfileList(profiles,kind){
  if(!profiles.length)return `<div class="empty">표시할 캐릭터가 아직 없어요.</div>`;
- return `<div class="profile-list">${profiles.map(p=>`<div class="profile-row"><div><b>${gateEsc(p.name)}</b><span>${gateEsc(p.role)} · ${gateEsc(gateSignature(p).name)}</span></div><div class="row"><button class="btn light" onclick="gateChoose('${p.id}')">1인 보기</button>${kind==="own"?`<button class="btn small" onclick="gateEdit('${p.id}')">수정</button><button class="btn small danger" onclick="gateRemove('${p.id}')">삭제</button>`:""}</div></div>`).join("")}</div>`;
+ return `<div class="profile-list">${profiles.map(p=>`<div class="profile-row"><div><b>${gateEsc(p.name)}</b><span>${gateEsc(p.role)} · ${gateEsc(gateSignature(p).name)}</span></div><div class="row"><button class="btn light" onclick="gateChoose('${p.id}')">1인 보기</button>${kind==="own"?`<button class="btn small" onclick="gateEdit('${p.id}')">수정</button>${p.localOnly?`<button class="btn small" onclick="gateV7RetrySave('${p.id}')">Firebase 저장 재시도</button>`:""}<button class="btn small danger" onclick="gateRemove('${p.id}')">삭제</button>`:""}</div></div>`).join("")}</div>`;
 }
 
 function gateChoose(id){gateState.selected=id;gateRender();document.getElementById("gatePersonal")?.scrollIntoView({behavior:"smooth",block:"start"})}
@@ -256,14 +267,14 @@ async function gateStartCloud(){
   const cred=await authLib.signInAnonymously(auth),uid=cred.user.uid;
   const ownRef=id=>fireLib.doc(db,"gateUsers",uid,"records",id),publicRef=id=>fireLib.doc(db,"gatePublicProfiles",id);
   gateState.cloud={
-   async save(p){const batch=fireLib.writeBatch(db);batch.set(ownRef(p.id),{...p,ownerUid:uid});if(p.isPublic)batch.set(publicRef(p.id),{...gatePublicRecord(p),ownerUid:uid});else if(gateState.directory.some(x=>x.id===p.id))batch.delete(publicRef(p.id));await batch.commit()},
+   async save(p){const batch=fireLib.writeBatch(db);batch.set(ownRef(p.id),{...gateFirestoreEncode(p),ownerUid:uid});if(p.isPublic)batch.set(publicRef(p.id),{...gateFirestoreEncode(gatePublicRecord(p)),ownerUid:uid});else if(gateState.directory.some(x=>x.id===p.id))batch.delete(publicRef(p.id));await batch.commit()},
    async remove(p){const batch=fireLib.writeBatch(db);batch.delete(ownRef(p.id));if(p.isPublic)batch.delete(publicRef(p.id));await batch.commit()},
    async refresh(){
     const own=await fireLib.getDocs(fireLib.collection(db,"gateUsers",uid,"records"));
     const shared=await fireLib.getDocs(fireLib.query(fireLib.collection(db,"gatePublicProfiles"),fireLib.where("isPublic","==",true)));
-    const fromCloud=own.docs.map(d=>({...d.data(),id:d.id,localOnly:false})).filter(gateValid);
+    const fromCloud=own.docs.map(d=>gateFirestoreDecode({...d.data(),id:d.id,localOnly:false})).filter(gateValid);
     const kept=gateState.own.filter(p=>p.localOnly&&!fromCloud.some(x=>x.id===p.id));
-    gateState.own=[...fromCloud,...kept];gateState.directory=shared.docs.map(d=>({...d.data(),id:d.id})).filter(gateValid);
+    gateState.own=[...fromCloud,...kept];gateState.directory=shared.docs.map(d=>gateFirestoreDecode({...d.data(),id:d.id})).filter(gateValid);
     gatePersist();
    }
   };
