@@ -29,7 +29,192 @@ const SIGNATURES=[
  ['짧은 메아리','되돌아오는 메아리','오래 남는 잔향']
 ];
 const STATES=['파장이 낮은 구간','조정 가능한 구간','자극이 도드라지는 구간'];
-function signature(p){const a=p.axes,hi=a.indexOf(Math.max(...a)),lo=a.indexOf(Math.min(...a));const band=bandIndex(a[hi]);const nuance=a[5]>6.8?'감각 여운이 길게 이어지는 기록':a[0]>6.8?'많은 자극을 동시 수용하는 기록':a[3]>6.8?'위기 앞에서 완충을 먼저 찾는 기록':'상황에 따라 반응 리듬을 바꾸는 기록';const hue=(213+Math.round((a[1]-a[0])*8+(a[2]-a[3])*5+360))%360;const bg1=`hsl(${hue} 43% 25%)`,bg2=`hsl(${(hue+38)%360} 51% 41%)`;return {name:SIGNATURES[hi][band],subtitle:nuance,accent:STATES[bandIndex(a[0])],primary:DOMAINS[hi].short,low:DOMAINS[lo].short,hue,bg1,bg2,code:`${String(hi+1).padStart(2,'0')}-${String(band+1).padStart(2,'0')}-${String(Math.round(a[0]*10)).padStart(3,'0')}-${String(Math.round(a[5]*10)).padStart(3,'0')}`};}
+// 6축의 1위와 2위, 내부 문항군 차이를 함께 읽는 세부 감각 서명.
+// 성향과 무관한 랜덤 분배는 사용하지 않으며 점수 계산은 변경하지 않습니다.
+const SIGNATURE_SUBTYPES={
+  "0": {
+    "1": [
+      "울림을 읽는 감각",
+      "파장을 받아 적는 청자",
+      "표현의 결을 좇는 귀"
+    ],
+    "2": [
+      "기척을 줍는 감각",
+      "미세한 전조의 청자",
+      "신호에 흔들리는 감각"
+    ],
+    "3": [
+      "완충을 찾는 감각",
+      "자극을 조율하는 청자",
+      "대응에 따라 열리는 감각"
+    ],
+    "4": [
+      "거리를 재는 감각",
+      "경계를 읽는 청자",
+      "허용 범위를 살피는 감각"
+    ],
+    "5": [
+      "잔향을 붙드는 감각",
+      "여운을 모으는 청자",
+      "뒤늦게 열리는 감각"
+    ]
+  },
+  "1": {
+    "0": [
+      "울림을 크게 보내는 발신자",
+      "감각을 전하는 파동",
+      "받은 자극을 되돌리는 파장"
+    ],
+    "2": [
+      "경고를 전하는 파장",
+      "신호를 앞세운 발신자",
+      "속도를 바꾸는 경고음"
+    ],
+    "3": [
+      "움직임을 이끄는 파장",
+      "완충을 재촉하는 발신자",
+      "수습의 리듬을 흔드는 파동"
+    ],
+    "4": [
+      "경계를 드러내는 파장",
+      "말로 거리를 만드는 사람",
+      "상대에 맞춰 변하는 파동"
+    ],
+    "5": [
+      "여운을 남기는 파장",
+      "오래 울리는 발신자",
+      "이후에 번지는 울림"
+    ]
+  },
+  "2": {
+    "0": [
+      "기척을 줍는 정찰자",
+      "감각으로 징후를 읽는 눈",
+      "자극의 결을 좇는 감시자"
+    ],
+    "1": [
+      "경고를 전하는 신호수",
+      "파장을 띄우는 파수꾼",
+      "목소리를 바꾸는 경계자"
+    ],
+    "3": [
+      "위기를 낮추는 경보",
+      "경고 다음의 완충자",
+      "신호와 대응을 잇는 손"
+    ],
+    "4": [
+      "경계에 먼저 선 관찰자",
+      "허락을 묻는 파수꾼",
+      "선을 다시 그리는 감시자"
+    ],
+    "5": [
+      "잔향을 기억하는 경보",
+      "여운을 좇는 감시자",
+      "지나간 신호의 추적자"
+    ]
+  },
+  "3": {
+    "0": [
+      "자극을 정리하는 완충자",
+      "감각을 낮추는 조율자",
+      "현장을 따라 움직이는 완충"
+    ],
+    "1": [
+      "파장을 조정하는 완충자",
+      "소란을 가라앉히는 사람",
+      "말보다 먼저 움직이는 조율자"
+    ],
+    "2": [
+      "경고에 응답하는 완충자",
+      "위기를 받아내는 조정자",
+      "전조를 따라 바뀌는 지원"
+    ],
+    "4": [
+      "거리를 지키는 완충자",
+      "동의를 앞세운 조율자",
+      "개입의 선을 다시 긋는 손"
+    ],
+    "5": [
+      "회복을 남겨 두는 완충자",
+      "끝을 살피는 지원자",
+      "여운에 맞춰 조절하는 손"
+    ]
+  },
+  "4": {
+    "0": [
+      "자극의 경계를 읽는 사람",
+      "감각의 거리를 재는 관찰자",
+      "신호에 맞춰 여닫히는 선"
+    ],
+    "1": [
+      "말로 거리를 정하는 사람",
+      "파장을 조율하는 경계자",
+      "표현에 따라 움직이는 선"
+    ],
+    "2": [
+      "경고 앞에서 묻는 사람",
+      "전조를 확인하는 경계자",
+      "위기에 따라 바뀌는 허용선"
+    ],
+    "3": [
+      "개입의 거리를 정하는 사람",
+      "완충에 기준을 세우는 손",
+      "지원에 따라 움직이는 경계"
+    ],
+    "5": [
+      "회복을 기다리는 경계자",
+      "여운에 자리를 남기는 사람",
+      "끝난 뒤 다시 긋는 선"
+    ]
+  },
+  "5": {
+    "0": [
+      "감각을 오래 기억하는 사람",
+      "자극의 흔적을 모으는 기억",
+      "뒤늦게 떠오르는 감각"
+    ],
+    "1": [
+      "울림을 붙드는 기억자",
+      "말의 파장을 간직하는 사람",
+      "사후에 되살아나는 울림"
+    ],
+    "2": [
+      "경고의 흔적을 간직하는 사람",
+      "지나간 전조의 기록자",
+      "나중에 의미가 바뀌는 경보"
+    ],
+    "3": [
+      "완충 뒤에도 남는 감각",
+      "수습 이후의 관찰자",
+      "돌아와 다시 느끼는 여운"
+    ],
+    "4": [
+      "경계의 흔적을 기억하는 사람",
+      "허용된 거리를 돌아보는 눈",
+      "지나간 선택을 되묻는 여운"
+    ]
+  }
+};
+function signature(p){
+ const a=p.axes,order=[0,1,2,3,4,5].sort((i,j)=>a[j]-a[i]||i-j);
+ const hi=order[0],runner=order[1],lo=order[5];
+ const band=bandIndex(a[hi]);
+ const firstFacets=Array.isArray(p.facets)&&p.facets.length===12?p.facets.slice(hi*2,hi*2+2):[];
+ const innerGap=firstFacets.length===2?Math.abs(Number(firstFacets[0])-Number(firstFacets[1])):0;
+ const runnerGap=a[hi]-a[runner];
+ const mode=innerGap>=1.7?2:runnerGap>=1.35?0:1;
+ const family=SIGNATURES[hi][band];
+ const name=SIGNATURE_SUBTYPES[hi][runner][mode];
+ const modeText=mode===2?`같은 ${DOMAINS[hi].short} 안에서도 응답의 편차가 ${fixed(innerGap)}점으로, 상황에 따라 반응의 결이 달라집니다.`:
+  mode===0?`${DOMAINS[hi].short}이(가) ${DOMAINS[runner].short}보다 ${fixed(runnerGap)}점 앞서며 중심 반응을 이룹니다.`:
+  `${DOMAINS[hi].short}과(와) ${DOMAINS[runner].short}이(가) ${fixed(runnerGap)}점 차이로 맞물려 나타납니다.`;
+ const roleText=p.role==="가이드"?"가이딩 잔량 관리와 지원의 타이밍에서 이 차이가 드러날 수 있습니다.":"부하도 변화에 대응하고 동료에게 신호를 보내는 순간에 이 차이가 드러날 수 있습니다.";
+ const nuance=`${modeText} ${roleText}`;
+ const hue=(213+Math.round((a[1]-a[0])*8+(a[2]-a[3])*5+360))%360;
+ const bg1=`hsl(${hue} 43% 25%)`,bg2=`hsl(${(hue+38)%360} 51% 41%)`;
+ return {name,family,subtitle:nuance,accent:STATES[bandIndex(a[0])],primary:DOMAINS[hi].short,secondary:DOMAINS[runner].short,low:DOMAINS[lo].short,hue,bg1,bg2,
+  signatureMode:mode,signatureAxes:[hi,runner],code:`${String(hi+1).padStart(2,'0')}-${String(band+1).padStart(2,'0')}-${String(Math.round(a[0]*10)).padStart(3,'0')}-${String(Math.round(a[5]*10)).padStart(3,'0')}`};
+}
 function narrativePick(pool,...parts){
  const valid=(Array.isArray(pool)?pool:[]).filter(x=>typeof x==="string"&&x.trim());
  if(!valid.length)return "";
