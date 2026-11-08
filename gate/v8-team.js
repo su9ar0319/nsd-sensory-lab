@@ -84,7 +84,7 @@ gateTrio=function(ps){
  const unique=[...new Set(cores)];
  const cover=unique.length===3?"서로 다른 우선순위 세 가지를 동시에 운용하는 팀입니다. 의견이 나뉘었을 때 누가 합의의 근거를 모으는지가 중요합니다.":unique.length===1?"세 명의 판단 동기가 유사합니다. 즉각적인 합의는 쉬워질 수 있지만 다른 방향의 위험을 놓치지 않을 교차 확인자가 필요합니다.":"둘은 판단의 이유가 가깝고 한 사람은 다른 기준을 가지고 있습니다. 소수의 다른 의견을 무시하지 않는 배치가 유효합니다.";
  result.stages.forEach((stage,i)=>{
-  stage.summary+=" "+gateV8TrioSummary(ps,i,stage);
+  stage.summary+=" "+gateV8TrioSummary(ps,{index:i+1},stage);
   if(i===3||i===4||i===5)stage.consequence+=" "+(stage.resources.some(r=>r.role==="가이드"&&r.guiding)?"이 단계에서는 명시적으로 선택된 가이딩의 수행이 가이딩 잔량 감소에 반영되었습니다.":"이 단계에서 모든 가이드가 자동으로 가이딩을 수행한 것은 아닙니다.");
  });
  result.pairs.forEach((pair,i)=>{
