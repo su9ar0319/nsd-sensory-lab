@@ -157,3 +157,125 @@ function trioResult(ps){
   pairs
  };
 }
+
+// 2인·3인 심화 해설 및 세 사람 역할 분담
+function teamPick(pool,...parts){
+ const list=(Array.isArray(pool)?pool:[]).filter(x=>typeof x==="string"&&x.trim());
+ if(!list.length)return "";
+ return narrativePick(list, ...parts);
+}
+
+function teamRoleAssignment(ps){
+ if(ps.length!==3 || new Set(ps.map(p=>p.id||p.name)).size!==3)throw Error("서로 다른 세 캐릭터를 선택해 주세요.");
+ const roleSpecs=[
+  {key:"detect",label:"이상 징후 감지",axis:2,action:"변화를 먼저 확인하고 두 동료에게 경고를 전달하는 역할"},
+  {key:"buffer",label:"현장 완충 대응",axis:3,action:"불필요한 자극과 동선을 조정해 대응 여유를 확보하는 역할"},
+  {key:"boundary",label:"개입 범위 조율",axis:4,action:"지원의 범위와 당사자의 의사를 확인하고 순서를 맞추는 역할"}
+ ];
+ const score=(p,axis)=>{
+   const base=Number(p.axes[axis]);
+   const facets=Array.isArray(p.facets)&&p.facets.length===12?
+     ((Number(p.facets[axis*2])+Number(p.facets[axis*2+1]))/2-base)*0.035:0;
+   const scenarios=getScenarios(p.role);
+   const scenarioDelta=(p.choices||[]).reduce((sum,ch,i)=>{
+     const v=scenarios[i]?.opts?.[ch]?.[1]?.[axis]||0;
+     return sum+v;
+   },0);
+   return base+facets+scenarioDelta*0.035;
+ };
+ const perms=[[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]];
+ let best=perms[0],bestScore=-Infinity;
+ for(const perm of perms){
+   const value=perm.reduce((sum,personIndex,roleIndex)=>sum+score(ps[personIndex],roleSpecs[roleIndex].axis),0);
+   if(value>bestScore+1e-9){bestScore=value;best=perm;}
+ }
+ const seed=ps.map(p=>(p.id||p.name)+":"+p.axes.join(".")+":"+(p.choices||[]).join("")).join("|");
+ const assignments=roleSpecs.map((spec,j)=>{
+   const index=best[j],p=ps[index],raw=Number(p.axes[spec.axis]);
+   const highest=Math.max(...ps.map(x=>Number(x.axes[spec.axis])));
+   const level=raw>=6.8?"해당 영역에 뚜렷한 반응":raw<4.5?"해당 영역에서는 신중한 반응":"상황에 따라 조절하는 반응";
+   const note=highest-raw>=1.2?"다른 역할과의 균형을 위해 이 역할에 배치했습니다.":"세 사람의 강점을 비교해 이 역할에 배치했습니다.";
+   const description=teamPick(TEAM_DB.TRIO.assignment[spec.key],seed,"assignment",spec.key);
+   return {key:spec.key,label:spec.label,axis:spec.axis,name:p.name,id:p.id||p.name,index,score:raw,action:spec.action,reason:`${level}을 보이며, ${note} ${description}`};
+ });
+ return assignments;
+}
+
+function pairDeepResult(a,b){
+ const base=pairResult(a,b),p=TEAM_DB.PAIR;
+ const seed=[a.id||a.name,b.id||b.name,a.axes.join(","),b.axes.join(","),a.choices.join(""),b.choices.join("")].join("|");
+ const gap=base.fromAToB.delta-base.fromBToA.delta;
+ const similar=a.axes.map((x,i)=>Math.abs(x-b.axes[i])).filter(v=>v<1.4).length;
+ const opener=similar>=4?"same":"different";
+ const opening=teamPick(p.opening[opener],seed,"opening");
+ const senses=[a.axes[2],b.axes[2]];
+ const signalKind=Math.min(...senses)>=6.8?"fast":Math.max(...senses)<4.5?"slow":"split";
+ const signal=`${teamPick(p.signal[signalKind],seed,"signal")} ${a.axes[2]>=b.axes[2]?a.name:b.name}이(가) 전조를 먼저 알아차릴 가능성이 상대적으로 높지만, 두 사람의 실제 판단은 현장 정보에 따라 달라질 수 있습니다.`;
+ const supports=[a.axes[3],b.axes[3]];
+ const supportKind=Math.min(...supports)>=6.8?"both":Math.max(...supports)<4.5?"quiet":"split";
+ const support=teamPick(p.support[supportKind],seed,"support");
+ const misKind=Math.abs(a.axes[4]-b.axes[4])>2.2?"boundary":Math.abs(a.axes[1]-b.axes[1])>2.2?"expression":"timing";
+ const misreading=teamPick(p.misread[misKind],seed,"misread");
+ const kind=a.role==="센티넬"&&b.role==="센티넬"?"SS":a.role==="가이드"&&b.role==="가이드"?"GG":"SG";
+ const resource=`${teamPick(p.role[kind],seed,"role")} ${base.role}`;
+ const recGap=Math.abs(a.axes[5]-b.axes[5]);
+ const recKind=recGap>2.2?"split":Math.min(a.axes[5],b.axes[5])>=6.8?"slow":Math.max(a.axes[5],b.axes[5])<4.5?"fast":"split";
+ const recovery=teamPick(p.after[recKind],seed,"recovery");
+ const outlookKind=Math.abs(gap)>=26?"asymmetric":similar>=4?"near":"far";
+ const outlook=teamPick(p.outlook[outlookKind],seed,"outlook");
+ const selected=(person,sceneIdx)=>{
+   const scene=getScenarios(person.role)[sceneIdx];
+   const option=scene?.opts?.[person.choices[sceneIdx]];
+   return option?`${person.name}의 선택: "${option[0]}"`:`${person.name}의 현장 반응은 별도로 확인이 필요합니다.`;
+ };
+ const scenes=[
+   {title:"01 · 첫 번째 경고",text:`게이트에서 불분명한 신호가 발견된 상황을 가정합니다. ${signal} ${selected(a,0)} / ${selected(b,0)}`},
+   {title:"02 · 지원이 필요한 순간",text:`부담이 커질 때는 협력의 시작 시점이 중요합니다. ${support} ${selected(a,4)} / ${selected(b,4)}`},
+   {title:"03 · 현장을 떠난 뒤",text:`같은 사건을 겪어도 긴장을 내려놓는 속도는 달라질 수 있습니다. ${recovery} ${selected(a,6)} / ${selected(b,6)}`}
+ ];
+ const decision=`${Math.abs(a.axes[4]-b.axes[4])>=2.2?"개입에 동의하는 기준이 다릅니다.":"개입 범위에 대한 기준은 크게 어긋나지 않습니다."} ${misreading} ${selected(a,7)} / ${selected(b,7)}`;
+ const turning=`${base.fromAToB.delta>base.fromBToA.delta?`${a.name}→${b.name} 방향에서 자극이 완충을 앞서는 정도가 상대적으로 더 큽니다.`:`${b.name}→${a.name} 방향에서 자극이 완충을 앞서는 정도가 상대적으로 더 큽니다.`} ${outlook}`;
+ return {...base,opening,signal,supportTiming:support,misreading,resource,recovery,decision,turning,scenes,outlook};
+}
+
+function trioDeepResult(ps){
+ const base=trioResult(ps), t=TEAM_DB.TRIO;
+ const seed=ps.map(p=>[p.id||p.name,p.axes.join(","),(p.choices||[]).join("")].join(":")).join("|");
+ const assignment=teamRoleAssignment(ps);
+ const who=key=>assignment.find(x=>x.key===key);
+ const countG=ps.filter(p=>p.role==="가이드").length;
+ const groupKind=["SSS","SSG","SGG","GGG"][countG];
+ const makeup=teamPick(t.makeup[groupKind],seed,"makeup",groupKind);
+ const spread=DOMAINS.map((_,i)=>Math.max(...ps.map(p=>p.axes[i]))-Math.min(...ps.map(p=>p.axes[i])));
+ const peaks=ps.map(p=>p.axes.indexOf(Math.max(...p.axes)));
+ const pressureKind=spread.filter(v=>v<1.2).length>=4?"same":new Set(peaks).size===3?"split":spread.filter(v=>v>3.4).length>=2?"one":"resource";
+ const pressure=`${teamPick(t.pressure[pressureKind],seed,"pressure")} ${teamPick(t.pressure.resource,seed,"resource")}`;
+ const scenes=[
+  {title:"STEP 01 · 진입과 관찰",text:`${teamPick(t.scene.entry,seed,"enter")} ${who("detect").name}이(가) 전조 감지를 맡고, ${who("buffer").name}이(가) 주변 자극을 조정합니다. ${who("boundary").name}이(가) 지원의 범위를 확인합니다.`},
+  {title:"STEP 02 · 작은 이상 징후",text:`${teamPick(t.scene.warning,seed,"warning")} ${who("detect").name}의 경고가 나오면 ${who("buffer").name}은(는) 현장의 부담을 낮출 방법을 찾고 ${who("boundary").name}은(는) 필요한 의사를 확인합니다.`},
+  {title:"STEP 03 · 압박이 커지는 순간",text:`${teamPick(t.scene.crisis,seed,"crisis")} ${who("buffer").name}이(가) 완충에 집중하는 동안 ${who("detect").name}은(는) 후속 변화를 살피고, ${who("boundary").name}은(는) 개입 범위를 조율합니다.`},
+  {title:"STEP 04 · 종료와 회복",text:`${teamPick(t.scene.ending,seed,"ending")} 세 사람의 감각적 여운은 각자 다를 수 있으므로 다음 행동은 상태 확인 뒤 결정합니다.`}
+ ];
+ const pairDetails=[[0,1],[0,2],[1,2]].map(([i,j],k)=>{
+   const a=ps[i],b=ps[j],q=pairResult(a,b);
+   const da=q.fromAToB.delta,db=q.fromBToA.delta;
+   const stronger=da>db?a.name:b.name;
+   const weakest=DOMAINS[q.difference].short;
+   const diffs=a.axes.map((v,z)=>Math.abs(v-b.axes[z]));
+   const note=teamPick([PAIR_AXES[q.difference].contrastText,...NARRATIVE_DB.PAIR_VARIANTS[q.difference][Math.max(...diffs)>2.2?"contrast":"match"]],seed,"p",k);
+   return {name:`${a.name} × ${b.name}`,data:`${a.name}→${b.name}: 자극 ${q.fromAToB.stimulation}, 완충 ${q.fromAToB.buffer} / ${b.name}→${a.name}: 자극 ${q.fromBToA.stimulation}, 완충 ${q.fromBToA.buffer}`,text:`두 사람이 차이를 크게 보이는 곳은 ${weakest}입니다. ${note} ${stronger}이(가) 상대에게 미치는 영향의 방향을 먼저 확인하면 조율에 도움이 됩니다.`};
+ });
+ const highRecovery=ps.reduce((a,b)=>a.axes[5]>=b.axes[5]?a:b);
+ const avgRecovery=mean(ps.map(x=>x.axes[5])),differenceRecovery=Math.max(...ps.map(x=>x.axes[5]))-Math.min(...ps.map(x=>x.axes[5]));
+ const recoverKey=differenceRecovery>2.2?"mixed":avgRecovery>=6.8?"slow":"fast";
+ const recovery=`${highRecovery.name}은(는) 세 사람 가운데 상대적으로 감각적 여운이 오래 남을 수 있습니다. ${teamPick(t.recovery[recoverKey],seed,"recovery")}`;
+ const fallback=assignment.map(x=>{
+    const remaining=ps.filter(p=>(p.id||p.name)!==x.id);
+    const backup=remaining.slice().sort((a,b)=>b.axes[x.axis]-a.axes[x.axis])[0];
+    return {title:`${x.name}이(가) ${x.label} 역할을 쉬게 된다면`,text:`다른 두 사람 중 ${backup.name}이(가) ${x.label}의 일부를 이어받을 수 있습니다. ${teamPick(t.fallback[x.key],seed,x.key,"fallback")} 기존 담당자의 상태를 먼저 확인해야 합니다.`};
+ });
+ const overall=pressureKind==="same"?"steady":pressureKind==="split"?"split":countG>0?"resource":"volatile";
+ const outlook=teamPick(t.outlook[overall],seed,"outlook");
+ const roleSummary=`이번 배치는 한 사람의 최고 점수만 세 번 고르는 방식이 아니라 세 사람 모두 역할을 맡도록 감각 축을 비교한 작전 배치입니다. ${assignment.map(x=>`${x.name}: ${x.label}(${fixed(x.score)}점)`).join(" / ")}.`;
+ return {...base,roles:roleSummary,assignments:assignment,makeup,pressure,scenes,pairDetails,fallback,recovery,outlook};
+}
