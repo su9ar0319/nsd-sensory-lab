@@ -146,7 +146,8 @@ function gateTrio(ps){
  let state=ps.map(p=>({id:p.id,name:p.name,role:p.role,value:p.role==="가이드"?Math.round(gateClamp(89-p.axes[5]*1.4+p.axes[7]*1.5)):Math.round(gateClamp(17+p.axes[5]*2.2-p.axes[7]*1.2))}));
  const stages=[];
  for(let stage=0;stage<7;stage++){
-  const riskBias=[9,18,26,40,55,48,22][stage];
+  /* Seven-step hazard curve: challenging mid-gate without turning stages 4-6 into an unavoidable failure. */
+  const riskBias=[9,16,22,29,34,30,18][stage];
   const rolescore=stage===0?gateMean(ps.map(p=>p.axes[1])):stage===1?detect.axes[0]:stage===2?gateMean(ps.map(p=>p.axes[0])):stage===3?gateMean(ps.map(p=>p.axes[8])):stage===4?sustain.axes[7]:stage===5?lead.axes[10]:gateMean(ps.map(p=>p.axes[11]));
   const choices=ps.map(p=>gateChoice(p,stage));
   const roleChoices=ps.map(p=>gateChoice(p,4+(stage%4)));
@@ -156,7 +157,8 @@ function gateTrio(ps){
   const roleAffinity=gateMean(ps.map(p=>p.axes[gateScenarios(p.role)[4+(stage%4)].opts[p.choices[4+(stage%4)]].axis]));
   const readiness=Math.round(rolescore*4.5+shared*1.4+roleAffinity+(aligned?4:0));
   const currentThreat=threat;
-  const pressure=Math.round(gateClamp(15+riskBias+threat*.35-readiness*.20));
+  /* Balance escalating external danger against actual tactical readiness, not the number of Guides in the squad. */
+  const pressure=Math.round(gateClamp(15+riskBias+threat*.29-readiness*.22));
   const successStep=readiness>=pressure-2;
   if(successStep)success++;else cohesion=gateClamp(cohesion-7);
   const localResource=[];
