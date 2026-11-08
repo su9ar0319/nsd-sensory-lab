@@ -123,6 +123,35 @@ function gateV8Integrated(p){
  }
  return {sensory,chroma,text:pieces.join(" ")};
 }
+
+/* Natural action phrasing for the three major phases of a hypothetical gate operation.
+ * Source choices are preserved separately, in the expandable evidence section. */
+const GATE_V8_OPERATION_ACTIONS={
+ opening:[
+  "단서를 더 확인하며 섣부른 결론을 피합니다.",
+  "먼저 결정의 기준을 정리해 판단이 지연되지 않도록 합니다.",
+  "역할을 나눠 서로 다른 단서를 동시에 확인하도록 조율합니다.",
+  "가장 위험한 가능성부터 차단해 다음 행동을 위한 여지를 확보합니다."
+ ],
+ entry:[
+  "탐색 범위를 조심스럽게 넓혀 기척의 정체를 확인합니다.",
+  "예상 밖의 신호에 맞춰 진입 경로를 신속하게 바꿉니다.",
+  "발견한 경고를 짧게 정리해 동행자 모두에게 알립니다.",
+  "잠시 멈춰 철수가 필요한 조건부터 다시 확인합니다."
+ ],
+ "센티넬":[
+  "주변 신호를 다시 살피며 놓친 위치를 추적합니다.",
+  "감각 혼란을 혼자 감추지 않고 동료에게 현재 위험을 알립니다.",
+  "확실하게 파악한 위협부터 제압하며 대응 범위를 좁힙니다.",
+  "잠시 물러나 감각을 정리하고 이후 행동을 검토합니다."
+ ],
+ "가이드":[
+  "남은 가이딩 잔량을 공유해 지원 계획을 다시 논의합니다.",
+  "가이딩 강도를 조절해 소모를 관리합니다.",
+  "직접 가이딩 대신 환경을 조정하는 방식으로 대응을 바꿉니다.",
+  "공명 고갈에 이르기 전에 철수 조건을 확인합니다."
+ ]
+};
 function gateV8PickScenes(p,e){
  const arr=e.choices;
  const ranked=arr.map((c,i)=>{
@@ -137,7 +166,7 @@ function gateV8Sections(p){
  const e=gateV8Evidence(p),pri=e.priorities[0],other=e.priorities[1],high=e.top[0],runner=e.top[1],low=e.top[e.top.length-1],h=GATE_V8_AXIS_TEXT[high.i],h2=GATE_V8_AXIS_TEXT[runner.i],lo=GATE_V8_AXIS_TEXT[low.i],integrated=gateV8Integrated(p);
  const q=e.choices,scenes=gateV8PickScenes(p,e);
  const nm=i=>GATE_AXES[i].name;
- const sceneSentence=(c)=>"「"+c.scene.title+"」에서 '"+c.label+"'를 선택했습니다. 이때 "+gateV8Polite(c.hint)+".";
+ const sceneSentence=(c)=>gateV8Polite(c.hint)+".";
  const sceneCards=scenes.map((c,i)=>({title:["진입과 첫 판단","위험 속에서 바뀌는 선택","직군별 한계와 대응"][i],scene:c.scene.title,choice:c.label,text:sceneSentence(c)+" "+(c.choice.axis===high.i?"평소 주력 전술 성향과도 맞닿아 있지만, 이 선택 하나만으로 모든 상황에서 같은 행동을 한다고 단정할 수는 없습니다.":c.choice.axis===low.i?"평소 낮게 나타난 전술 축과 다른 선택을 한 장면입니다. 필요할 때 예외적으로 이 방식에 무게를 둘 가능성이 있습니다.":"주력 성향 이외의 전술 판단을 사용한 장면이므로, 환경 변화에 따라 행동의 이유가 달라질 수 있습니다.")}));
  const close=pri.rank-other.rank;
  const motive="가장 두드러진 동기는 '"+pri.id+"'에 가깝습니다. "+pri.kind+"이 있습니다. "+gateV8Polite(pri.cause)+". "+(close<.6?"다만 '"+other.id+"'의 동기도 비슷한 비중으로 나타납니다. 따라서 하나의 이유로만 행동을 설명하면 판단의 중요한 절반을 놓칠 수 있습니다.":"뒤이어 '"+other.id+"' 성향이 선택의 방향을 조정하는 경우가 있습니다.");
@@ -147,10 +176,21 @@ function gateV8Sections(p){
  const contrastText=strong?"전술 축의 차이가 비교적 크게 나타나므로":"두 성향의 차이가 아주 크게 벌어진 것은 아니지만";
  const tensionText=contrastText+" '"+tension.name+"'을 실제 작전의 갈림길로 읽을 만합니다. "+gateV8Polite(tension.line)+". "+gateV8Polite(h.cost)+". "+gateV8Polite(pri.risk)+". "+(p.axes[5]>=7.3&&p.axes[10]<5.3?"특히 돌파가 필요한 순간에 철수 기준이 느슨해지지 않도록, 동료와 미리 결정권과 중단 신호를 정하는 편이 좋습니다.":p.axes[6]>=7.3&&p.axes[4]<5.3?"동료를 돕고 싶다는 의지가 강해도 실제로 역할을 바꾸는 과정에는 별도의 협의가 필요합니다.":"이 긴장이 곧 잘못된 판단을 뜻하는 것은 아닙니다. 같은 사람이 다른 조건에서 합리적으로 다른 선택을 할 수 있다는 의미입니다.");
  const scene3=q[5],scene4=q[7];
- const reconstruction="작전 초반에는 "+sceneSentence(q[0])+" 이후 진입 지점에서 "+sceneSentence(q[1])+" 진행이 어긋나면 "+sceneSentence(scene3)+" 이 세 가지 선택을 연결하면 단순히 앞서가거나 뒤에 남는 인물이라기보다, 상황마다 무엇을 확인하고 무엇을 내려놓는지 읽을 수 있습니다. "+(p.role==="가이드"?"가이딩은 필요한 때 실제 수행하는 지원입니다. 동의 없는 자동 가이딩이나 상시 정신 연결을 전제하지 않습니다.":"센티넬의 부하도 변화는 설문 점수에서 직접 예측되지 않습니다. 폭주 위험이나 가이딩 가능성은 실제 상황에서 별도로 확인해야 합니다.");
+ const opening=GATE_V8_OPERATION_ACTIONS.opening[p.choices[0]];
+ const entry=GATE_V8_OPERATION_ACTIONS.entry[p.choices[1]];
+ const crisis=GATE_V8_OPERATION_ACTIONS[p.role][p.choices[5]];
+ const differentAxes=new Set([q[0].choice.axis,q[1].choice.axis,q[5].choice.axis]).size;
+ const arc=differentAxes===1?
+  "상황이 달라져도 핵심 판단 기준이 크게 흔들리지 않는 편입니다. 같은 전술을 반복하는 것이 유리한지 현장 조건과 대조할 필요는 있습니다.":
+  differentAxes===3?
+  "처음에는 위험의 범위를 정리하고, 이후에는 새 정보를 확인하거나 경로를 수정하며, 위기에서는 다시 실행 가능한 대응에 집중합니다. 이처럼 단계마다 전술의 무게중심이 이동합니다.":
+  "일부 판단 기준은 유지하면서도 상황에 따라 대응의 방향을 조정합니다. 따라서 한 번의 행동보다 전술을 전환하는 시점을 살펴보는 편이 정확합니다.";
+ const reconstruction="설문 응답을 가상의 작전 흐름으로 이어 보면, 서로 다른 보고가 올라오는 초반에는 "+opening+" 이어 진입 지점에서 낯선 기척이 포착되면 "+entry+" "+(p.role==="가이드"?"가이딩 잔량이 예상보다 빠르게 줄어들 때는 ":"감각 과부하로 적의 위치를 놓친 순간에는 ")+crisis+" "+arc+" "+(p.role==="가이드"?
+  "실제 가이딩 여부는 당사자의 동의와 남은 잔량에 따라 달라지며, 자동으로 연결되거나 소모된다고 가정하지 않습니다.":
+  "이 서술만으로 실제 부하도나 폭주 여부를 예측할 수는 없으므로, 현장에서는 현재 상태를 별도로 확인해야 합니다.");
  const partner="이 인물과 동행하는 사람에게 가장 중요한 것은 "+h.request+"입니다. "+h2.request+"의 역할이 함께 있으면 도움이 될 수 있습니다. 반대로 "+gateV8AsFact(h.cost)+" 모르고 접근하면 서로를 오해하기 쉽습니다. "+(q[3].choice.axis===6?"도움을 거절한 동료 앞에서 거절 자체를 확인하는 선택을 했으므로, 직접 개입하기보다 가능한 지원 형태부터 합의하는 방식이 적합할 수 있습니다.":q[3].choice.axis===7?"도움의 필요성과 실제 지원 가능한 양을 함께 이야기하는 편이므로, 요청의 범위가 모호한 동료와 먼저 합의가 필요합니다.":q[3].choice.axis===3?"도움을 거절한 상대에게 위험 정보를 설명하는 쪽을 택했으므로, 설명이 설득이나 강요로 바뀌지 않도록 거리를 조절해야 합니다.":"동료가 도움을 거절할 때 직접 지원 대신 주변을 안정시키는 선택을 했으므로, 보이지 않는 지원까지 동의 범위에 포함할지 합의하는 편이 좋습니다.");
- const recovery="작전이 끝난 뒤에도 이 인물이 같은 속도로 움직인다고 가정해서는 안 됩니다. "+(p.axes[11]>=7?"사후 회복 점수가 높아 종료 이후의 상태 확인을 중요한 판단 절차로 보는 편입니다.":"사후 회복이 주력 성향에 비해 덜 선명하므로, 다음 임무 전에 상태를 점검하는 절차를 팀 차원에서 확보하면 도움이 됩니다.")+" "+(p.axes[7]>=7?"남겨 둔 자원의 양과 실제 회복된 상태는 다르기 때문에 다시 투입할 조건을 따로 확인하는 편입니다.":"자원 배분을 판단할 때 다음 단계에 필요한 여력을 별도로 계산하는 동료와 협력하면 좋습니다.")+" "+sceneSentence(scene4)+" "+(p.role==="가이드"?"가이딩을 수행했다면 가이딩 잔량을 확인해야 하며, 잔량이 0이면 공명 고갈 상태가 됩니다.":"현재 부하도와 감각 부담을 확인하지 않고 안정되었다고 단정해서는 안 됩니다.");
- const distinct="겉으로는 "+gateV7Josa(nm(high.i),"이","가")+" 가장 뚜렷한 인물처럼 보이지만, 이 성향 하나로는 설명하기 어렵습니다. "+gateV7Josa(nm(runner.i),"이","가")+" 함께 작동하는 방식과 가장 낮게 나온 "+gateV7Josa(nm(low.i),"이","가")+" 개입하는 조건을 나누어 봐야 합니다. "+gateV8Polite(lo.weak)+". "+(e.top[2].v>=6.8?"세 번째로 강하게 나타난 "+nm(e.top[2].i)+" 역시 주력 두 성향만으로는 예측하기 어려운 행동을 만들 수 있습니다.":"그 밖의 전술 축은 상대적으로 덜 선명하므로, 모든 상황에서 안정적으로 같은 능력을 발휘한다고 판단하기보다 선택을 관찰할 여지가 남습니다.")+" 특히 '"+q[2].label+"'와 '"+q[6].label+"'가 서로 다른 위기 상황에서 선택되었다는 점을 비교하면, 같은 캐릭터 안에서도 행동의 우선순위가 바뀌는 장면을 찾을 수 있습니다.";
+ const recovery="작전이 끝난 뒤에도 이 인물이 같은 속도로 움직인다고 가정해서는 안 됩니다. "+(p.axes[11]>=7?"사후 회복 점수가 높아 종료 이후의 상태 확인을 중요한 판단 절차로 보는 편입니다.":"사후 회복이 주력 성향에 비해 덜 선명하므로, 다음 임무 전에 상태를 점검하는 절차를 팀 차원에서 확보하면 도움이 됩니다.")+" "+(p.axes[7]>=7?"남겨 둔 자원의 양과 실제 회복된 상태는 다르기 때문에 다시 투입할 조건을 따로 확인하는 편입니다.":"자원 배분을 판단할 때 다음 단계에 필요한 여력을 별도로 계산하는 동료와 협력하면 좋습니다.")+" "+(p.role==="가이드"?"가이딩 중 다른 위협이 커지는 상황에서는 ":"가이딩이 늦어질 가능성이 생기면 ")+sceneSentence(scene4)+" "+(p.role==="가이드"?"가이딩을 수행했다면 가이딩 잔량을 확인해야 하며, 잔량이 0이면 공명 고갈 상태가 됩니다.":"현재 부하도와 감각 부담을 확인하지 않고 안정되었다고 단정해서는 안 됩니다.");
+ const distinct="겉으로는 "+gateV7Josa(nm(high.i),"이","가")+" 가장 뚜렷한 인물처럼 보이지만, 이 성향 하나로는 설명하기 어렵습니다. "+gateV7Josa(nm(runner.i),"이","가")+" 함께 작동하는 방식과 가장 낮게 나온 "+gateV7Josa(nm(low.i),"이","가")+" 개입하는 조건을 나누어 봐야 합니다. "+gateV8Polite(lo.weak)+". "+(e.top[2].v>=6.8?"세 번째로 강하게 나타난 "+nm(e.top[2].i)+" 역시 주력 두 성향만으로는 예측하기 어려운 행동을 만들 수 있습니다.":"그 밖의 전술 축은 상대적으로 덜 선명하므로, 모든 상황에서 안정적으로 같은 능력을 발휘한다고 판단하기보다 선택을 관찰할 여지가 남습니다.")+" 대원들의 전진이 겹칠 때는 "+sceneSentence(q[2])+" 한편 동료의 상태를 다시 살펴야 하는 상황에서는 "+sceneSentence(q[6])+" 서로 다른 장면에서 무엇을 우선하는지 비교하면, 한 인물 안에서 전술의 기준이 달라지는 지점을 읽을 수 있습니다.";
  const cross=integrated.text||"기존 감각·색채 보고서와 연결되지 않아도 이 전술 해석은 독립적으로 성립합니다. 다만 감각적 반응이나 삶의 가치관에 관한 세부 해석은 이 검사만으로 확정하지 않습니다.";
  const key="동행을 위해 미리 합의할 것: "+(q[3].choice.axis===6?"지원 거절의 범위":q[3].choice.axis===7?"지원 가능한 자원의 상한":q[3].choice.axis===3?"위험 근거를 설명하는 방식":"직접 개입하지 않는 안전 확보")+", "+(p.axes[10]>=6.8?"철수 신호":"철수 판단을 맡을 사람")+", "+(p.axes[3]>=6.8?"빠른 정보 공유":"최소 경고 문장")+"입니다.";
  const line=pri.quote;
@@ -163,6 +203,7 @@ function gateV8Reader(p){
  const chapter=(id,english,korean)=>'<div class="gate-v7-chapter"><small>'+id+' / '+english+'</small><h3>'+korean+'</h3></div>';
  const sc=s.sceneCards.map((x,i)=>panel("SCENE "+String(i+1).padStart(2,"0")+" · "+x.scene,x.text)).join("");
  const evidence=s.e.top.map(v=>'<span class="gate-v7-chip">'+h(GATE_AXES[v.i].name)+' '+gateFixed(v.v)+'</span>').join("");
+ const choiceEvidence=s.e.choices.map((c,i)=>'<li><b>Q'+String(i+17).padStart(2,"0")+'</b> '+h(c.scene.title)+' · '+h(c.label)+'</li>').join("");
  const matched="감각 보고서 "+(s.integrated.sensory?"연결됨":"미연결 / 현재 공개 기록 불러오기 불가")+" · 색채 보고서 "+(s.integrated.chroma?"연결됨":"미연결 / 현재 공개 기록 불러오기 불가");
  return '<section class="surface gate-v7-report" id="gatePersonal"><div class="eyebrow">NSD / INDIVIDUAL OPERATIONAL STUDY · V8</div><div class="gate-v7-cover"><small>'+h(p.role)+' / INDIVIDUAL GATE REPORT</small><h2>'+h(p.name)+' · '+h(s.title)+'</h2><p>'+h(s.intro)+'</p><p class="gate-v8-subline">'+h(s.subtitle)+'</p></div>'+
  chapter("01","MOTIVE","이 인물이 움직이는 이유")+panel("주력 전술과 행동 동기",s.core)+
@@ -174,7 +215,7 @@ function gateV8Reader(p){
  chapter("07","DISTINCTION","비슷한 유형이라도 다른 이유")+panel("다른 캐릭터와 갈라지는 선택",s.distinct)+
  chapter("08","CROSS REPORT","감각·색채 기록과의 교차 해석")+panel("연동 자료에서 얻을 수 있는 보조 근거",s.cross)+
  chapter("09","VOICE","이 캐릭터가 남길 법한 한마디")+'<blockquote class="gate-v7-quote">'+h(s.line)+'</blockquote>'+
- '<details class="gate-v7-evidence"><summary>연구자용 수치 및 상황 선택 확인</summary><div class="gate-v7-chips">'+evidence+'</div><p>'+h(matched)+'</p><p>이 해설은 검사에서 확인한 선택과 전술 지표를 해석한 창작 보고서이며 게임 내 전투력·실제 부하도·가이딩 잔량을 예측하지 않습니다.</p></details>'+
+ '<details class="gate-v7-evidence"><summary>연구자용 수치 및 상황 선택 확인</summary><div class="gate-v7-chips">'+evidence+'</div><p>'+h(matched)+'</p><h4>8개 상황 응답 원문</h4><ol class="gate-v8-choice-evidence">'+choiceEvidence+'</ol><p>이 해설은 검사에서 확인한 선택과 전술 지표를 해석한 창작 보고서이며 게임 내 전투력·실제 부하도·가이딩 잔량을 예측하지 않습니다.</p></details>'+
  '<div class="row actions"><button class="btn primary" onclick="gateFromSolo(\''+h(p.id)+'\',\'pair\')">2인 동행 분석</button><button class="btn light" onclick="gateFromSolo(\''+h(p.id)+'\',\'trio\')">3인 작전 시뮬레이션</button><button class="btn light" onclick="window.print()">인쇄 · PDF</button></div></section>';
 }
 function gateV8Solo(p){
