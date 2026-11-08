@@ -114,7 +114,7 @@ function gatePair(a,b){
  if(guide)debuff.push({weight:63,title:"공명 고갈을 늦게 발견하는 위험",trigger:`${guide.name}에게 요청이 몰리며 가이딩 잔량의 감소가 숨겨질 때입니다.`,chain:`센티넬의 부하도가 낮아져도 가이드의 잔량이 자동으로 회복되는 것은 아닙니다. 계속 지원하면 공명 고갈 위험이 높아질 수 있습니다.`,mitigation:`가이딩 전후 잔량과 추가 지원 가능 여부를 따로 확인합니다.`});
  synergy.forEach((card,i)=>{card.action+=" "+gatePick(GATE_NARRATIVES.pair[i],a.id,b.id,"pair-synergy",i,gateFixed(x[4]-y[4]));});
  const resources=`${a.role==="센티넬"?`${a.name}의 부하도 전조와 폭주 위험`:`${a.name}의 가이딩 잔량과 공명 고갈 위험`} / ${b.role==="센티넬"?`${b.name}의 부하도 전조와 폭주 위험`:`${b.name}의 가이딩 잔량과 공명 고갈 위험`}을 별도로 기록합니다. 현재 자원 상태는 설문만으로 확정할 수 없으므로 실제 작전 전 확인이 필요합니다.`;
- return {a:a.name,b:b.name,directions:[ab,ba],synergies:sorted(synergy,4),debuffs:sorted(debuff,4),resources,rankLabel:gateMean([x[4],y[4],x[9],y[9]])>=6.7?"조율 우세":gateMean([x[5],y[5],x[2],y[2]])>=7.1?"돌파 우세":"변동형",scenes:[0,5,10].map(i=>({title:["진입 직후","자원 소모가 커질 때","작전 종료 여부"][ [0,5,10].indexOf(i)],text:`${a.name}은(는) '${gateChoice(a,i)}', ${b.name}은(는) '${gateChoice(b,i)}'를 선택했습니다. 서로 다른 판단을 연결할 공통 신호가 필요합니다.`}))};
+ return {a:a.name,b:b.name,directions:[ab,ba],synergies:sorted(synergy,4),debuffs:sorted(debuff,4),resources,rankLabel:gateMean([x[4],y[4],x[9],y[9]])>=6.7?"조율 우세":gateMean([x[5],y[5],x[2],y[2]])>=7.1?"돌파 우세":"변동형",scenes:[0,5,6].map(i=>({title:["진입 직후","자원 소모가 커질 때","위험 판단 충돌"][ [0,5,6].indexOf(i)],text:`${a.name}은(는) '${gateChoice(a,i)}', ${b.name}은(는) '${gateChoice(b,i)}'를 선택했습니다. 서로 다른 판단을 연결할 공통 신호가 필요합니다.`}))};
 }
 
 function gateAssignments(ps){
@@ -140,11 +140,11 @@ function gateTrio(ps){
   const riskBias=[9,18,26,40,55,48,22][stage];
   const rolescore=stage===0?gateMean(ps.map(p=>p.axes[1])):stage===1?detect.axes[0]:stage===2?gateMean(ps.map(p=>p.axes[0])):stage===3?gateMean(ps.map(p=>p.axes[8])):stage===4?sustain.axes[7]:stage===5?lead.axes[10]:gateMean(ps.map(p=>p.axes[11]));
   const choices=ps.map(p=>gateChoice(p,stage));
-  const roleChoices=ps.map(p=>gateChoice(p,8+stage));
+  const roleChoices=ps.map(p=>gateChoice(p,4+(stage%4)));
   const choiceAxes=ps.map(p=>gateScenarios(p.role)[stage].opts[p.choices[stage]].axis);
   const aligned=new Set(choiceAxes).size===1;
   const shared=gateMean(ps.map(p=>p.axes[4]));
-  const roleAffinity=gateMean(ps.map(p=>p.axes[gateScenarios(p.role)[8+stage].opts[p.choices[8+stage]].axis]));
+  const roleAffinity=gateMean(ps.map(p=>p.axes[gateScenarios(p.role)[4+(stage%4)].opts[p.choices[4+(stage%4)]].axis]));
   const readiness=Math.round(rolescore*4.5+shared*1.4+roleAffinity+(aligned?4:0));
   const currentThreat=threat;
   const pressure=Math.round(gateClamp(15+riskBias+threat*.35-readiness*.20));
@@ -153,7 +153,7 @@ function gateTrio(ps){
   const localResource=[];
   state=state.map((old,i)=>{
    const p=ps[i],active=p.role==="센티넬";
-   const guideChoice=p.choices[8+stage];
+   const guideChoice=p.choices[4+(stage%4)];
    // 가이딩은 자동 발생하지 않습니다. 이 모형에서는 관련 행동을 명시적으로 선택했을 때만 잔량을 소모합니다.
    const requestedGuiding=!active&&((stage===0&&guideChoice===1)||(stage===1&&guideChoice===1)||(stage===3&&guideChoice===0)||(stage===4&&guideChoice===1)||(stage===5&&guideChoice===1)||(stage===6&&guideChoice===1));
    const guiding=requestedGuiding&&old.value>0;
