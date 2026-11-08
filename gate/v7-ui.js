@@ -143,7 +143,7 @@ function gateV7Bootstrap(){
  gateState.own=gateLocal("nsd_gate_v1_own",[]).filter(gateValid);
  gateState.imported=gateLocal("nsd_gate_v1_imported",[]).filter(gateValid);
  gateState.answers=Array(16).fill(0);gateState.choices=Array(8).fill(-1);gateState.step=0;
- gateState.tab="home";gateV7State.initialized=true;gateRender();
- gateV7LoadExternal();
+ gateState.tab="home";gateImportHash();gateV7State.initialized=true;gateRender();
+ gateStartCloud();gateV7LoadExternal();
 }
 gateV7Bootstrap();
