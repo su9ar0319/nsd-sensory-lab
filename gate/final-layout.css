@@ -78,3 +78,25 @@
   page-break-inside:avoid;
  }
 }
+
+/* Final polish / 1-person FIELD CHOICES:
+   a legacy adjacent-panel margin offset the second and third grid cells. */
+.gate-v7-report .gate-v7-scenes{
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ align-items:stretch;
+ gap:11px;
+}
+.gate-v7-report .gate-v7-scenes > .gate-v7-panel,
+.gate-v7-report .gate-v7-scenes > .gate-v7-panel + .gate-v7-panel{
+ margin:0;
+ min-width:0;
+ height:100%;
+ align-self:stretch;
+}
+@media(max-width:780px){
+ .gate-v7-report .gate-v7-scenes{grid-template-columns:minmax(0,1fr)}
+}
+@media print{
+ .gate-v7-report .gate-v7-scenes > .gate-v7-panel{break-inside:avoid;page-break-inside:avoid}
+}
