@@ -3,7 +3,7 @@
 function linkSeed(a,b){return [a.id||a.name,b.id||b.name,a.role,b.role,a.axes.join(","),b.axes.join(","),a.choices.join(""),b.choices.join("")].join("|");}
 
 function pickNonrepeat(pool,seed,key,ex){
- let x=teamPick(pool,seed,key);if(x===ex&&pool.length>1)x=pool[(pool.indexOf(x)+1)%pool.length];return x;
+ let x=teamPick(pool,seed,key);if(ex&&ex.includes(x)&&pool.length>1)x=pool[(pool.indexOf(x)+1)%pool.length];return x;
 }
 
 function directionLayers(src,dst,avoid){
@@ -79,22 +79,22 @@ function pairDeepResult(a,b){
  const sigKey=diff>1.5?"split":Math.min(a.axes[2],b.axes[2])>=6.8?"fast":"slow";
  const signal=`${teamPick(TEAM_DB.PAIR.signal[sigKey],seed,"signal")} ${a.name}의 전조 감지 ${fixed(a.axes[2])}점과 ${b.name}의 ${fixed(b.axes[2])}점을 비교하면, 감지와 후속 행동을 어떻게 나눌지가 중요한 협력 조건입니다.`;
  const supKey=Math.abs(a.axes[3]-b.axes[3])>1.6?"split":Math.min(a.axes[3],b.axes[3])>6.8?"both":"quiet";
- const supportTiming=`${teamPick(TEAM_DB.PAIR.support[supKey],seed,"support")} ${c.synergies[0].text}`;
+ const supportTiming=`${teamPick(TEAM_DB.PAIR.support[supKey],seed,"support")} ${a.name}과(와) ${b.name}이(가) 어떤 순간에 도움을 제안하는지에 따라 상대가 받는 부담이 달라질 수 있습니다.`;
  const misKey=Math.abs(a.axes[4]-b.axes[4])>1.6?"boundary":Math.abs(a.axes[1]-b.axes[1])>1.6?"expression":"timing";
- const misreading=`${teamPick(TEAM_DB.PAIR.misread[misKey],seed,"misread")} ${c.debuffs[0].text}`;
+ const misreading=`${teamPick(TEAM_DB.PAIR.misread[misKey],seed,"misread")} 두 사람이 같은 행동을 서로 다른 뜻으로 해석하는 순간에는 먼저 무엇이 필요했는지 구체적으로 확인하는 편이 좋습니다.`;
  const roleKey=a.role==="센티넬"&&b.role==="센티넬"?"SS":a.role==="가이드"&&b.role==="가이드"?"GG":"SG";
  const resource=`${teamPick(TEAM_DB.PAIR.role[roleKey],seed,"role")} ${base.role}`;
  const restGap=Math.abs(a.axes[5]-b.axes[5]);
  const recovery=`${teamPick(TEAM_DB.PAIR.after[restGap>1.8?"split":Math.min(a.axes[5],b.axes[5])>=6.8?"slow":"fast"],seed,"rest")} 두 사람의 잔향 회복 차이는 ${fixed(restGap)}점입니다.`;
  const pick=(p,i)=>getScenarios(p.role)[i]?.opts[p.choices[i]]?.[0]||"상황을 살핀다";
  const scenes=[
- {title:"첫 번째 경고를 들었을 때",text:`${a.name}은(는) '${pick(a,0)}', ${b.name}은(는) '${pick(b,0)}'를 선택했습니다. ${signal} 서로가 같은 위험을 보고 있는지부터 확인하면 행동의 순서를 정하기 쉬워집니다.`},
- {title:"동료에게 도움이 필요할 때",text:`${a.name}의 대응은 '${pick(a,1)}'이고 ${b.name}의 대응은 '${pick(b,1)}'입니다. ${supportTiming} 같은 순간에도 지원을 먼저 제안하는 사람과 반응을 기다리는 사람이 달라질 수 있습니다.`},
- {title:"게이트를 떠난 뒤",text:`${a.name}은(는) '${pick(a,5)}'를 선택했고 ${b.name}은(는) '${pick(b,5)}'를 선택했습니다. 각 직군의 현장 선택은 다른 종류의 피로를 다루는 방식입니다. ${recovery}`}
+ {title:"첫 번째 경고를 들었을 때",text:`${a.name}은(는) '${pick(a,0)}', ${b.name}은(는) '${pick(b,0)}'를 선택했습니다. 이 선택들은 위험을 발견했을 때 무엇을 먼저 지키는지 보여 줍니다. 누가 경고를 전달하고 누가 별도의 신호를 확인할지 나누면 충돌을 줄일 수 있습니다.`},
+ {title:"동료에게 도움이 필요할 때",text:`${a.name}의 대응은 '${pick(a,1)}'이고 ${b.name}의 대응은 '${pick(b,1)}'입니다. 지원을 빨리 시작하는 사람은 장면을 바꾸려 하고, 신중하게 확인하는 사람은 상대가 감당할 범위를 살핍니다. 두 판단의 순서를 맞추면 도움이 간섭으로 변하는 순간을 줄일 수 있습니다.`},
+ {title:"게이트를 떠난 뒤",text:`${a.name}은(는) '${pick(a,5)}'를 선택했고 ${b.name}은(는) '${pick(b,5)}'를 선택했습니다. 두 사람은 각 직군의 장면에서 회복을 다르게 다룹니다. 어느 쪽이 먼저 안정되었는지보다 언제 다음 행동을 시작할 준비가 되는지 확인하는 편이 좋습니다.`}
  ];
- const decision=`경계 조율 점수는 ${a.name} ${fixed(a.axes[4])}점, ${b.name} ${fixed(b.axes[4])}점입니다. ${c.debuffs[1].text}`;
+ const decision=`경계 조율 점수는 ${a.name} ${fixed(a.axes[4])}점, ${b.name} ${fixed(b.axes[4])}점입니다. ${Math.abs(a.axes[4]-b.axes[4])>2.2?"두 사람 중 한쪽이 먼저 움직이려 하고 다른 쪽이 사전 동의를 원할 수 있습니다.":"기본적인 기준이 비슷해도 위기에서는 설명을 생략할 수 있습니다."} 실제 개입 이전에 상대가 선택할 수 있는 범위를 간단히 확인하는 편이 좋습니다.`;
  const gap=base.fromAToB.delta-base.fromBToA.delta;
- const turning=`${Math.abs(gap)>13?`${base.fromAToB.delta>base.fromBToA.delta?a.name:b.name}에게서 상대 방향으로 전달되는 자극과 완충의 차이가 더 크게 나타납니다.`:"두 방향의 자극·완충 차이는 비교적 가까운 편입니다."} ${teamPick(TEAM_DB.PAIR.outlook[Math.abs(gap)>20?"asymmetric":same?"near":"far"],seed,"outlook")} ${c.synergies[1].text}`;
+ const turning=`${Math.abs(gap)>13?`${base.fromAToB.delta>base.fromBToA.delta?a.name:b.name}에게서 상대 방향으로 전달되는 자극과 완충의 차이가 더 크게 나타납니다.`:"두 방향의 자극·완충 차이는 비교적 가까운 편입니다."} ${teamPick(TEAM_DB.PAIR.outlook[Math.abs(gap)>20?"asymmetric":same?"near":"far"],seed,"outlook")} 두 방향에서 자극과 완충이 뒤바뀌는 장면을 살펴보면 관계의 균형을 더 명확히 읽을 수 있습니다.`;
  return {...base,opening,fromA:fw.body,fromB:bw.body,directional:[fw,bw],synergies:c.synergies,debuffs:c.debuffs,
  signal,supportTiming,misreading,resource,recovery,decision,turning,scenes,outlook:turning,
  primary:`${opening} ${base.primary}`,support:c.synergies[2].text,risk:c.debuffs[2].text};
