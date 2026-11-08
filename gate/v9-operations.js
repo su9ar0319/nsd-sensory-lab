@@ -281,3 +281,8 @@ gateTrio=function(ps){
  r.v9Focus="gate-field-operations";
  return r;
 };
+
+
+/* Existing shared-link pair/trio routes can render during the older bootstrap;
+   refresh them once V9 operations have replaced the narrative functions. */
+if(typeof gateRender==="function"&&typeof gateState!=="undefined"&&(gateState.tab==="pair"||gateState.tab==="trio"))gateRender();
