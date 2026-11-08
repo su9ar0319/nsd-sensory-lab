@@ -50,14 +50,14 @@ function trioDeepResult(ps){
  const richest=trioPairs.slice().sort((a,b)=>b.score-a.score)[0],riskiest=trioPairs.slice().sort((a,b)=>b.tension-a.tension)[0];
  const teamSynergies=[
  {title:"감지 → 완충 → 조율의 역할 연계",text:`${role("detect").name}이(가) 이상 징후를 발견하면 ${role("buffer").name}이(가) 주변의 자극과 동선을 정리하고, ${role("boundary").name}이(가) 지원의 범위를 확인합니다. 세 사람을 한 역할에 몰아넣지 않아 경고와 대응이 동시에 진행될 수 있습니다. 다만 서로에게 정보를 전달할 순서가 필요합니다.`},
- {title:`${richest.name}의 상호 보완`,text:`세 관계 중 상대적으로 완충의 여지가 큰 방향이 포함된 조합입니다. ${richest.text} ${richest.third.name}의 참여는 '${richest.third.label}'이라는 다른 가능성을 더합니다.`},
+ {title:`${richest.name}의 상호 보완`,text:`세 관계를 비교할 때 ${richest.name}에서 완충 여지가 상대적으로 두드러집니다. 이 두 사람의 지원 방식이 전체 팀의 안정에 기여할 수 있지만, ${richest.third.name}이(가) 별도 역할을 맡을 때 효과가 더욱 구체화됩니다.`},
  {title:"서로 다른 감각의 관찰 범위",text:`세 사람이 감각 수용과 전조 감지에서 보이는 차이는 각각 ${fixed(spread[0])}점, ${fixed(spread[2])}점입니다. ${spread[2]>2?"먼저 반응하는 사람과 근거를 확인하는 사람이 나뉠 수 있어 위험을 서로 다른 시점에 포착할 수 있습니다.":"세 사람의 경고 타이밍이 가까워 빠르게 합의할 수 있지만 같은 신호를 함께 놓치는지 점검해야 합니다."}`},
- {title:"지원의 소모를 나누는 선택",text:`${makeup} ${role("buffer").name}이(가) 현장을 완충하는 동안 나머지 두 사람은 경고와 지원 범위를 확인할 수 있습니다. 필요한 지원을 구분해 요청하면 한 사람에게 몰리는 부담을 줄일 수 있습니다.`},
+ {title:"지원의 소모를 나누는 선택",text:`${role("buffer").name}이(가) 현장을 완충하는 동안 나머지 두 사람은 경고와 지원 범위를 확인할 수 있습니다. 필요한 지원을 구분해 요청하면 한 사람에게 몰리는 부담을 줄일 수 있습니다.`},
  {title:"역할 변경에도 남는 협력",text:`기본 배치의 감지 담당은 ${role("detect").name}, 완충 담당은 ${role("buffer").name}, 조율 담당은 ${role("boundary").name}입니다. 어느 한 사람이 쉬어야 할 때도 남은 두 사람이 모든 행동을 동시에 이어받기보다 먼저 핵심 신호와 지원 범위를 정하는 것이 유리합니다.`}
  ];
  const maxWear=ps.slice().sort((a,b)=>b.axes[5]-a.axes[5])[0];
  const teamDebuffs=[
- {title:`${riskiest.name} 사이에서의 자극 연쇄`,text:`이 조합에서 상대적으로 부담이 두드러지는 관계입니다. ${riskiest.debuff.text} ${riskiest.third.text} 제3자의 도움도 전달 강도가 높아지면 오히려 압박을 키울 수 있습니다.`},
+ {title:`${riskiest.name} 사이에서의 자극 연쇄`,text:`이 조합에서 자극과 완충 차이가 상대적으로 크게 나타나는 관계입니다. ${riskiest.first}→${riskiest.second} 방향의 위험이 커지는지, 반대 방향에서도 같은 일이 생기는지 별도로 확인해야 합니다. 제3자인 ${riskiest.third.name}이(가) 개입할 때도 세 사람의 감각 부담이 동시에 증가하지 않도록 조율해야 합니다.`},
  {title:"세 사람의 다른 경계 기준",text:`경계 조율 점수의 최대 차이는 ${fixed(spread[4])}점입니다. ${spread[4]>2.2?"누군가는 먼저 행동하고 다른 누군가는 동의를 확인하려 해 같은 지원을 다르게 해석할 수 있습니다.":"기본적인 지원 기준은 비슷해도 급박한 상황에서는 판단이 동시에 몰릴 수 있습니다."} 합의할 수 없는 순간에는 필요한 행동을 구체적으로 나누는 편이 좋습니다.`},
  {title:"지원 역할 집중과 자원 부족",text:`${gids.length?gids.map(g=>g.name).join("·")+"의 가이딩 잔량이 줄어드는 상황과": "세 사람의 부하도가 함께 상승하는 상황과"} ${role("buffer").name}에게 완충 역할이 몰리는 순간을 함께 고려해야 합니다. 한 사람의 대응 속도를 팀 전체의 여유로 착각하면 다음 상황에 필요한 자원이 남지 않을 수 있습니다.`},
  {title:"회복 속도의 차이와 남는 부담",text:`${maxWear.name}의 잔향 회복은 ${fixed(maxWear.axes[5])}점으로 세 사람 중 높게 나타납니다. 나머지 두 사람에게는 이미 끝난 현장도 ${maxWear.name}에게는 감각적 긴장으로 이어질 수 있습니다. 같은 휴식 시간을 모두에게 적용하면 불편함이 남습니다.`},
@@ -65,12 +65,12 @@ function trioDeepResult(ps){
  ];
  const sc=(p,i)=>getScenarios(p.role)[i]?.opts?.[p.choices[i]]?.[0]||"대응을 정한다";
  const scenes=[
- {title:"STEP 01 · 진입 전 상태 확인",text:`${teamPick(t.scene.entry,seed,"entry")} ${role("detect").name}은(는) 관찰 기준을 정하고 ${role("buffer").name}은(는) 자극을 줄일 방법을 준비하며 ${role("boundary").name}은(는) 각자의 허용 범위를 확인합니다. ${makeup}`},
- {title:"STEP 02 · 낯선 신호가 감지된다면",text:`${teamPick(t.scene.warning,seed,"warning")} ${role("detect").name}은(는) 실제로 '${sc(ps[role("detect").index],0)}'를 선택했습니다. ${role("buffer").name}과(와) ${role("boundary").name}은(는) 이 경고를 서로 다른 판단으로 이어받습니다. ${teamSynergies[0].text}`},
- {title:"STEP 03 · 두 대원의 반응이 충돌한다면",text:`${teamPick(t.scene.crisis,seed,"crisis")} ${riskiest.name} 사이에서 감각적 부담이 커지는 조건을 살펴봅니다. ${riskiest.debuff.text} ${riskiest.third.name}의 지원은 ${riskiest.third.label}이라는 변화를 만들 여지가 있습니다.`},
+ {title:"STEP 01 · 진입 전 상태 확인",text:`${teamPick(t.scene.entry,seed,"entry")} ${role("detect").name}은(는) 관찰 기준을 정하고 ${role("buffer").name}은(는) 자극을 줄일 방법을 준비하며 ${role("boundary").name}은(는) 각자의 허용 범위를 확인합니다. 이런 사전 확인이 있어야 위기에서 지원을 요청할 기준을 놓치지 않을 수 있습니다.`},
+ {title:"STEP 02 · 낯선 신호가 감지된다면",text:`${teamPick(t.scene.warning,seed,"warning")} ${role("detect").name}은(는) 실제로 '${sc(ps[role("detect").index],0)}'를 선택했습니다. ${role("buffer").name}과(와) ${role("boundary").name}은(는) 이 경고를 서로 다른 판단으로 이어받습니다. 경고가 과장되었는지보다 서로 어떤 신호를 확인했는지 먼저 공유할 필요가 있습니다.`},
+ {title:"STEP 03 · 두 대원의 반응이 충돌한다면",text:`${teamPick(t.scene.crisis,seed,"crisis")} ${riskiest.name} 사이에서 서로의 반응 속도가 어긋나는 상황을 가정합니다. ${riskiest.third.name}의 대응은 '${riskiest.third.label}'의 방향으로 이어질 수 있습니다. 당사자들이 무엇을 부담으로 느끼는지 먼저 확인해야 협력이 계속됩니다.`},
  {title:"STEP 04 · 자원과 지원의 한계",text:`${teamPick(t.pressure.resource,seed,"resource")} ${role("buffer").name}은(는) '${sc(ps[role("buffer").index],4)}'라는 대응을 선택했습니다. 가이딩 잔량과 부하도는 각 인물에게 별도로 적용되므로, 지원의 순서를 조정하는 동안 남은 대원은 관찰과 경계 확인을 이어가야 합니다.`},
  {title:"STEP 05 · 역할 교대와 최종 선택",text:`${teamPick(t.scene.crisis,seed,"shift")} ${role("boundary").name}은(는) '${sc(ps[role("boundary").index],7)}'를 선택했습니다. 누군가가 더 이상 자기 역할을 지속하기 어렵다면 나머지 두 사람이 상태를 확인하고 어떤 지원을 먼저 이어받을지 정해야 합니다.`},
- {title:"STEP 06 · 종료 뒤 서로 다른 회복",text:`${teamPick(t.scene.ending,seed,"ending")} ${maxWear.name}의 감각적 여운이 상대적으로 길 수 있습니다. ${teamDebuffs[3].text} 다음 동행에서는 세 사람의 회복 시간을 따로 확인한 뒤 일정을 정하는 편이 좋습니다.`}
+ {title:"STEP 06 · 종료 뒤 서로 다른 회복",text:`${teamPick(t.scene.ending,seed,"ending")} ${maxWear.name}의 감각적 여운이 상대적으로 길 수 있습니다. 나머지 두 사람에게 평온한 시간이더라도 당사자에게는 정리가 필요할 수 있습니다. 다음 동행에서는 각자가 원하는 회복 환경을 따로 확인한 뒤 일정을 정하는 편이 좋습니다.`}
  ];
  const fallback=assignments.map(x=>{
    const remain=ps.filter((p,i)=>i!==x.index);
@@ -79,9 +79,9 @@ function trioDeepResult(ps){
    return {title:`${x.name}이(가) ${x.label} 담당에서 물러난다면`,text:`남은 두 사람 중 ${backup.name}이(가) ${x.label}의 일부를 대신할 여지가 있습니다(관련 축 ${fixed(backup.axes[x.axis])}점). ${other.name}은(는) 정보를 분담하고 ${backup.name}의 부담이 과해지지 않는지 확인할 수 있습니다. ${teamPick(t.fallback[x.key],seed,x.key,"fallback")} 실제 역할 변경은 두 사람의 현재 상태와 의사를 확인한 뒤 결정하는 것이 좋습니다.`};
  });
  const recoverGap=Math.max(...ps.map(p=>p.axes[5]))-Math.min(...ps.map(p=>p.axes[5]));
- const recovery=`${maxWear.name}은(는) 잔향 회복 ${fixed(maxWear.axes[5])}점으로 가장 긴 여운을 보일 수 있습니다. ${teamPick(t.recovery[recoverGap>2.2?"mixed":mean(ps.map(p=>p.axes[5]))>=6.8?"slow":"fast"],seed,"rec")} ${teamDebuffs[3].text}`;
- const outlook=`${teamPick(t.outlook[spread.filter(x=>x>2.8).length>=3?"split":spread.filter(x=>x<1.2).length>=3?"steady":countG>0?"resource":"volatile"],seed,"outlook")} ${teamSynergies[0].text}`;
+ const recovery=`${maxWear.name}은(는) 잔향 회복 ${fixed(maxWear.axes[5])}점으로 가장 긴 여운을 보일 수 있습니다. ${teamPick(t.recovery[recoverGap>2.2?"mixed":mean(ps.map(p=>p.axes[5]))>=6.8?"slow":"fast"],seed,"rec")} 작전 직후 모두가 같은 속도로 회복하는 것은 아닙니다. 가장 먼저 안정되는 사람이 다른 두 사람의 다음 일정을 일방적으로 정하지 않는 편이 좋습니다.`;
+ const outlook=`${teamPick(t.outlook[spread.filter(x=>x>2.8).length>=3?"split":spread.filter(x=>x<1.2).length>=3?"steady":countG>0?"resource":"volatile"],seed,"outlook")} 세 사람이 어떤 역할을 맡든 현재의 상태와 예상하지 못한 변수에 따라 조정할 수 있습니다. 서로의 강점을 고정된 의무로 바꾸지 않는 태도가 협력을 길게 이어 줍니다.`;
  const roles=`${assignments.map(x=>`${x.name}: ${x.label}(${fixed(x.score)}점)`).join(" / ")}. 이 배치는 세 사람의 점수를 함께 비교해 한 명이 모든 역할을 독점하지 않도록 정한 협력 제안입니다.`;
- return {...base,roles,assignments,makeup,pressure:teamDebuffs[4].text,scenes,teamSynergies,teamDebuffs,pairDetails:trioPairs,fallback,recovery,outlook,
-  thirdEffects:trioPairs.map(p=>({pair:p.name,...p.third})),failureChains:trioPairs.map(p=>({title:`${p.name}에서 부담이 커진다면`,text:`${p.debuff.text} ${p.third.name}이(가) 이 장면에 참여했을 때 ${p.third.text} ${role("boundary").name}은(는) 당사자들의 의사를 다시 확인하여 후속 행동의 범위를 정할 수 있습니다.`}))};
+ return {...base,roles,assignments,makeup,pressure,scenes,teamSynergies,teamDebuffs,pairDetails:trioPairs,fallback,recovery,outlook,
+  thirdEffects:trioPairs.map(p=>({pair:p.name,...p.third})),failureChains:trioPairs.map(p=>({title:`${p.name}에서 부담이 커진다면`,text:`${p.first}과(와) ${p.second}의 감각 리듬이 어긋나면 둘의 지원 행동이 충돌할 수 있습니다. 제3자 ${p.third.name}은(는) '${p.third.label}'에 가까운 역할을 통해 영향을 줄 수 있습니다. ${role("boundary").name}은(는) 현재의 의사를 확인하고 ${role("detect").name}은(는) 추가 전조를 살피며 ${role("buffer").name}은(는) 자극을 낮출 수 있는지를 다시 판단합니다.`}))};
 }
