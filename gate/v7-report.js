@@ -29,6 +29,13 @@ const GATE_V7_SENSORY_MOTIVES=[
 "감각 기록에서는 지원에 앞서 거리와 동의를 확인하는 성향이 두드러집니다. 협력 과정에서도 상대의 선택을 존중하는지 비교할 만합니다.",
 "감각 기록에서는 긴장이 끝난 뒤에도 감각적 여운이 오래 남는 편으로 나타납니다. 작전 후 회복 조건의 해설에만 참고하며 실제 자원 회복량으로 환산하지는 않습니다."
 ];
+/** Attach Korean topic, subject, object or connective particles by final consonant. */
+function gateV7Josa(word,withFinal,withoutFinal){
+ const text=String(word??"").trim();
+ if(!text)return text;
+ const cp=text.charCodeAt(text.length-1),final=(cp>=0xAC00&&cp<=0xD7A3)?(cp-0xAC00)%28:null;
+ return text+(final===null?withoutFinal:final?withFinal:withoutFinal);
+}
 function gateV7FindLinked(p,type){
  const id=p.linkRefs&&(type==="sensory"?p.linkRefs.sensoryId:p.linkRefs.chromaId);
  if(!id||!window.gateV7State)return null;
@@ -43,14 +50,14 @@ function gateV7Paragraphs(p){
  const sensory=sIx>=0&&sProfile.axes[sIx]>=6.5?GATE_V7_SENSORY_MOTIVES[sIx]:"";
  const color=cIx>=0&&cProfile.axes[cIx]>=6.5?GATE_V7_COLOR_MOTIVES[cIx]:"";
  const roleLine=p.role==="가이드"?"가이딩은 필요한 상황에 실제로 수행하는 지원이며, 가이딩 잔량이 0이 되면 공명 고갈 상태가 됩니다. 무조건적인 지원이나 자동 연결을 전제로 해석하지 않습니다.":"부하도 상승이나 폭주 위험은 실제 상태에 따라 달라집니다. 설문으로 확인한 위험 대응 취향만으로 고정적인 전투력이나 실제 부하도 수치를 계산하지 않습니다.";
- const intro="이 인물의 작전에서는 "+GATE_AXES[primary].name+"과 "+GATE_AXES[secondary].name+"이 특히 뚜렷하게 드러납니다. 한 가지 성향만으로 설명하기보다, 먼저 무엇을 지키고 무엇을 바꿀 수 있다고 생각하는지 함께 보는 편이 정확합니다.";
+ const intro="이 인물의 작전에서는 "+gateV7Josa(GATE_AXES[primary].name,"과","와")+" "+gateV7Josa(GATE_AXES[secondary].name,"이","가")+" 특히 뚜렷하게 드러납니다. 한 가지 성향만으로 설명하기보다, 먼저 무엇을 지키고 무엇을 바꿀 수 있다고 생각하는지 함께 보는 편이 정확합니다.";
  const core=s.core+" "+t.core+" "+(color||"이 두 성향이 동시에 작동하는 장면에서는 판단의 순서 자체가 캐릭터의 개성으로 나타납니다. 단순히 적극적이거나 신중하다고 분류하는 것만으로는 그 선택의 이유를 전부 설명할 수 없습니다.");
  const scenes=[0,2,5].map(i=>({title:sc[i].title,text:"이 장면에서 '"+c(i)+"'는 선택을 했습니다. 이 선택은 "+GATE_AXES[sc[i].opts[p.choices[i]].axis].name+"에 무게를 두는 응답입니다. "+(i===0?s.case:i===2?t.case:w.case)}));
  const conflict=s.friction+" "+w.friction+" "+(p.axes[5]>=7&&p.axes[10]<=4.5?"위험을 감수하려는 마음이 강한 반면 철수 기준은 상대적으로 약하므로, 목표에 가까워질수록 중단 결정을 타인과 교차 확인하는 편이 좋습니다.":p.axes[6]>=7&&p.axes[4]<=4.5?"동료를 보호하려는 의지는 선명하지만 역할 재배치 자체는 적극적이지 않을 수 있습니다. 지원이 한 사람에게 집중되는지 살펴봐야 합니다.":"특히 강점이 한계 상황에서도 같은 형태로 유지된다는 보장은 없습니다. 본인과 동료가 어떤 신호를 중단 조건으로 보는지 미리 맞추는 것이 도움이 됩니다.");
  const caseText="예를 들어 '"+sc[1].title+"'라는 상황이 발생했다고 가정해 봅시다. 이 인물은 '"+c(1)+"'를 선택했습니다. "+s.case+" 이후 '"+sc[4].title+"' 같은 문제가 이어진다면 '"+c(4)+"' 방식으로 대응할 가능성을 살펴볼 수 있습니다. 이 연결은 실제 경험이 아니라 응답을 바탕으로 재구성한 가상 작전 장면입니다.";
  const partner=s.partner+" "+t.partner+" "+(sensory||"동료가 이 인물을 이해하기 위해서는 속도를 맞추는 것뿐 아니라 어떤 정보를 받고 싶어 하는지, 어느 순간 도움을 요청하는지 확인하는 것이 좋습니다.");
  const after=s.after+" "+t.after+" "+roleLine;
- const contrast=s.contrast+" 같은 점수대라도 "+GATE_AXES[secondary].name+"을 함께 사용하는 방식이 다르면 행동의 이유가 달라질 수 있습니다. 낮게 나온 "+GATE_AXES[weak].name+" 역시 결함이라는 뜻이 아니라 다른 방식의 지원이나 판단이 필요한 지점으로 읽어야 합니다.";
+ const contrast=s.contrast+" 같은 점수대라도 "+gateV7Josa(GATE_AXES[secondary].name,"을","를")+" 함께 사용하는 방식이 다르면 행동의 이유가 달라질 수 있습니다. 낮게 나온 "+GATE_AXES[weak].name+" 역시 결함이라는 뜻이 아니라 다른 방식의 지원이나 판단이 필요한 지점으로 읽어야 합니다.";
  return {primary,secondary,weak,title:GATE_AXES[primary].type+" · "+GATE_AXES[secondary].short+" 연계형",intro,core,scenes,conflict,caseText,partner,after,contrast,line:s.line,sensory:!!sProfile,chroma:!!cProfile};
 }
 function gateV7Reader(p){
