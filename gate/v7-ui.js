@@ -16,7 +16,11 @@ function gateV7Role(role){
 function gateV7SourceOptions(type){
  const arr=gateV7State.sources[type].filter(p=>p.role===gateState.role&&(p.name.toLowerCase().includes(gateV7State.search.trim().toLowerCase())||p.id===gateV7State.linkRefs[type==="sensory"?"sensoryId":"chromaId"]));
  const key=type==="sensory"?"sensoryId":"chromaId";
- return '<option value="">선택하지 않음</option>'+arr.map(p=>'<option value="'+gateV7E(p.id)+'" '+(gateV7State.linkRefs[key]===p.id?"selected":"")+'>'+gateV7E(p.name)+" · "+gateV7E(p.role)+" · "+gateV7E(p.id.slice(-6))+'</option>').join("");
+  return '<option value="">선택하지 않음</option>'+arr.map(p=>{
+    const duplicates=gateV7State.sources[type].filter(x=>x.role===p.role&&x.name===p.name);
+    const suffix=duplicates.length>1?" (동명이인 "+(duplicates.findIndex(x=>x.id===p.id)+1)+")":"";
+    return '<option value="'+gateV7E(p.id)+'" '+(gateV7State.linkRefs[key]===p.id?"selected":"")+'>'+gateV7E(p.name)+" · "+gateV7E(p.role)+suffix+'</option>';
+  }).join("");
 }
 function gateV7FilterSources(q){
  gateV7State.search=q;
