@@ -71,7 +71,7 @@ async function gateSave(){
  try{
   const derived=gateScoring(gateState.answers,gateState.choices,gateState.role);
   const old=gateState.own.find(p=>p.id===gateState.editId);
-  const profile={...derived,id:old?.id||gateId(),name:gateState.name.trim(),isPublic:gateState.isPublic,updatedAt:new Date().toISOString(),localOnly:!gateState.cloud};
+  const profile={...derived,id:old?.id||gateId(),name:gateState.name.trim(),isPublic:gateState.isPublic,updatedAt:new Date().toISOString(),localOnly:true};
   gateState.own=[...gateState.own.filter(p=>p.id!==profile.id),profile];
   gatePersist();gateState.selected=profile.id;gateState.editId=null;
   if(gateState.cloud){try{await gateState.cloud.save(profile);profile.localOnly=false;gatePersist();await gateCloudRefresh(false)}catch(e){gateNotify("로컬 저장 완료 · 온라인 등록 실패: "+e.message,true)}}
