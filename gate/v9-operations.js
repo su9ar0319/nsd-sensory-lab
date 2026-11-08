@@ -116,17 +116,44 @@ function gateV9Debuff(a,b,card){
  return {...card,...v};
 }
 function gateV9PairScenes(a,b){
- const aChoice=(x,i)=>gateV9Part(x.name,"은")+" "+gateV9Action(x,i)+".";
+ const sameEntry=gateV8Choice(a,1).choice.axis===gateV8Choice(b,1).choice.axis;
+ const sameLine=gateV8Choice(a,2).choice.axis===gateV8Choice(b,2).choice.axis;
+ const aRet=a.axes[10],bRet=b.axes[10];
  return [
-  {title:"CASE 01 · 진입 지점의 예상 밖 기척",text:"첫 진입로에서 예고되지 않은 신호가 나타나면 "+aChoice(a,1)+" "+aChoice(b,1)+" "+gateV9Compare(a,b,1)+" 이동을 확정하기 전에 통로를 다시 열 사람과 경고를 공유할 사람을 정해야 합니다."},
-  {title:"CASE 02 · 같은 통로로 전진하는 두 대원",text:"둘의 전진 시점이 겹치면 "+aChoice(a,2)+" "+aChoice(b,2)+" 공격을 맡는 사람과 후방을 지키는 사람이 동시에 전면에 나서지 않도록 진형을 다시 정리해야 합니다."},
-  {title:"CASE 03 · 위협 확대와 귀환 선택",text:"목표가 남아 있는 동안 예상보다 많은 자원을 사용하면 "+aChoice(a,7)+" "+aChoice(b,7)+" 여기서는 누가 더 오래 버틸지가 아니라 어떤 조건에서 함께 돌아올 수 있는지가 핵심입니다."}
+  {title:"CASE 01 · 예고되지 않은 진입로 신호",
+   text:"게이트 입구에서 기존 브리핑에 없던 기척이 발견됩니다. "+(sameEntry?
+    "두 사람의 대응 방향이 비슷하므로 한 명이 추가 위험을 찾고 다른 한 명은 진입 허가 신호를 맡는 분업이 필요합니다.":
+    "한 사람은 새로운 정보를 확인하려 하고 다른 사람은 다른 방식으로 위험을 처리하려 합니다. 이때 누가 경로를 변경할 수 있는지 결정권을 분명히 해야 합니다.")+" 초기 대응 이후에는 입구와 후방의 이동 가능 여부를 따로 점검해야 합니다."},
+  {title:"CASE 02 · 전열이 겹쳐 통로가 비는 순간",
+   text:"통로가 좁아진 곳에서 두 대원이 동시에 전진해야 하는 상황입니다. "+(sameLine?
+    "두 사람의 선택이 같은 방향에 가까워 전열이 몰릴 수 있습니다. 먼저 이동할 대원과 후방을 유지할 대원을 분리해야 합니다.":
+    "전진을 둘러싼 기준이 달라 출발 시점이 어긋날 수 있습니다. 위험 견제와 후방 확보 중 어떤 행동을 먼저 끝낼지 확인해야 합니다.")+" 전진 담당이 바뀌면 기존 이동 명령도 함께 갱신해야 합니다."},
+  {title:"CASE 03 · 목표 직전의 귀환 판단",
+   text:"목표까지의 거리가 짧아졌지만 부하도나 가이딩 잔량이 빠르게 바뀌는 구간입니다. "+(Math.abs(aRet-bRet)>=2?
+    "두 사람의 철수 판단에는 차이가 있으므로 위험을 허용하는 시간을 하나의 기준으로 맞춰야 합니다.":
+    "철수 판단 성향이 크게 다르지 않더라도 마지막 행동에 필요한 여력은 서로 다를 수 있습니다.")+" 이 시점에는 추가 진입을 결정할 사람, 귀환 통로를 지킬 사람, 중단 신호를 실행할 사람을 각각 지정하는 편이 안전합니다."}
  ];
+}
+function gateV9ReverseDirection(from,to,original){
+ const f=gateV9Part(from.name,"은"),t=gateV9Part(to.name,"은");
+ const forward=from.axes[2]>=to.axes[2]?"빠르게 움직이려는 쪽":"다른 대원의 선택을 확인하려는 쪽";
+ const exit=from.axes[10]>=to.axes[10]?"철수 가능성을 먼저 확인하는 편":"현장의 진행 가능성을 더 확인하려는 편";
+ original.sections=[
+  {title:"상대의 진입 결정을 받아들이는 조건",
+   text:"먼저 움직인 대원의 판단을 받아들일 때 "+f+" "+gateV9Action(from,0)+". "+t+" "+gateV9Action(to,4)+". 두 기준을 잇기 위해서는 진입에 필요한 최소 단서와 위험 경고를 누가 최종 확인할지 정해야 합니다."},
+  {title:"막힌 통로에서 요구되는 지원",
+   text:f+" "+forward+"입니다. 예고되지 않은 길막이나 우회 요청이 들어오면 "+gateV9Action(from,1)+". 이때 "+gateV9Part(to.name,"이")+" 후방을 지키는 동안 앞쪽 대원은 현재 위치와 새 통로의 진입 가능 여부를 짧게 전달해야 합니다."},
+  {title:"지원 범위를 다시 정해야 하는 순간",
+   text:"부하도나 가이딩 잔량이 빠르게 변하면 "+f+" "+gateV9Action(from,5)+". 반대편에서는 "+t+" "+gateV9Action(to,7)+". 즉각 필요한 대응과 다음 구역을 위해 남길 자원을 분리하지 않으면 먼저 지원한 대원에게 부담이 계속 몰리게 됩니다."},
+  {title:"귀환 시 지켜야 할 한 가지 기준",
+   text:gateV9Part(from.name,"은")+" "+exit+"입니다. "+gateV9Part(to.name,"과")+" 한 팀으로 움직이려면 마지막 목표를 확인할 사람, 복귀 경로를 열어 둘 사람, 철수 조건을 선언할 사람의 역할을 미리 나누는 편이 좋습니다. 단순히 더 오래 버틸 수 있는 쪽을 기준으로 삼지 않는 것이 중요합니다."}
+ ];
+ return original;
 }
 const gateV9OriginalPair=gateV8PairOriginal;
 gatePair=function(a,b){
  const r=gateV9OriginalPair(a,b);
- r.directions=r.directions.map((d,i)=>gateV9Direction(i===0?a:b,i===0?b:a,d));
+ r.directions=r.directions.map((d,i)=>i===0?gateV9Direction(a,b,d):gateV9ReverseDirection(b,a,d));
  r.synergies=r.synergies.map(card=>gateV9Synergy(a,b,card));
  r.debuffs=r.debuffs.map(card=>gateV9Debuff(a,b,card));
  r.resources=(a.role==="가이드"||b.role==="가이드"?
@@ -141,11 +168,16 @@ function gateV9StageEvent(ps,stage,record,roles){
  const scout=ps[roles[0].index],leader=ps[roles[1].index],reserve=ps[roles[2].index];
  const actors=ps.map(p=>gateV9Part(p.name,"은")+" "+gateV9Action(p,stage)+".");
  const set=new Set(ps.map(p=>gateV8Choice(p,stage).choice.axis)).size;
- const variant=set===1?
-  "대응 방향은 비교적 일치하지만 담당 구역이 겹치지 않도록 역할을 분명히 해야 합니다.":
-  set===3?
-  "세 사람의 대응 방향이 모두 다릅니다. 이를 동시 수행할지, 단계적으로 실행할지 현장 지휘에서 결정해야 합니다.":
-  "두 사람이 비슷한 대응을 택하고 한 사람은 다른 방법을 고릅니다. 그 다른 선택이 후방의 위험을 보완할 수 있는지 살펴봐야 합니다.";
+ const alignedVariant=[
+  ["첫 브리핑에서는 같은 방향으로 판단하는 대원들의 확인 역할을 구분해야 합니다.","첫 정보가 갈리므로 보고를 합치는 순서와 진입 허가권을 분리해야 합니다.","세 가지 다른 판단을 한 번에 실행하기보다는 진입 조건을 먼저 합의해야 합니다."],
+  ["입구의 기척을 같은 방향으로 탐색해도 후방 경계를 맡을 사람이 필요합니다.","앞에서 확인할 정보와 뒤에서 감시할 정보를 나눠 위험을 분산합니다.","다른 대응 세 가지 중 무엇을 먼저 할지 정하지 않으면 진입 속도가 흐트러집니다."],
+  ["이상 징후를 추적하는 방향이 같으므로 위치 보고를 중복하지 않도록 주의해야 합니다.","정면의 징후와 후방의 변화에 서로 다른 담당을 두는 편이 유리합니다.","각자 다른 위험을 보고 있다면 위협이 실제로 접근하는 방향부터 확인해야 합니다."],
+  ["모두 같은 전술을 택하더라도 앞뒤의 자리를 바꾸는 절차를 정해야 합니다.","둘의 이동을 확인하는 동안 세 번째 대원이 후방을 확보할 수 있습니다.","전진·우회·지원이 동시에 벌어지므로 경로 변경 신호를 통일해야 합니다."],
+  ["지원 방식이 비슷해도 세 사람의 부하도와 잔량은 각각 다른 속도로 변합니다.","한 명의 다른 선택이 다음 구역에 남길 여력을 확보하는 역할을 할 수 있습니다.","세 대원의 자원 대응이 갈리므로 당장의 수습과 귀환용 자원을 분리해야 합니다."],
+  ["진행 여부가 같아도 각자의 귀환 위치가 연결되어 있는지 확인해야 합니다.","소수 의견이 철수에 가까우면 귀환 통로를 누가 유지할지 검토해야 합니다.","목표와 철수 사이에 세 가지 선택이 나오므로 중단 조건을 한 번 더 명확히 해야 합니다."],
+  ["세 사람이 같은 방향으로 귀환을 원해도 앞뒤의 합류 순서를 정해야 합니다.","두 대원의 귀환 흐름을 따라오지 못하는 한 사람의 상태를 확인해야 합니다.","각자 다른 속도로 움직이므로 마지막 대원의 이동을 확인한 뒤 임무를 마무리해야 합니다."]
+ ];
+ const variant=alignedVariant[stage][set===1?0:set===2?1:2];
  const event=[
   gateV9Part(leader.name,"이")+" 기존 브리핑의 불일치 사항을 정리하는 동안 게이트 입구의 위험 정보를 서로 확인합니다. 어느 신호까지 확인해야 진입할지, 첫 출발 순서를 언제 확정할지가 관건입니다.",
   "게이트 진입로 안쪽에서 예상하지 못한 기척이 나타납니다. "+gateV9Part(scout.name,"이")+" 위험이 발생한 방향을 확인하는 동안 다른 대원들은 통로를 비워 귀환할 여지를 남겨야 합니다.",
@@ -156,17 +188,23 @@ function gateV9StageEvent(ps,stage,record,roles){
   "게이트를 벗어나는 단계입니다. 마지막 구간에 위험이 다시 나타날 수 있으므로 선두가 빠져나간 뒤 후방 인원이 고립되지 않도록 합류 순서를 정하고, 귀환 후 상태를 점검합니다."
  ][stage];
  const assessment=record.critical?
-   "자원 경고가 나타났으므로 다음 행동에 앞서 교대·철수·지원 중 우선할 조치를 결정해야 합니다.":
+   ["위험 신호와 함께 자원 경고가 확인되어 첫 진입의 동의를 다시 받아야 합니다.",
+    "진입 직후 자원 경고가 나타났으므로 다음 통로로 넘어가기 전 배치를 조정해야 합니다.",
+    "이상 징후와 자원 압박이 겹쳐 우회·교대 중 먼저 할 조치를 결정해야 합니다.",
+    "전열 변경 중 자원 경고가 확인되어 무리한 동시 이동을 중단할 필요가 있습니다.",
+    "잔여 자원이 위험 수준에 가까워졌으므로 지원 강도와 철수 계획을 다시 정해야 합니다.",
+    "목표 직전의 자원 경고는 즉시 철수할지 마지막 대응을 끝낼지 판단해야 하는 신호입니다.",
+    "귀환 중 자원 경고가 이어지면 마지막 합류 대원을 보호할 동선을 우선 마련해야 합니다."][stage]:
    record.success?
    ["초기 진입의 우선순위를 유지할 수 있습니다.","입구의 위협을 넘겼으므로 뒤따르는 대원의 위치를 확인합니다.","후방의 위험이 커지지 않도록 다음 구역의 진입 순서를 확인합니다.","새 배치가 작동했으므로 통신 확인 뒤 전진합니다.","이번 구역을 통과했더라도 귀환에 쓸 자원을 남겨야 합니다.","목표를 향한 진행은 가능하지만 철수 경로는 계속 확보해야 합니다.","귀환 동선을 유지하면서 마지막 합류와 사후 점검을 진행합니다."][stage]:
    ["출발 전에 위험 구역과 안전 구역을 다시 나눠야 합니다.","첫 진입의 지연이 후속 대원까지 이어지지 않게 해야 합니다.","위협의 방향을 놓쳤다면 우회 통로부터 확보해야 합니다.","동시에 움직인 대원들의 위치를 다시 맞춰야 합니다.","자원 소모가 커지면 지금 단계에서 지원을 재배치해야 합니다.","계속 전진하면 귀환이 어려워질 수 있어 중단을 검토해야 합니다.","귀환 순서가 흐트러졌다면 다음 이동보다 합류 확인을 우선해야 합니다."][stage];
- return event+" 현장 대응은 "+actors.join(" ")+" "+variant+" "+assessment;
+ return event+" 대원별 대응: "+actors.join(" ")+" "+variant+" "+assessment;
 }
 function gateV9TrioPair(ps,item,index){
  const map=[[0,1,2],[0,2,1],[1,2,0]][index],a=ps[map[0]],b=ps[map[1]],third=ps[map[2]];
  const steps=[1,2,5],scene=steps[index];
  const p=gateV9Part(third.name,"은");
- return p+" "+gateV9Action(third,scene)+". "+gateV9Part(a.name,"과")+" "+b.name+"의 전술이 "+(index===0?"진입로 안전을 확인하는 단계":index===1?"동시 전진으로 담당 구역이 겹치는 단계":"목표를 이어갈지 철수할지 결정하는 단계")+"에서 어긋날 때, 제3자는 별도의 위험을 확인하거나 두 사람의 동선을 연결하는 역할을 맡습니다.";
+ return p+" "+(index===0?"나머지 둘이 진입 경로를 논의할 때 후방에서 위험 신호가 추가로 나타나는지 확인합니다.":index===1?"두 사람의 전진 순서가 충돌할 때 이탈할 통로를 먼저 확보하고 합류 위치를 지정합니다.":"목표를 계속할지 철수할지 의견이 갈릴 때 남은 자원과 귀환 경로를 비교해 둘이 결정할 근거를 마련합니다.");
 }
 function gateV9TrioSynergy(ps,roles,card,index){
  const leader=ps[roles[1].index],scout=ps[roles[0].index],reserve=ps[roles[2].index];
@@ -199,9 +237,36 @@ gateTrio=function(ps){
  r.stages.forEach((stage,i)=>{
   stage.summary=gateV9StageEvent(ps,i,stage,r.roles);
   const critical=stage.resources.filter(x=>x.role==="센티넬"?x.after>=86:x.after<=14);
+  const criticalResults=[
+   "진입 직전의 위험 경고가 다음 단계의 출발 순서를 바꿀 수 있습니다.",
+   "입구에서 자원 압박이 드러나면 첫 정찰 이후 교대를 검토해야 합니다.",
+   "첫 이상 징후의 부담이 누적되어 다음 위협에 대응할 여력을 줄입니다.",
+   "전술 변경 도중 자원이 한계에 가까워져 대원 교대가 필요해질 수 있습니다.",
+   "연속된 위협으로 잔여 여력이 줄어들어 목표를 향한 전진을 재검토해야 합니다.",
+   "목표 구역에서 위험이 커지므로 철수 경로를 우선 확보해야 합니다.",
+   "귀환 직전의 자원 경고는 마지막 대원의 합류에 영향을 줄 수 있습니다."
+  ];
+  const successResults=[
+   "출발 순서가 정리되면서 입구로 향할 수 있는 조건이 마련됩니다.",
+   "진입 경로를 확보해 첫 이상 징후를 확인할 여지가 생깁니다.",
+   "위협의 방향을 좁히면서 새로 나타나는 길의 안전을 검토할 수 있습니다.",
+   "역할을 재배치한 뒤 다음 위험 구역으로 이동할 여력이 생깁니다.",
+   "소모를 관리해 목표 구역으로 접근할 수 있는 자원이 남습니다.",
+   "목표에 대한 판단이 정리되면서 귀환 구간의 우선순위를 세울 수 있습니다.",
+   "남은 대원의 합류와 상태 확인을 마치며 작전을 종료할 수 있습니다."
+  ];
+  const failureResults=[
+   "서로 다른 브리핑이 정리되지 않아 첫 진입부터 지연이 발생합니다.",
+   "예상하지 못한 입구의 기척으로 전진 동선이 다시 좁혀집니다.",
+   "이상 징후의 방향이 확정되지 않아 후방 위협을 재확인해야 합니다.",
+   "동시 전진과 경로 변경이 겹쳐 전열을 다시 맞추는 시간이 필요합니다.",
+   "사용할 수 있는 자원이 줄어들어 후속 지원과 회피 경로를 재배정해야 합니다.",
+   "목표를 앞두고 위험을 더 감수하기 어려워져 철수 여부를 다시 논의해야 합니다.",
+   "마지막 합류가 지연되어 귀환 순서와 안전한 위치를 조정해야 합니다."
+  ];
   stage.consequence=critical.length?
-   critical.map(x=>x.name+"의 "+(x.role==="센티넬"?"부하도 상승":"가이딩 잔량 부족")+"이 다음 단계의 위험에 영향을 줍니다.").join(" "):
-   stage.success?"이번 단계의 진행이 이어지면서 다음 구역으로 이동할 여지가 확보됩니다.":"해당 구역에서 지연이 발생해 다음 단계의 접근 경로나 자원 배분을 다시 검토해야 합니다.";
+   critical.map(x=>x.name+"의 "+(x.role==="센티넬"?"부하도 상승":"가이딩 잔량 부족")+"이 확인됩니다.").join(" ")+criticalResults[i]:
+   stage.success?successResults[i]:failureResults[i];
  });
  r.pairs.forEach((item,i)=>{item.intervention=gateV9TrioPair(ps,item,i)});
  r.synergies=r.synergies.map((x,i)=>gateV9TrioSynergy(ps,r.roles,x,i));
