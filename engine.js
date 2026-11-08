@@ -205,14 +205,17 @@ function signature(p){
  const mode=innerGap>=1.7?2:runnerGap>=1.35?0:1;
  const family=SIGNATURES[hi][band];
  const name=SIGNATURE_SUBTYPES[hi][runner][mode];
- const modeText=mode===2?`같은 ${DOMAINS[hi].short} 안에서도 응답의 편차가 ${fixed(innerGap)}점으로, 상황에 따라 반응의 결이 달라집니다.`:
-  mode===0?`${DOMAINS[hi].short}이(가) ${DOMAINS[runner].short}보다 ${fixed(runnerGap)}점 앞서며 중심 반응을 이룹니다.`:
-  `${DOMAINS[hi].short}과(와) ${DOMAINS[runner].short}이(가) ${fixed(runnerGap)}점 차이로 맞물려 나타납니다.`;
- const roleText=p.role==="가이드"?"가이딩 잔량 관리와 지원의 타이밍에서 이 차이가 드러날 수 있습니다.":"부하도 변화에 대응하고 동료에게 신호를 보내는 순간에 이 차이가 드러날 수 있습니다.";
- const nuance=`${modeText} ${roleText}`;
+ const modeText=mode===2?`같은 ${DOMAINS[hi].short} 안에서도 문항군 사이의 점수 차이가 ${fixed(innerGap)}점으로 나타납니다.`:
+  mode===0?`두 번째 강점인 ${DOMAINS[runner].short}보다 ${DOMAINS[hi].short} 점수가 ${fixed(runnerGap)}점 높게 나타납니다.`:
+  `가장 높은 두 축의 간격은 ${fixed(runnerGap)}점으로, ${DOMAINS[hi].short} 및 ${DOMAINS[runner].short}의 점수가 가깝게 나타납니다.`;
+ const subtitle=mode===2?`${DOMAINS[hi].short} 중심 · 내부 응답 차이 ${fixed(innerGap)}점`:
+   mode===0?`${DOMAINS[hi].short} 중심 · ${DOMAINS[runner].short} 동반`:
+   `${DOMAINS[hi].short} × ${DOMAINS[runner].short} · 이중 강세`;
+ const roleText=p.role==="가이드"?"지원의 타이밍과 가이딩 잔량 관리에서 두 성향이 함께 작용할 수 있습니다.":"부하도 변화에 대응하고 동료에게 경고를 전달하는 순간에 두 성향이 함께 작용할 수 있습니다.";
+ const detail=`${modeText} ${roleText}`;
  const hue=(213+Math.round((a[1]-a[0])*8+(a[2]-a[3])*5+360))%360;
  const bg1=`hsl(${hue} 43% 25%)`,bg2=`hsl(${(hue+38)%360} 51% 41%)`;
- return {name,family,subtitle:nuance,accent:STATES[bandIndex(a[0])],primary:DOMAINS[hi].short,secondary:DOMAINS[runner].short,low:DOMAINS[lo].short,hue,bg1,bg2,
+ return {name,family,subtitle,detail,accent:STATES[bandIndex(a[0])],primary:DOMAINS[hi].short,secondary:DOMAINS[runner].short,low:DOMAINS[lo].short,hue,bg1,bg2,
   signatureMode:mode,signatureAxes:[hi,runner],code:`${String(hi+1).padStart(2,'0')}-${String(band+1).padStart(2,'0')}-${String(Math.round(a[0]*10)).padStart(3,'0')}-${String(Math.round(a[5]*10)).padStart(3,'0')}`};
 }
 function narrativePick(pool,...parts){
