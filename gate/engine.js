@@ -1,4 +1,12 @@
 'use strict';
+/** Resolve Korean particles for dynamic names and tactical labels. */
+function gateEngineJosa(word,withFinal,withoutFinal){
+ const text=String(word??"").trim();
+ if(!text)return text;
+ const c=text.charCodeAt(text.length-1);
+ const jong=(c>=0xAC00&&c<=0xD7A3)?(c-0xAC00)%28:null;
+ return text+(jong===null?withoutFinal:jong?withFinal:withoutFinal);
+}
 function gateQuestions(role){
  return GATE_AXES.flatMap((axis,i)=>{
    const pack=[...GATE_COMMON[i].slice(0,2),...GATE_ROLE[role][i].slice(0,2)];
@@ -34,7 +42,7 @@ function gateSignature(p){
  const diff=p.axes[head]-p.axes[second],facets=p.facets?.[head]||[p.axes[head],p.axes[head]],inside=Math.abs(facets[0]-facets[1]);
  const mode=inside>=2?"변칙형":diff>=1.7?"주도형":"연계형";
  const title=mode==="변칙형"?`${GATE_AXES[head].type} · 상황 전환형`:mode==="주도형"?`${GATE_AXES[head].type} · 중심 돌파형`:`${GATE_AXES[head].type} · ${GATE_AXES[second].short} 연계형`;
- return {name:title,family:GATE_AXES[head].type,primary:head,secondary:second,weakest:tail,mode,contrast:diff,inside,code:`GO-${String(head+1).padStart(2,"0")}${String(second+1).padStart(2,"0")}-${Math.round(p.axes[head]*10)}-${Math.round(p.axes[second]*10)}`,detail:mode==="변칙형"?`${GATE_AXES[head].name}에서 공통 상황과 직군 전용 상황의 응답 차이가 ${gateFixed(inside)}점으로 나타납니다. 익숙한 일과 돌발 상황에서 전술의 결이 바뀔 수 있습니다.`:mode==="주도형"?`${GATE_AXES[head].name}이(가) 두 번째 강점보다 ${gateFixed(diff)}점 높습니다. 하나의 판단 기준이 행동을 강하게 이끄는 편입니다.`:`${GATE_AXES[head].name}과(와) ${GATE_AXES[second].name}이(가) ${gateFixed(diff)}점 차이로 맞물립니다. 두 강점이 한 번의 판단에 함께 사용될 수 있습니다.`};
+ return {name:title,family:GATE_AXES[head].type,primary:head,secondary:second,weakest:tail,mode,contrast:diff,inside,code:`GO-${String(head+1).padStart(2,"0")}${String(second+1).padStart(2,"0")}-${Math.round(p.axes[head]*10)}-${Math.round(p.axes[second]*10)}`,detail:mode==="변칙형"?`${GATE_AXES[head].name}에서 공통 상황과 직군 전용 상황의 응답 차이가 ${gateFixed(inside)}점으로 나타납니다. 익숙한 일과 돌발 상황에서 전술의 결이 바뀔 수 있습니다.`:mode==="주도형"?`${gateEngineJosa(GATE_AXES[head].name, "이", "가")} 두 번째 강점보다 ${gateFixed(diff)}점 높습니다. 하나의 판단 기준이 행동을 강하게 이끄는 편입니다.`:`${gateEngineJosa(GATE_AXES[head].name, "과", "와")} ${gateEngineJosa(GATE_AXES[second].name, "이", "가")} ${gateFixed(diff)}점 차이로 맞물립니다. 두 강점이 한 번의 판단에 함께 사용될 수 있습니다.`};
 }
 
 function gateChoice(p,i){
@@ -47,8 +55,8 @@ function gateSolo(p){
  const hi=order.slice(0,4),low=order.slice(-3).reverse();
  const match=(i,j)=>`${GATE_AXES[i].name} ${gateFixed(a[i])}점과 ${GATE_AXES[j].name} ${gateFixed(a[j])}점`;
  const quick=[
-  {title:"전술 서명과 판단의 중심",text:`${s.detail} 그 결과 ${GATE_AXES[s.primary].name}과(와) ${GATE_AXES[s.secondary].name}이(가) 이번 작전의 우선순위를 결정하는 주요 단서가 됩니다.`},
-  {title:"강점이 모이는 행동",text:`가장 선명한 강점은 ${GATE_AXES[hi[0]].name} ${gateFixed(a[hi[0]])}점입니다. ${GATE_AXES[hi[1]].name}과(와) ${GATE_AXES[hi[2]].name}까지 고려하면 한 가지 기능만 수행하는 인물보다 다른 역할과 맞물릴 가능성이 보입니다.`},
+  {title:"전술 서명과 판단의 중심",text:`${s.detail} 그 결과 ${gateEngineJosa(GATE_AXES[s.primary].name, "과", "와")} ${gateEngineJosa(GATE_AXES[s.secondary].name, "이", "가")} 이번 작전의 우선순위를 결정하는 주요 단서가 됩니다.`},
+  {title:"강점이 모이는 행동",text:`가장 선명한 강점은 ${GATE_AXES[hi[0]].name} ${gateFixed(a[hi[0]])}점입니다. ${gateEngineJosa(GATE_AXES[hi[1]].name, "과", "와")} ${GATE_AXES[hi[2]].name}까지 고려하면 한 가지 기능만 수행하는 인물보다 다른 역할과 맞물릴 가능성이 보입니다.`},
   {title:"판단이 늦어질 수 있는 구간",text:`상대적으로 낮은 지표는 ${GATE_AXES[low[0]].name} ${gateFixed(a[low[0]])}점입니다. 실수로 단정하기보다 이 판단이 중요한 장면에서 어떤 정보나 지원이 필요한지 살펴볼 수 있습니다.`},
   {title:"첫 번째 경고를 받는 방식",text:`'${gateChoice(p,1)}'라는 선택은 익숙한 계획에 없던 신호를 다루는 방법을 보여 줍니다. ${GATE_AXES[0].name} ${gateFixed(a[0])}점과 ${GATE_AXES[3].name} ${gateFixed(a[3])}점이 정보를 모으고 동료에게 전달하는 속도에 서로 다른 영향을 줍니다.`},
   {title:"동료 보호와 작전 목표",text:`${match(6,5)}을 함께 보면 동료를 보호하려는 판단과 작전 진전을 위해 위험을 받아들이는 기준이 구분됩니다. '${gateChoice(p,3)}'라는 상황 선택이 이 긴장을 해석할 단서가 됩니다.`},
@@ -57,7 +65,7 @@ function gateSolo(p){
   {title:"게이트를 떠난 뒤",text:`사후 회복은 ${gateFixed(a[11])}점, 철수 판단은 ${gateFixed(a[10])}점입니다. '${gateChoice(p,7)}'라는 선택을 함께 읽으면 임무 종료와 실제 복귀 준비가 반드시 같은 순간은 아니라는 점이 드러납니다.`}
  ];
  const deep=[
-  {title:"01 / 전술을 결정하는 두 강점",text:`${match(hi[0],hi[1])}은(는) 서로 다른 강점을 만듭니다. ${GATE_AXES[hi[0]].desc}와 ${GATE_AXES[hi[1]].desc}를 함께 고려해야 이 인물의 작전 리듬이 보입니다. ${s.detail}`},
+  {title:"01 / 전술을 결정하는 두 강점",text:`${gateEngineJosa(match(hi[0],hi[1]), "은", "는")} 서로 다른 강점을 만듭니다. ${GATE_AXES[hi[0]].desc}와 ${GATE_AXES[hi[1]].desc}를 함께 고려해야 이 인물의 작전 리듬이 보입니다. ${s.detail}`},
   {title:"02 / 과감함과 보호의 간격",text:`위험 감수 ${gateFixed(a[5])}점, 동료 보호 ${gateFixed(a[6])}점입니다. ${a[5]>a[6]+1.5?"작전 기회가 보일 때 조금 더 앞서 움직이지만 동료가 뒤처지는지 확인해야 합니다.":a[6]>a[5]+1.5?"동료의 안전을 먼저 지키려 하므로 성급한 돌파 제안을 받으면 신중해질 수 있습니다.":"진전과 보호에 비슷한 비중을 둡니다. 그 순간 누가 위험을 떠안을지에 따라 최종 선택이 달라질 수 있습니다."} 긴급 판단은 실제 상태 확인과 분리할 수 없습니다.`},
   {title:"03 / 전술 정보를 전달하는 속도",text:`${match(0,3)}입니다. ${a[0]>a[3]+1.5?"관찰은 빠르지만 그 사실이 팀 전체에 충분히 전달되지 않을 가능성이 있습니다.":"보고와 관찰이 비교적 가까운 속도로 움직일 수 있습니다."} 첫 진입 시 '${gateChoice(p,0)}', 미지의 기척 앞에서 '${gateChoice(p,1)}'를 선택한 흐름을 연결하면 경고를 어떻게 행동으로 전환하는지 드러납니다.`},
   {title:"04 / 지시보다 빠른 행동의 대가",text:`선제 행동 ${gateFixed(a[2])}점과 상황 인지 ${gateFixed(a[0])}점을 함께 고려합니다. ${a[2]>a[0]+1.5?"먼저 움직이는 순간이 관찰보다 앞서기 쉬워, 동료의 새로운 보고가 늦게 반영될 수 있습니다.":"충분히 살핀 뒤 움직이려는 성향이 있어 돌발 기회를 놓치지 않도록 역할을 정할 필요도 있습니다."} 실제로 팀 내 행동이 겹친 장면에서는 '${gateChoice(p,2)}'를 선택했습니다.`},
@@ -81,7 +89,7 @@ function gateDirection(a,b){
  const type=diff>12?"지원 우세":diff< -12?"부담 우세":"변동형";
  const first=aa[0]>=bb[0]?"관찰을 공유하는 쪽":"확인 질문을 받아들이는 쪽";
  const response=`${a.name}의 선제 행동 ${gateFixed(aa[2])}점과 ${b.name}의 상황 인지 ${gateFixed(bb[0])}점이 만나면 ${first}에서 정보의 속도가 달라집니다. ${aa[2]>bb[0]+1.8?"행동이 확인보다 앞설 수 있으므로 출발 전에 현재 단서를 명시하는 편이 좋습니다.":"상대에게 먼저 판단의 여지를 남길 수 있지만 결정할 사람을 정해 두어야 합니다."}`;
- const coordination=`${a.name}의 정보 전달 ${gateFixed(aa[3])}점, ${b.name}의 역할 조율 ${gateFixed(bb[4])}점입니다. ${aa[3]>bb[4]+1.8?"보고가 먼저 쌓여 상대가 재배치를 결정하기 어려워질 수 있습니다.":"현장 정보가 역할 변경으로 이어지려면 누가 어떤 정보에 응답할지 합의해야 합니다."} ${a.name}은(는) '${gateChoice(a,2)}'를, ${b.name}은(는) '${gateChoice(b,2)}'를 선택했습니다.`;
+ const coordination=`${a.name}의 정보 전달 ${gateFixed(aa[3])}점, ${b.name}의 역할 조율 ${gateFixed(bb[4])}점입니다. ${aa[3]>bb[4]+1.8?"보고가 먼저 쌓여 상대가 재배치를 결정하기 어려워질 수 있습니다.":"현장 정보가 역할 변경으로 이어지려면 누가 어떤 정보에 응답할지 합의해야 합니다."} ${gateEngineJosa(a.name, "은", "는")} '${gateChoice(a,2)}'를, ${gateEngineJosa(b.name, "은", "는")} '${gateChoice(b,2)}'를 선택했습니다.`;
  const resource=`${a.name}의 자원 관리 ${gateFixed(aa[7])}점과 ${b.name}의 철수 판단 ${gateFixed(bb[10])}점을 비교하면, 지원을 지속할 조건과 멈출 조건이 같지 않습니다. ${a.role==="가이드"?"가이딩을 수행한다면 잔량을 소모하므로, 지원 범위를 먼저 정해야 합니다.":"센티넬의 부하도는 누적될 수 있으므로, 현재 상태를 알리는 것이 전술의 일부입니다."}`;
  const closure=`${type}으로 분석되는 이 방향에서는 부담 지표 ${pressure}, 지원 지표 ${support}로 나타납니다. ${diff>12?"상대가 맡은 역할을 안정시키는 여지가 있지만 동의를 생략하면 지원 효과가 흔들릴 수 있습니다.":diff< -12?"한 사람의 빠른 선택이 상대에게 추가 판단을 요구할 수 있어 행동 개시 시점이 중요합니다.":"상황에 따라 도움과 부담이 뒤바뀌므로 어떤 행동을 먼저 하는지가 결과를 좌우합니다."}`;
  return {from:a.name,to:b.name,pressure,support,diff,type,sections:[{title:"선제 행동과 상대의 관찰",text:response},{title:"교신과 역할 변경",text:coordination},{title:"자원 사용과 철수 조건",text:resource},{title:"이 방향의 전술적 영향",text:closure}]};
@@ -99,22 +107,22 @@ function gatePair(a,b){
  const recovery=x[11]>=y[11]?a:b,rest=recovery===a?b:a;
  const sorted=(arr,n)=>arr.sort((v,w)=>w.weight-v.weight).slice(0,n);
  const synergy=[
- {weight:Math.max(x[0],y[0])*6,title:"정찰과 후속 판단의 분업",condition:`${detection.name}이(가) 관찰한 변화의 근거를 먼저 공유하고 ${planner.name}이(가) 대응 우선순위를 정할 때입니다.`,action:`${detection.name}은(는) '${gateChoice(detection,1)}'에 가까운 방식으로 단서를 확보하고, ${alternate.name}이(가) 별도의 위험을 확인할 수 있습니다.`,break:`관찰 내용이 전달되기 전에 한 사람이 행동을 확정하거나 같은 정보만 반복 확인할 때입니다.`},
- {weight:Math.max(x[4],y[4])*5+Math.abs(x[8]-y[8])*3,title:"역할 교대를 통한 전술 전환",condition:`${agile.name}이(가) 새로운 경로를 제안할 때 ${steady.name}이(가) 현재 역할과 충돌하는 부분을 정리할 때입니다.`,action:`두 사람의 전술 유연성 차이는 ${gateFixed(Math.abs(x[8]-y[8]))}점입니다. 계획 변경을 개인 판단으로 끝내지 않고 실제 역할 배치까지 연결할 수 있습니다.`,break:`새 계획이 동료에게 전달되지 않거나 변경 사실을 알고도 이전 역할을 반복할 때입니다.`},
- {weight:Math.max(x[6],y[6])*5,title:"동료 보호를 작전 목표와 연결하기",condition:`${helper.name}이(가) 위험한 대원의 부담을 발견하고 ${other.name}이(가) 진행 가능한 대안을 함께 검토할 때입니다.`,action:`${helper.name}의 보호 성향 ${gateFixed(helper.axes[6])}점을 활용해 직접 지원과 외부 위험 차단을 구분합니다.`,break:`보호를 이유로 상대의 선택을 대신 결정하거나 작전 목표를 아무 설명 없이 변경할 때입니다.`},
- {weight:Math.max(x[7],y[7])*5,title:"여력 보존과 후속 지원",condition:`${manager.name}이(가) 다음 단계에 필요한 자원을 먼저 계산하고 ${receiver.name}이(가) 현재 지원 범위를 동의할 때입니다.`,action:`${manager.name}은(는) '${gateChoice(manager,5)}'를 선택했습니다. 이 대응을 준비 단계에서 공유하면 나중에 필요한 지원을 남길 수 있습니다.`,break:`한 사람이 성공적으로 수습했다는 이유로 같은 지원량을 계속 요구할 때입니다.`}
+ {weight:Math.max(x[0],y[0])*6,title:"정찰과 후속 판단의 분업",condition:`${gateEngineJosa(detection.name, "이", "가")} 관찰한 변화의 근거를 먼저 공유하고 ${gateEngineJosa(planner.name, "이", "가")} 대응 우선순위를 정할 때입니다.`,action:`${gateEngineJosa(detection.name, "은", "는")} '${gateChoice(detection,1)}'에 가까운 방식으로 단서를 확보하고, ${gateEngineJosa(alternate.name, "이", "가")} 별도의 위험을 확인할 수 있습니다.`,break:`관찰 내용이 전달되기 전에 한 사람이 행동을 확정하거나 같은 정보만 반복 확인할 때입니다.`},
+ {weight:Math.max(x[4],y[4])*5+Math.abs(x[8]-y[8])*3,title:"역할 교대를 통한 전술 전환",condition:`${gateEngineJosa(agile.name, "이", "가")} 새로운 경로를 제안할 때 ${gateEngineJosa(steady.name, "이", "가")} 현재 역할과 충돌하는 부분을 정리할 때입니다.`,action:`두 사람의 전술 유연성 차이는 ${gateFixed(Math.abs(x[8]-y[8]))}점입니다. 계획 변경을 개인 판단으로 끝내지 않고 실제 역할 배치까지 연결할 수 있습니다.`,break:`새 계획이 동료에게 전달되지 않거나 변경 사실을 알고도 이전 역할을 반복할 때입니다.`},
+ {weight:Math.max(x[6],y[6])*5,title:"동료 보호를 작전 목표와 연결하기",condition:`${gateEngineJosa(helper.name, "이", "가")} 위험한 대원의 부담을 발견하고 ${gateEngineJosa(other.name, "이", "가")} 진행 가능한 대안을 함께 검토할 때입니다.`,action:`${helper.name}의 보호 성향 ${gateFixed(helper.axes[6])}점을 활용해 직접 지원과 외부 위험 차단을 구분합니다.`,break:`보호를 이유로 상대의 선택을 대신 결정하거나 작전 목표를 아무 설명 없이 변경할 때입니다.`},
+ {weight:Math.max(x[7],y[7])*5,title:"여력 보존과 후속 지원",condition:`${gateEngineJosa(manager.name, "이", "가")} 다음 단계에 필요한 자원을 먼저 계산하고 ${gateEngineJosa(receiver.name, "이", "가")} 현재 지원 범위를 동의할 때입니다.`,action:`${gateEngineJosa(manager.name, "은", "는")} '${gateChoice(manager,5)}'를 선택했습니다. 이 대응을 준비 단계에서 공유하면 나중에 필요한 지원을 남길 수 있습니다.`,break:`한 사람이 성공적으로 수습했다는 이유로 같은 지원량을 계속 요구할 때입니다.`}
  ];
- if(guide&&sentinel)synergy.push({weight:62,title:"부하도와 가이딩 잔량의 교차 관리",condition:`${sentinel.name}이(가) 위험한 부하도 전조를 알리고 ${guide.name}이(가) 가능한 지원 범위를 선택할 때입니다.`,action:`가이딩을 수행할 경우 ${guide.name}의 잔량이 소모됩니다. 환경 조정으로 해결할 수 있는 일과 직접 지원이 필요한 일을 분리하면 상호 부담을 낮출 수 있습니다.`,break:`${guide.name}의 현재 잔량 확인 없이 이전에 성공한 가이딩 강도를 반복할 때입니다.`});
+ if(guide&&sentinel)synergy.push({weight:62,title:"부하도와 가이딩 잔량의 교차 관리",condition:`${gateEngineJosa(sentinel.name, "이", "가")} 위험한 부하도 전조를 알리고 ${gateEngineJosa(guide.name, "이", "가")} 가능한 지원 범위를 선택할 때입니다.`,action:`가이딩을 수행할 경우 ${guide.name}의 잔량이 소모됩니다. 환경 조정으로 해결할 수 있는 일과 직접 지원이 필요한 일을 분리하면 상호 부담을 낮출 수 있습니다.`,break:`${guide.name}의 현재 잔량 확인 없이 이전에 성공한 가이딩 강도를 반복할 때입니다.`});
  const debuff=[
- {weight:Math.abs(x[2]-y[0])*5+33,title:"행동이 확인보다 앞서는 충돌",trigger:`${x[2]>=y[2]?a.name:b.name}이(가) 먼저 움직이는 동안 상대가 다른 위험을 아직 확인하지 못한 순간입니다.`,chain:`서로의 지시를 기다리는 게 아니라 이미 서로 다른 목표를 향해 움직이면서 중복 행동이 생깁니다.`,mitigation:`진입 전 서로 반드시 전달해야 할 단서를 하나씩 지정하고 행동 개시 신호를 맞춥니다.`},
+ {weight:Math.abs(x[2]-y[0])*5+33,title:"행동이 확인보다 앞서는 충돌",trigger:`${gateEngineJosa(x[2]>=y[2]?a.name:b.name, "이", "가")} 먼저 움직이는 동안 상대가 다른 위험을 아직 확인하지 못한 순간입니다.`,chain:`서로의 지시를 기다리는 게 아니라 이미 서로 다른 목표를 향해 움직이면서 중복 행동이 생깁니다.`,mitigation:`진입 전 서로 반드시 전달해야 할 단서를 하나씩 지정하고 행동 개시 신호를 맞춥니다.`},
  {weight:Math.abs(x[5]-y[5])*5+27,title:"위험 허용 기준의 불일치",trigger:`위험 감수 점수 차이가 ${gateFixed(Math.abs(x[5]-y[5]))}점으로 나타나는 상황에서 같은 목표를 두고 서로 다른 행동을 정할 때입니다.`,chain:`한 사람은 돌파가 가능한 기회라고 보고 다른 사람은 철수를 준비할 수 있습니다.`,mitigation:`목표 달성 조건과 반드시 철수할 조건을 사전에 분리해 합의합니다.`},
- {weight:Math.abs(x[7]-y[7])*5+30,title:"지원 자원의 집중 소모",trigger:`${manager.name}은(는) 소모를 줄이려 하는데 ${receiver.name}의 활동이 계속해서 지원을 요구하는 상황입니다.`,chain:`작전 초반 안정이 다음 단계에서 사용할 가이딩 잔량이나 부하도 여유를 잠식할 수 있습니다.`,mitigation:`대응을 선택할 때 현재 소모뿐 아니라 다음 상황에 남길 자원을 함께 계산합니다.`},
- {weight:Math.abs(x[10]-y[10])*5+27,title:"철수 시점의 어긋남",trigger:`${x[10]>=y[10]?a.name:b.name}이(가) 철수를 준비하지만 상대는 아직 임무를 진행할 수 있다고 판단할 때입니다.`,chain:`철수와 돌파가 동시에 시작되면 후방 지원과 정찰을 누가 담당할지 불명확해질 수 있습니다.`,mitigation:`재진입 가능성보다 안전한 이탈 경로 확보를 공통 확인 항목으로 정합니다.`}
+ {weight:Math.abs(x[7]-y[7])*5+30,title:"지원 자원의 집중 소모",trigger:`${gateEngineJosa(manager.name, "은", "는")} 소모를 줄이려 하는데 ${receiver.name}의 활동이 계속해서 지원을 요구하는 상황입니다.`,chain:`작전 초반 안정이 다음 단계에서 사용할 가이딩 잔량이나 부하도 여유를 잠식할 수 있습니다.`,mitigation:`대응을 선택할 때 현재 소모뿐 아니라 다음 상황에 남길 자원을 함께 계산합니다.`},
+ {weight:Math.abs(x[10]-y[10])*5+27,title:"철수 시점의 어긋남",trigger:`${gateEngineJosa(x[10]>=y[10]?a.name:b.name, "이", "가")} 철수를 준비하지만 상대는 아직 임무를 진행할 수 있다고 판단할 때입니다.`,chain:`철수와 돌파가 동시에 시작되면 후방 지원과 정찰을 누가 담당할지 불명확해질 수 있습니다.`,mitigation:`재진입 가능성보다 안전한 이탈 경로 확보를 공통 확인 항목으로 정합니다.`}
  ];
  if(guide)debuff.push({weight:63,title:"공명 고갈을 늦게 발견하는 위험",trigger:`${guide.name}에게 요청이 몰리며 가이딩 잔량의 감소가 숨겨질 때입니다.`,chain:`센티넬의 부하도가 낮아져도 가이드의 잔량이 자동으로 회복되는 것은 아닙니다. 계속 지원하면 공명 고갈 위험이 높아질 수 있습니다.`,mitigation:`가이딩 전후 잔량과 추가 지원 가능 여부를 따로 확인합니다.`});
  synergy.forEach((card,i)=>{card.action+=" "+gatePick(GATE_NARRATIVES.pair[i],a.id,b.id,"pair-synergy",i,gateFixed(x[4]-y[4]));});
  const resources=`${a.role==="센티넬"?`${a.name}의 부하도 전조와 폭주 위험`:`${a.name}의 가이딩 잔량과 공명 고갈 위험`} / ${b.role==="센티넬"?`${b.name}의 부하도 전조와 폭주 위험`:`${b.name}의 가이딩 잔량과 공명 고갈 위험`}을 별도로 기록합니다. 현재 자원 상태는 설문만으로 확정할 수 없으므로 실제 작전 전 확인이 필요합니다.`;
- return {a:a.name,b:b.name,directions:[ab,ba],synergies:sorted(synergy,4),debuffs:sorted(debuff,4),resources,rankLabel:gateMean([x[4],y[4],x[9],y[9]])>=6.7?"조율 우세":gateMean([x[5],y[5],x[2],y[2]])>=7.1?"돌파 우세":"변동형",scenes:[0,5,6].map(i=>({title:["진입 직후","자원 소모가 커질 때","위험 판단 충돌"][ [0,5,6].indexOf(i)],text:`${a.name}은(는) '${gateChoice(a,i)}', ${b.name}은(는) '${gateChoice(b,i)}'를 선택했습니다. 서로 다른 판단을 연결할 공통 신호가 필요합니다.`}))};
+ return {a:a.name,b:b.name,directions:[ab,ba],synergies:sorted(synergy,4),debuffs:sorted(debuff,4),resources,rankLabel:gateMean([x[4],y[4],x[9],y[9]])>=6.7?"조율 우세":gateMean([x[5],y[5],x[2],y[2]])>=7.1?"돌파 우세":"변동형",scenes:[0,5,6].map(i=>({title:["진입 직후","자원 소모가 커질 때","위험 판단 충돌"][ [0,5,6].indexOf(i)],text:`${gateEngineJosa(a.name, "은", "는")} '${gateChoice(a,i)}', ${gateEngineJosa(b.name, "은", "는")} '${gateChoice(b,i)}'를 선택했습니다. 서로 다른 판단을 연결할 공통 신호가 필요합니다.`}))};
 }
 
 function gateAssignments(ps){
@@ -130,7 +138,7 @@ function gateTrio(ps){
  const pairs=pairIndices.map(([i,j,k])=>{
   const analysis=gatePair(ps[i],ps[j]);
   const third=ps[k];const strong=third.axes[0]>7.2?"추가 전조를 확인":third.axes[8]>7.2?"전술 변경을 제안":third.axes[7]>7.2?"자원 소모를 점검":"위험 정보를 교차 확인";
-  return {label:`${ps[i].name} × ${ps[j].name}`,from:analysis.directions[0],back:analysis.directions[1],third:third.name,intervention:`${third.name}은(는) 두 사람의 판단이 어긋날 때 '${strong}'하는 제3자 역할을 맡을 수 있습니다. 직접 결정을 대신하기보다 각자의 관찰을 모아 대응의 순서를 정합니다.`,tension:Math.max(analysis.directions[0].pressure,analysis.directions[1].pressure),synergy:analysis.synergies[0].title,debuff:analysis.debuffs[0].title};
+  return {label:`${ps[i].name} × ${ps[j].name}`,from:analysis.directions[0],back:analysis.directions[1],third:third.name,intervention:`${gateEngineJosa(third.name, "은", "는")} 두 사람의 판단이 어긋날 때 '${strong}'하는 제3자 역할을 맡을 수 있습니다. 직접 결정을 대신하기보다 각자의 관찰을 모아 대응의 순서를 정합니다.`,tension:Math.max(analysis.directions[0].pressure,analysis.directions[1].pressure),synergy:analysis.synergies[0].title,debuff:analysis.debuffs[0].title};
  });
  const threatFrom=gateMean(ps.map(p=>p.axes[5]))*3,control=gateMean(ps.map(p=>p.axes[9]));
  let threat=Math.round(gateClamp(39+threatFrom-control*2)),cohesion=Math.round(gateClamp(gateMean(ps.map(p=>p.axes[4]))*10)),success=0;
@@ -166,7 +174,7 @@ function gateTrio(ps){
   const critical=state.some(p=>p.role==="센티넬"?p.value>=86:p.value<=14);
   threat=Math.round(gateClamp(threat*.65+pressure*.35+(successStep?-5:7)+(critical?9:0)-((stage===5&&lead.axes[10]>7)?6:0)));
   cohesion=Math.round(gateClamp(cohesion+(successStep?3:-3)+(aligned?2:0)));
-  const actor=ps[stage%3],roleText=stage===0?`정보가 먼저 모이면 ${lead.name}이(가) 초기 역할을 확정하고 ${detect.name}이(가) 확인할 신호를 좁힙니다.`:stage===1?`${detect.name}의 정찰이 첫 진입의 리듬을 정합니다. 관찰 범위가 겹치지 않도록 다른 대원은 후방을 살필 수 있습니다.`:stage===2?`처음 확인되지 않은 기척이 드러납니다. ${detect.name}이(가) 포착한 정보가 ${lead.name}에게 전달되는 순서가 중요합니다.`:stage===3?`행동이 엇갈리면 ${lead.name}은(는) 기존 배치를 유지할지 다른 방법을 택할지 선택해야 합니다.`:stage===4?`${sustain.name}은(는) 자원 사용의 한계를 확인합니다. 높은 부하도나 낮은 잔량은 위험을 높일 수 있습니다.`:stage===5?`목표를 이어갈지 철수할지 ${lead.name}이(가) 근거를 정리하고 각자의 의사를 확인해야 합니다.`:`작전이 끝나도 ${sustain.name}의 사후 상태 점검은 별개로 진행해야 합니다.`;
+  const actor=ps[stage%3],roleText=stage===0?`정보가 먼저 모이면 ${gateEngineJosa(lead.name, "이", "가")} 초기 역할을 확정하고 ${gateEngineJosa(detect.name, "이", "가")} 확인할 신호를 좁힙니다.`:stage===1?`${detect.name}의 정찰이 첫 진입의 리듬을 정합니다. 관찰 범위가 겹치지 않도록 다른 대원은 후방을 살필 수 있습니다.`:stage===2?`처음 확인되지 않은 기척이 드러납니다. ${gateEngineJosa(detect.name, "이", "가")} 포착한 정보가 ${lead.name}에게 전달되는 순서가 중요합니다.`:stage===3?`행동이 엇갈리면 ${gateEngineJosa(lead.name, "은", "는")} 기존 배치를 유지할지 다른 방법을 택할지 선택해야 합니다.`:stage===4?`${gateEngineJosa(sustain.name, "은", "는")} 자원 사용의 한계를 확인합니다. 높은 부하도나 낮은 잔량은 위험을 높일 수 있습니다.`:stage===5?`목표를 이어갈지 철수할지 ${gateEngineJosa(lead.name, "이", "가")} 근거를 정리하고 각자의 의사를 확인해야 합니다.`:`작전이 끝나도 ${sustain.name}의 사후 상태 점검은 별개로 진행해야 합니다.`;
   const consequence=critical?`자원 임계 상태에 가까운 대원이 감지되어 후속 단계의 위험에 추가 영향을 줍니다.`:successStep?`이 단계의 판단이 일정 부분 맞아떨어져 다음 단계의 위협이 낮아지는 흐름입니다.`:`판단이 엇갈리거나 현장의 압박이 높아져 다음 단계에 부담이 남습니다.`;
   const stageDetail=gatePick(GATE_NARRATIVES.stage[stage][successStep?0:1],ps.map(p=>p.id).join(","),"gate-stage",stage,pressure,successStep?"success":"risk");
   stages.push({index:stage+1,title:GATE_STAGES[stage],beforeThreat:currentThreat,pressure,afterThreat:threat,cohesion,success:successStep,critical,summary:roleText+" "+stageDetail,consequence,actions:ps.map((p,i)=>({name:p.name,choice:choices[i],roleChoice:roleChoices[i]})),resources:localResource,lead:actor.name});
@@ -176,8 +184,8 @@ function gateTrio(ps){
  const best=pairs.slice().sort((a,b)=>(b.from.support+b.back.support)-(a.from.support+a.back.support))[0];
  const worst=pairs.slice().sort((a,b)=>b.tension-a.tension)[0];
  const trioSynergies=[
- {title:"정찰 → 판단 → 자원 관리의 연결",condition:`${detect.name}이(가) 전조를 확인하면 ${lead.name}이(가) 행동 순서를 정하고 ${sustain.name}이(가) 남은 여력을 확인할 때입니다.`,effect:"세 역할이 한 인물에 몰리지 않아 위기의 처음과 이후를 동시에 다룰 수 있습니다.",break:"경고를 공유하지 않거나 지휘 판단이 자원 상태 확인보다 앞서 나갈 때입니다."},
- {title:`${best.label}의 역할 보완`,condition:`${best.label}에서 상대의 정보 전달과 전술 조정이 적절한 순서로 이어질 때입니다.`,effect:`제3자인 ${best.third}이(가) 다른 방향의 정보를 점검하면 두 사람의 협력으로 놓칠 수 있는 위험을 보완합니다.`,break:"두 사람만 지원 정보를 주고받고 제3자의 관찰을 작전 판단에서 제외할 때입니다."},
+ {title:"정찰 → 판단 → 자원 관리의 연결",condition:`${gateEngineJosa(detect.name, "이", "가")} 전조를 확인하면 ${gateEngineJosa(lead.name, "이", "가")} 행동 순서를 정하고 ${gateEngineJosa(sustain.name, "이", "가")} 남은 여력을 확인할 때입니다.`,effect:"세 역할이 한 인물에 몰리지 않아 위기의 처음과 이후를 동시에 다룰 수 있습니다.",break:"경고를 공유하지 않거나 지휘 판단이 자원 상태 확인보다 앞서 나갈 때입니다."},
+ {title:`${best.label}의 역할 보완`,condition:`${best.label}에서 상대의 정보 전달과 전술 조정이 적절한 순서로 이어질 때입니다.`,effect:`제3자인 ${gateEngineJosa(best.third, "이", "가")} 다른 방향의 정보를 점검하면 두 사람의 협력으로 놓칠 수 있는 위험을 보완합니다.`,break:"두 사람만 지원 정보를 주고받고 제3자의 관찰을 작전 판단에서 제외할 때입니다."},
  {title:"세 방향의 추가 감시",condition:`세 사람이 정찰 영역을 나누고 각자 관찰 결과를 짧게 보고할 때입니다.`,effect:`전조 감지 최고점 ${gateFixed(Math.max(...ps.map(p=>p.axes[0])))}점의 대원이 신호를 발견해도 다른 대원이 근거를 확인할 수 있습니다.`,break:"같은 기척을 세 사람이 중복 추적하면서 뒤쪽의 위험을 놓칠 때입니다."},
  {title:"보조 인력으로 이어지는 작전 수정",condition:`전술 유연성이 높은 대원이 변경안을 제시하고 역할 조율 담당이 실제 배치를 바꿀 때입니다.`,effect:`세 사람의 전술 유연성 차이는 ${gateFixed(Math.max(...ps.map(p=>p.axes[8]))-Math.min(...ps.map(p=>p.axes[8])))}점입니다. 차이를 활용해 다른 대안을 검토할 수 있습니다.`,break:"계획을 수정한 사람만 새 목표를 알고 다른 둘은 이전 동선을 따를 때입니다."},
  {title:"재투입 전 여력 재확인",condition:`모든 대원이 작전 종료 후 상태를 따로 보고하고 다음 임무의 지원 범위를 다시 정할 때입니다.`,effect:`작전 최종 단계에서 시뮬레이션 자원 지표를 비교하면 누가 쉬어야 할지 구체적으로 논의할 수 있습니다.`,break:"한 사람이 아직 움직일 수 있다는 이유로 팀 전체를 즉시 다시 투입할 때입니다."}
