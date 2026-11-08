@@ -62,7 +62,7 @@ function spectrumCard(p,small=false){const r=signature(p);return `<div class="sp
 function statBars(p){return `<div class="metrics">${p.axes.map((v,i)=>`<div class="metric"><b>${esc(DOMAINS[i].short)}</b><div class="track"><i style="width:${Math.round(v*10)}%"></i></div><span>${fixed(v)}</span></div>`).join('')}</div>`;}
 function lineSection(i,title,content){return `<div class="section"><h3>${String(i).padStart(2,'0')}. ${title}</h3><p>${content}</p></div>`;}
 function soloInsightCards(items){
- return `<div class="solo-depth-grid">${items.map((x,i)=>`<article class="solo-depth-card"><div class="solo-depth-number">${String(i+1).padStart(2,"0")}</div><h4>${esc(x.title)}</h4><p>${esc(x.text)}</p></article>`).join("")}</div>`;
+ return `<div class="solo-depth-grid solo-depth-count-${items.length}">${items.map((x,i)=>`<article class="solo-depth-card"><div class="solo-depth-number">${String(i+1).padStart(2,"0")}</div><h4>${esc(x.title)}</h4><p>${esc(x.text)}</p></article>`).join("")}</div>`;
 }
 function soloSummaryCards(p,t,r){
  const highest=p.axes.indexOf(Math.max(...p.axes));
@@ -97,7 +97,7 @@ ${soloChapter("PART 02 / DEEP INTERPRETATION","감각 반응 심층 분석","09�
 <div class="section solo-depth-section"><h3>13. 타인에게 잘못 읽히기 쉬운 신호</h3><p class="sub">겉으로 보이는 행동과 실제 감각 부담이 늘 같은 방향으로 움직이지는 않습니다.</p>${soloInsightCards(depth.misreads)}</div>
 <div class="section solo-depth-section"><h3>14. 이 인물과 동행할 때 도움이 되는 대화</h3><p class="sub">누군가가 어떤 정보를 물어보고 어떤 선택권을 남겨야 할지 살펴봅니다.</p>${soloInsightCards(depth.cooperation)}</div>
 <div class="section solo-depth-section"><h3>15. 다른 선택이 이야기를 바꾸는 순간</h3><p class="sub">점수와 실제 선택에서 출발한 캐릭터 서사의 가능성입니다.</p>${soloInsightCards(depth.stories)}</div>
-<div class="section"><h3>16. 여덟 장면에 남은 선택</h3><p class="sub">선택한 행동을 통해 위기에서 드러나는 판단과 대응 방식을 살펴봅니다.</p>${acts}</div>
+<div class="section"><h3>16. 여덟 장면에 남은 선택</h3><p class="sub">선택한 행동을 통해 위기에서 드러나는 판단과 대응 방식을 살펴봅니다.</p><div class="sensory-choice-grid">${acts}</div></div>
 <div class="section"><h3>17. 여섯 개의 감각 좌표</h3>${statBars(p)}</div>
 <div class="row actions"><button class="btn soft" onclick="pairFrom('${esc(p.id)}')">이 캐릭터로 2인 분석 →</button><button class="btn ghost" onclick="copyAIAnalysis('individual','${esc(p.id)}')">AI 분석 패키지 복사</button><button class="btn ghost" onclick="window.print()">인쇄 · PDF 저장</button></div></section>`;}
 function pairFrom(id){state.choiceA=id;state.choiceB=allProfiles().find(x=>x.id!==id)?.id||'';switchTo('pair');}
@@ -105,7 +105,7 @@ function pairView(){const all=allProfiles();if(!state.choiceA)state.choiceA=all[
 function interferencePanel(a,b,r){return `<div class="impact-grid"><div class="impact-item"><span>${esc(a.name)} → ${esc(b.name)}</span><div class="impact-values"><b>자극 ${r.stimulation}</b><b>완충 ${r.buffer}</b></div><div class="impact-bars"><i style="width:${r.stimulation}%"></i><em style="width:${r.buffer}%"></em></div></div></div>`;}
 function sensoryCards(items,type){
  const labeled=text=>esc(text).replace(/\*\*(활성 조건|깨지는 순간|발동 계기|악화 지점|확대 경로)\*\*/g,(_,label)=>`${["깨지는 순간","악화 지점","확대 경로"].includes(label)?'<span class="analysis-break" aria-hidden="true"></span>':''}<strong class="analysis-condition">${label}</strong>`);
- return `<div class="analysis-card-grid">${items.map((p,i)=>`<div class="analysis-card ${type}"><div class="analysis-card-meta">${type==="synergy"?"SYNERGY":"RISK"} / ${String(i+1).padStart(2,"0")}</div><h4>${esc(p.title)}</h4><p>${labeled(p.text)}</p></div>`).join("")}</div>`;
+ return `<div class="analysis-card-grid sensory-analysis-count-${items.length}">${items.map((p,i)=>`<div class="analysis-card ${type}"><div class="analysis-card-meta">${type==="synergy"?"SYNERGY":"RISK"} / ${String(i+1).padStart(2,"0")}</div><h4>${esc(p.title)}</h4><p>${labeled(p.text)}</p></div>`).join("")}</div>`;
 }
 
 function directionView(d){
@@ -124,7 +124,7 @@ function pairViewResult(a,b){
  <div class="section"><h3>04. ${esc(b.name)}이(가) ${esc(a.name)}에게 미치는 영향</h3>${directionView(r.directional[1])}</div>
  <div class="section"><h3>05. 함께할 때 나타나는 시너지</h3><p class="sub">감지와 지원, 감각 수용 방식에서 서로를 보완할 수 있는 조건입니다.</p>${sensoryCards(r.synergies,"synergy")}</div>
  <div class="section"><h3>06. 서로를 힘들게 할 수 있는 역효과</h3><p class="sub">자극이 누적되거나 지원이 어긋나는 상황에서 나타날 수 있는 부담입니다.</p>${sensoryCards(r.debuffs,"debuff")}</div>
- <div class="section"><h3>07. 실제 선택을 연결한 세 가지 동행 장면</h3>${scenarios}</div>
+ <div class="section"><h3>07. 실제 선택을 연결한 세 가지 동행 장면</h3><div class="sensory-scene-grid">${scenarios}</div></div>
  ${lineSection(8,"경고의 속도가 달라질 때",esc(r.signal))}
  ${lineSection(9,"지원과 동의 사이에서",esc(r.supportTiming)+" "+esc(r.decision))}
  ${lineSection(10,"직군과 자원 관리",esc(r.resource))}
@@ -153,10 +153,10 @@ function groupViewResult(ps){
  <div class="section"><h3>02. 서로 다른 세 사람의 역할 배치</h3><p class="sub">모든 역할을 한 명에게 몰지 않고, 세 사람의 점수와 현장 선택을 함께 비교한 배치입니다.</p><div class="analysis-roles">${roles}</div></div>
  <div class="section"><h3>03. 세 사람이 만들 수 있는 시너지</h3>${sensoryCards(r.teamSynergies,"synergy")}</div>
  <div class="section"><h3>04. 세 사람이 서로에게 줄 수 있는 부담과 역효과</h3>${sensoryCards(r.teamDebuffs,"debuff")}</div>
- <div class="section"><h3>05. 여섯 단계의 동행 작전 기록</h3><p class="sub">서로 다른 반응이 만나면 같은 상황에서도 다음 행동이 달라질 수 있습니다.</p>${stages}</div>
+ <div class="section"><h3>05. 여섯 단계의 동행 작전 기록</h3><p class="sub">서로 다른 반응이 만나면 같은 상황에서도 다음 행동이 달라질 수 있습니다.</p><div class="sensory-stage-grid">${stages}</div></div>
  <div class="section"><h3>06. 세 쌍, 여섯 방향의 감각 간섭</h3><p class="sub">둘 사이의 영향에 제3자가 더해졌을 때 관계가 완충되거나 자극이 커질 수 있습니다.</p>${pairs}</div>
- <div class="section"><h3>07. 한 관계의 부담이 팀 전체로 번진다면</h3>${chains}</div>
- <div class="section"><h3>08. 한 사람이 이탈하거나 쉬어야 한다면</h3>${fallback}</div>
+ <div class="section"><h3>07. 한 관계의 부담이 팀 전체로 번진다면</h3><div class="sensory-trio-detail-grid">${chains}</div></div>
+ <div class="section"><h3>08. 한 사람이 이탈하거나 쉬어야 한다면</h3><div class="sensory-trio-detail-grid">${fallback}</div></div>
  ${lineSection(9,"임무 이후 남는 감각과 다음 동행",esc(r.recovery)+" "+esc(r.outlook))}
  <div class="section"><h3>10. 공통점과 감각 좌표</h3><div class="pills"><span class="pill">공통: ${esc(DOMAINS[r.common].short)}</span><span class="pill">차이: ${esc(DOMAINS[r.variable].short)}</span></div><div class="metrics">${DOMAINS.map((d,i)=>`<div class="metric"><b>${esc(d.short)}</b><div class="track"><i style="width:${mean(ps.map(p=>p.axes[i]))*10}%"></i></div><span>${fixed(Math.max(...ps.map(p=>p.axes[i]))-Math.min(...ps.map(p=>p.axes[i])))}Δ</span></div>`).join("")}</div></div>
  <div class="row actions"><button class="btn ghost" onclick="window.print()">그룹 결과 인쇄 · PDF</button><button class="btn soft" onclick="copyCurrentLink('group')">그룹 조합 링크 복사</button><button class="btn ghost" onclick="copyAIAnalysis('group')">AI 분석 패키지 복사</button></div></section>`;
