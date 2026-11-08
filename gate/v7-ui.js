@@ -96,7 +96,7 @@ async function gateV7Save(){
   const score=gateV7Score(gateState.answers,gateState.choices,gateState.role,gateV7State.clarifiers);
   const id=gateState.editId||gateId();
   const source=(type,key)=>gateV7State.sources[type].find(p=>p.id===gateV7State.linkRefs[key]&&p.role===gateState.role&&p.isPublic);
-  const linkRefs={sensoryId:source("sensory","sensoryId")?.id||"",chromaId:source("chroma","chromaId")?.id||""};
+  const linkRefs={sensoryId:gateV7State.linkRefs.sensoryId||"",chromaId:gateV7State.linkRefs.chromaId||""}; // Keep explicitly selected source IDs even when public list refresh is unavailable; readers still require isPublic.
   const p={...score,id,name:gateState.name.trim(),isPublic:!!gateState.isPublic,updatedAt:new Date().toISOString(),linkRefs,localOnly:true};
   gateState.own=gateState.own.filter(x=>x.id!==id).concat(p);gatePersist();gateState.selected=id;gateState.editId=null;
   if(gateState.cloud){
