@@ -6,7 +6,7 @@ function gateV7BaseCount(){
  return gateState.answers.filter(gateV7ValidValue).length+gateState.choices.filter(n=>Number.isInteger(n)&&n>=0&&n<=3).length;
 }
 function gateV7Rate(i,value){gateState.answers[i]=value?Number(value):0;gateV7Progress()}
-function gateV7SetChoice(i,value){gateState.choices[i]=Number(value);gateV7Progress()}
+function gateV7SetChoice(i,value){gateState.choices[i]=Number(value);if(gateState.step===4)gateRender();else gateV7Progress()}
 function gateV7Name(x){gateState.name=x;gateV7Progress()}
 function gateV7Role(role){
  if(role!==gateState.role&&["센티넬","가이드"].includes(role)){
