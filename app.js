@@ -64,15 +64,32 @@ function lineSection(i,title,content){return `<div class="section"><h3>${String(
 function soloInsightCards(items){
  return `<div class="solo-depth-grid">${items.map((x,i)=>`<article class="solo-depth-card"><div class="solo-depth-number">${String(i+1).padStart(2,"0")}</div><h4>${esc(x.title)}</h4><p>${esc(x.text)}</p></article>`).join("")}</div>`;
 }
+function soloSummaryCards(p,t,r){
+ const highest=p.axes.indexOf(Math.max(...p.axes));
+ const entries=[
+  {n:1,title:'이 감각 서명이 나타난 이유',text:t.intro,tag:'감각 서명',signal:DOMAINS[highest].short,axis:null},
+  {n:2,title:'자극을 받아들이는 방법',text:t.reception,tag:'감각 수용',axis:0},
+  {n:3,title:'타인에게 전해지는 파장',text:t.emission,tag:'자극 발산',axis:1},
+  {n:4,title:'부하도와 가이딩 잔량의 전조',text:t.alert,tag:'전조 감지',axis:2},
+  {n:5,title:'위기에서의 완충 행동',text:t.buffer,tag:'완충 개입',axis:3},
+  {n:6,title:'선의와 간섭 사이의 경계',text:t.boundary,tag:'경계 조율',axis:4},
+  {n:7,title:'가이딩 이후에도 남는 감각',text:t.after,tag:'잔향 회복',axis:5},
+  {n:8,title:'직군에 따른 현장 해석',text:t.role,tag:'현장 대응',signal:p.role,axis:null}
+ ];
+ return `<div class="solo-summary-grid">${entries.map(x=>{
+   const metric=x.axis!==null?`<div class="solo-summary-score" aria-label="${esc(x.tag)} ${fixed(p.axes[x.axis])}점"><strong>${fixed(p.axes[x.axis])}</strong><span>/ 10</span></div>`:
+    `<span class="solo-summary-tag">${esc(x.signal)}</span>`;
+   const track=x.axis!==null?`<div class="solo-summary-track" aria-hidden="true"><i style="width:${Math.max(0,Math.min(100,p.axes[x.axis]*10))}%"></i></div>`:'';
+   return `<article class="solo-summary-card"><div class="solo-summary-meta"><span>0${x.n} / QUICK READ</span>${metric}</div><h4>${esc(x.title)}</h4><p>${esc(x.text)}</p>${track}</article>`;
+ }).join('')}</div>`;
+}
+function soloChapter(label,title,description){
+ return `<div class="solo-chapter"><div class="solo-chapter-overline">${esc(label)}</div><h3>${esc(title)}</h3><p>${esc(description)}</p></div>`;
+}
 function individualView(p){const r=signature(p),t=reportNarratives(p),depth=individualDepthReport(p),name=esc(p.name),scenarios=getScenarios(p.role);const acts=[0,1,2,3,4,5,6,7].map(i=>`<div class="memory-card"><b>${esc(scenarios[i].title)}</b><p>“${esc(scenarios[i].opts[p.choices[i]][0])}”<br>${esc(scenarios[i].opts[p.choices[i]][2])}</p></div>`).join('');return `<section id="personalResult" class="card result"><div class="report-eyebrow">NSD / INDIVIDUAL SENSORY INTERFERENCE</div><h2>${name}의 감각 간섭 보고서</h2><p class="report-sub">${tag(p)} · 감각 수용과 위기 대응을 살펴보는 개인 기록</p><div class="columns hero-layout"><div>${spectrumCard(p)}</div><div class="sensory-panel"><div class="kicker">READING THE SIGNAL</div><h3>${esc(r.accent)}</h3><p>${esc(r.subtitle)}</p><div class="note-line"><b>강조</b><span>${esc(r.primary)}</span></div><div class="note-line"><b>여백</b><span>${esc(r.low)}</span></div><div class="note-line"><b>직군</b><span>${esc(p.role)}</span></div></div></div>
-${lineSection(1,'이 감각 서명이 나타난 이유',esc(t.intro))}
-${lineSection(2,'자극을 받아들이는 방법',esc(t.reception))}
-${lineSection(3,'타인에게 전해지는 파장',esc(t.emission))}
-${lineSection(4,'부하도와 가이딩 잔량의 전조',esc(t.alert))}
-${lineSection(5,'위기에서의 완충 행동',esc(t.buffer))}
-${lineSection(6,'선의와 간섭 사이의 경계',esc(t.boundary))}
-${lineSection(7,'가이딩 이후에도 남는 감각',esc(t.after))}
-${lineSection(8,'직군에 따른 현장 해석',esc(t.role))}
+${soloChapter("PART 01 / SENSORY PROFILE","감각 프로필 한눈에 읽기","01~08번은 각 감각 축과 직군별 기본 반응을 빠르게 확인하는 요약 분석입니다.")}
+${soloSummaryCards(p,t,r)}
+${soloChapter("PART 02 / DEEP INTERPRETATION","감각 반응 심층 분석","09번부터는 두 감각의 충돌, 실제 선택의 흐름, 위기 상황과 타인의 해석까지 연결해 살펴봅니다.")}
 <div class="section solo-depth-section"><h3>09. 서로 다른 감각이 한 사람 안에서 만날 때</h3><p class="sub">6축을 하나씩 읽는 대신, 두 감각이 동시에 작용할 때 생기는 간격과 변화에 주목합니다.</p>${soloInsightCards(depth.crosses)}</div>
 <div class="section solo-depth-section"><h3>10. 같은 감각 안에서도 달라지는 반응</h3><p class="sub">각 축의 두 문항군 응답을 비교해 하나의 평균 뒤에 가려진 차이를 살펴봅니다.</p>${soloInsightCards(depth.facets)}</div>
 <div class="section solo-depth-section"><h3>11. 네 가지 장면으로 이어 읽는 판단의 흐름</h3><p class="sub">서로 다른 설문 선택을 이어 보면 같은 인물도 위험과 도움, 회복 앞에서 순서를 바꿀 수 있습니다.</p>${soloInsightCards(depth.decisions)}</div>
