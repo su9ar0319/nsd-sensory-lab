@@ -37,15 +37,21 @@ function gateV7SceneRow(scene,i){
  return '<fieldset class="gate-v7-scene"><legend><b>S'+String(i+1).padStart(2,"0")+"</b> "+gateV7E(scene.title)+'</legend><p>'+gateV7E(scene.story)+'</p><div class="gate-v7-options">'+scene.opts.map((o,j)=>'<label><input type="radio" name="gate-v7-scene-'+i+'" value="'+j+'" '+(gateState.choices[i]===j?"checked":"")+' onchange="gateV7SetChoice('+i+','+j+')"><span>'+gateV7E(o.label)+'</span></label>').join("")+'</div></fieldset>';
 }
 function gateV7SourcePage(){
- const linked=gateV7State.linkRefs,have=gateV7State.sources.sensory.length+gateV7State.sources.chroma.length;
- return '<section class="surface gate-v7-source"><div class="eyebrow">STEP 01 / RESEARCH RECORDS</div><h2>기존 공개 기록 연결하기</h2><p class="muted">공개 등록된 캐릭터 기록을 본인이 직접 선택해 연결합니다. 이름이 같아도 자동으로 동일 인물로 취급하지 않으며, 연결하지 않고도 참여할 수 있습니다.</p>'+
- '<div class="gate-v7-basic"><label>캐릭터 이름<input class="field" maxlength="40" value="'+gateV7E(gateState.name)+'" placeholder="캐릭터 이름" oninput="gateV7Name(this.value)"></label><label>직군<select class="field" onchange="gateV7Role(this.value)"><option value="센티넬" '+(gateState.role==="센티넬"?"selected":"")+'>센티넬</option><option value="가이드" '+(gateState.role==="가이드"?"selected":"")+'>가이드</option></select></label></div>'+
- '<div class="gate-v7-source-controls"><button type="button" class="btn light" onclick="gateV7LoadExternal()" '+(gateV7State.loading?"disabled":"")+'>'+(gateV7State.loading?"공개 목록 연결 중…":"공개 캐릭터 목록 불러오기 / 새로고침")+'</button><small>'+gateV7E(gateV7State.sourceStatus)+' · 감각 '+gateV7State.sources.sensory.length+'명 / 색채 '+gateV7State.sources.chroma.length+'명</small></div>'+
- '<label class="field">공개 캐릭터 이름 검색<input class="field" placeholder="선택 목록에서 이름 검색" value="'+gateV7E(gateV7State.search)+'" oninput="gateV7FilterSources(this.value)"></label>'+
- '<div class="gate-v7-basic"><label>감각 간섭 보고서<select class="field" id="gate-v7-source-sensory" onchange="gateV7SetSource(\'sensory\',this.value)">'+gateV7SourceOptions("sensory")+'</select></label>'+
- '<label>색채·잔향 보고서<select class="field" id="gate-v7-source-chroma" onchange="gateV7SetSource(\'chroma\',this.value)">'+gateV7SourceOptions("chroma")+'</select></label></div>'+
- '<div class="gate-v7-tip">감각 정보는 반응 방식에, 색채 정보는 행동의 동기에 참고합니다. 기존 점수를 전투 능력으로 환산하지 않습니다. 비공개 전환 또는 삭제된 기록은 더 이상 가져오지 않습니다.</div>'+
- '<label class="gate-v7-public"><input type="checkbox" '+(gateState.isPublic?"checked":"")+' onchange="gateState.isPublic=this.checked"><span>게이트 분석 결과도 다른 참여자에게 공개하기</span></label></section>';
+ const sensory=gateV7State.sources.sensory.length,chroma=gateV7State.sources.chroma.length;
+ return '<section class="surface gate-v7-source gate-link-panel">'+
+ '<header class="gate-link-heading"><div class="eyebrow">STEP 01 / RESEARCH RECORDS</div><h2>기존 공개 기록 연결하기</h2><p class="muted">공개 캐릭터를 직접 선택해 이전 보고서를 연결할 수 있습니다. 이름이 같아도 자동으로 연결되지 않으며, 연동 없이도 검사할 수 있습니다.</p></header>'+
+ '<div class="gate-link-fields gate-link-identity">'+
+ '<label class="gate-link-field"><span class="gate-link-label">캐릭터 이름</span><input class="field" type="text" maxlength="40" autocomplete="off" value="'+gateV7E(gateState.name)+'" placeholder="캐릭터 이름 입력" oninput="gateV7Name(this.value)"></label>'+
+ '<label class="gate-link-field"><span class="gate-link-label">직군</span><select class="field" onchange="gateV7Role(this.value)"><option value="센티넬" '+(gateState.role==="센티넬"?"selected":"")+'>센티넬</option><option value="가이드" '+(gateState.role==="가이드"?"selected":"")+'>가이드</option></select></label></div>'+
+ '<div class="gate-link-source-heading"><div class="gate-link-subtitle">공개 기록 선택 <small>선택 사항</small></div><p>현재 공개 중인 기록만 목록에 표시됩니다.</p></div>'+
+ '<div class="gate-v7-source-controls gate-link-controls"><button type="button" class="btn light" onclick="gateV7LoadExternal()" '+(gateV7State.loading?"disabled":"")+'>'+(gateV7State.loading?"공개 목록 연결 중…":"공개 목록 새로고침")+'</button>'+
+ '<small role="status" aria-live="polite"><span class="gate-link-status-dot"></span>'+gateV7E(gateV7State.sourceStatus)+' <span class="gate-link-source-count">감각 '+sensory+'명 · 색채 '+chroma+'명</span></small></div>'+
+ '<label class="gate-link-field gate-link-search"><span class="gate-link-label">공개 캐릭터 이름 검색</span><input class="field" type="search" autocomplete="off" placeholder="연결할 캐릭터 이름 검색" value="'+gateV7E(gateV7State.search)+'" oninput="gateV7FilterSources(this.value)"></label>'+
+ '<div class="gate-link-fields gate-link-reports">'+
+ '<label class="gate-link-field"><span class="gate-link-label">감각 간섭 보고서</span><select class="field" id="gate-v7-source-sensory" onchange="gateV7SetSource(\'sensory\',this.value)">'+gateV7SourceOptions("sensory")+'</select></label>'+
+ '<label class="gate-link-field"><span class="gate-link-label">색채·잔향 보고서</span><select class="field" id="gate-v7-source-chroma" onchange="gateV7SetSource(\'chroma\',this.value)">'+gateV7SourceOptions("chroma")+'</select></label></div>'+
+ '<div class="gate-v7-tip gate-link-note">감각 정보는 반응 방식, 색채 정보는 행동 동기를 이해하기 위한 보조 자료입니다. 기존 점수를 전투 능력으로 환산하지 않으며, 비공개 전환 또는 삭제된 기록은 더 이상 불러오지 않습니다.</div>'+
+ '<label class="gate-v7-public gate-link-public"><input type="checkbox" '+(gateState.isPublic?"checked":"")+' onchange="gateState.isPublic=this.checked"><span>게이트 분석 결과도 다른 참여자에게 공개하기</span></label></section>';
 }
 function gateV7Clarify(i,v){gateV7State.clarifiers[i]=v?Number(v):0;gateV7Progress()}
 function gateV7CurrentStepValid(){
