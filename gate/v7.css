@@ -1,0 +1,49 @@
+
+/* Gate Research V7 short-form survey and long-form reader */
+.gate-v7-progress{padding-bottom:20px}
+.gate-v7-track{height:9px;background:#e6ebf2;border-radius:50px;overflow:hidden;margin-top:18px}
+.gate-v7-track i{display:block;height:100%;width:0;background:#3b709d;border-radius:50px;transition:width .2s}
+.gate-v7-basic{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.gate-v7-basic label,.gate-v7-source .field{display:block;font-weight:700;font-size:13px;color:#425c70}
+.gate-v7-basic input,.gate-v7-basic select,.gate-v7-source .field input{margin-top:7px}
+.gate-v7-source-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:20px 0}
+.gate-v7-source-controls small{font-size:12px;color:#5f7182}
+.gate-v7-tip{padding:13px 17px;border:1px solid #cbddec;border-radius:12px;background:#eef4f9;color:#37576d;font-size:13px;line-height:1.8;margin:16px 0}
+.gate-v7-public{display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer}
+.gate-v7-public input{width:17px;height:17px}
+.gate-v7-question{display:grid;grid-template-columns:minmax(0,1fr) 110px;align-items:center;gap:18px;padding:17px 4px;border-bottom:1px solid #e5eaf1;font-size:14px;line-height:1.8}
+.gate-v7-question:last-child{border-bottom:0}
+.gate-v7-question b{font-size:11px;letter-spacing:.08em;color:#28629f;margin-right:12px}
+.gate-v7-question select{padding:10px;border:1px solid #cad8e8;border-radius:9px;background:white;color:#264764;font:inherit;font-size:13px}
+.gate-v7-scene{border:0;border-bottom:1px solid #e4ebf3;padding:17px 0 22px;margin:0}
+.gate-v7-scene:last-child{border-bottom:0}
+.gate-v7-scene legend{font-size:15px;font-weight:800;line-height:1.6}
+.gate-v7-scene legend b{font-size:11px;color:#2465a0;margin-right:7px}
+.gate-v7-scene p{font-size:13px;color:#697c8b;margin:0 0 14px;line-height:1.8}
+.gate-v7-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gate-v7-options label{display:flex;align-items:start;gap:10px;padding:12px;border-radius:10px;border:1px solid #d8e2eb;background:#fff;cursor:pointer;font-size:13px;line-height:1.7}
+.gate-v7-options label:has(input:checked){background:#e7f0fb;border-color:#87a9c8}
+.gate-v7-options input{accent-color:#3e709c;margin-top:4px}
+.gate-v7-actions{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.gate-v7-actions span{font-size:12px;color:#7c8a96}
+.gate-v7-report{line-height:1.9}
+.gate-v7-cover{background:linear-gradient(130deg,#213c5b,#456b95);color:white;border-radius:17px;padding:27px 31px;margin-top:18px}
+.gate-v7-cover small{font-size:11px;font-weight:800;letter-spacing:.09em;color:#d9e6f6}
+.gate-v7-cover h2{font-size:clamp(23px,3vw,30px);line-height:1.45;margin:10px 0}
+.gate-v7-cover p{font-size:14px;color:#e5eefb;line-height:1.95;margin:0}
+.gate-v7-chapter{display:flex;align-items:baseline;gap:12px;margin:29px 0 12px}
+.gate-v7-chapter small{font-size:10px;color:#52779b;font-weight:800;white-space:nowrap}
+.gate-v7-chapter h3{font-size:20px;margin:0;color:#294d6a}
+.gate-v7-panel{padding:19px 23px;border:1px solid #dde6ee;background:#fff;border-radius:13px}
+.gate-v7-panel h4{font-size:15px;color:#2a425c;margin:0 0 9px}
+.gate-v7-panel p{font-size:14px;line-height:2.05;color:#3c5166;margin:0}
+.gate-v7-scenes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.gate-v7-scenes .gate-v7-panel{padding:17px 18px}
+.gate-v7-scenes .gate-v7-panel p{font-size:13px}
+.gate-v7-quote{margin:0;padding:19px 22px;border-left:4px solid #6a9cc7;background:#e9f2fc;border-radius:0 11px 11px 0;font-size:17px;font-weight:750;color:#214f77}
+.gate-v7-evidence{margin:23px 0;background:#fbfcfe;border:1px solid #dbe4ed;border-radius:11px;padding:14px 18px;font-size:12px;color:#50637b}
+.gate-v7-evidence summary{font-weight:800;cursor:pointer}
+.gate-v7-chips{display:flex;gap:7px;flex-wrap:wrap;margin:15px 0 11px}
+.gate-v7-chip{border-radius:50px;background:#ebf1f8;padding:5px 10px}
+@media(max-width:780px){.gate-v7-scenes,.gate-v7-basic{grid-template-columns:1fr}.gate-v7-options{grid-template-columns:1fr}.gate-v7-chapter{display:block}.gate-v7-chapter small{display:block}.gate-v7-question{grid-template-columns:1fr 87px;gap:9px}.gate-v7-cover{padding:22px}.gate-v7-report .row.actions{flex-wrap:wrap}}
+@media print{.gate-v7-source,.gate-v7-progress,.gate-v7-actions,.gate-v7-evidence,.gate-v7-report .row.actions{display:none!important}.gate-v7-report{border:0!important;box-shadow:none!important}.gate-v7-cover{-webkit-print-color-adjust:exact;print-color-adjust:exact}.gate-v7-panel{break-inside:avoid}}
