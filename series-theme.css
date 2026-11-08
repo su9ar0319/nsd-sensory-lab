@@ -213,6 +213,8 @@ button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-vis
 }
 .spectrum .kicker{color:#E1DEDF}
 .spectrum h3{letter-spacing:-.045em}
+/* Keep subtype names legible on the dark signature gradient (e.g. 전조를 따라 바뀌는 지원). */
+.card.result .spectrum h3,.card.result .spectrum.tiny h3{color:#FFFFFF}
 .spectrum p{color:#E2DFE0}
 .spectrum .sig-code{color:#E4E1E3}
 .signature-family{
