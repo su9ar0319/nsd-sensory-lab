@@ -255,6 +255,13 @@ function gateCopyAI(mode,id){
  if(mode==="solo"){const p=gateGet(id);if(!p)return;const r=gateSolo(p);content=intro+profile(p)+r.deep.map(x=>`\n### ${x.title}\n${x.text}`).join("\n")}
  if(mode==="pair"){const ps=gateState.pairIds.map(gateGet);if(ps.some(x=>!x))return;const r=gatePair(...ps);content=intro+ps.map(profile).join("\n")+r.directions.map(d=>`\n## ${d.from}→${d.to}\n${d.sections.map(s=>s.title+": "+s.text).join("\n")}`).join("\n")+r.synergies.map(x=>`\n시너지 ${x.title} / 활성: ${x.condition} / 실패: ${x.break}`).join("")+r.debuffs.map(x=>`\n위험 ${x.title} / 계기: ${x.trigger} / 대응: ${x.mitigation}`).join("")}
  if(mode==="trio"){const ps=gateState.trioIds.map(gateGet);if(ps.some(x=>!x))return;const r=gateTrio(ps);content=intro+ps.map(profile).join("\n")+`\n## 역할 배치\n${r.roles.map(x=>`${x.label}: ${x.name}`).join("\n")}`+r.stages.map(x=>`\n## ${x.title}\n${x.summary}\n${x.actions.map(a=>a.name+": "+a.choice+" / 직군 상황 대응: "+a.roleChoice).join("\n")}\n${x.consequence}\n위협 ${x.beforeThreat}→${x.afterThreat} · 자원: ${x.resources.map(z=>z.name+" "+z.before+"→"+z.after).join(", ")}`).join("\n")+`\n3인 시너지\n${r.synergies.map(x=>x.title+" / 조건: "+x.condition+" / 효과: "+x.effect+" / 붕괴: "+x.break).join("\n")}\n3인 위험\n${r.debuffs.map(x=>x.title+" / 계기: "+x.trigger+" / 연쇄: "+x.chain+" / 대응: "+x.counter).join("\n")}\n최종 평가 ${r.outcome}\n${r.notice}`}
+ if((mode==="pair"||mode==="trio")&&typeof gateV12Conversation==="function"){
+  const ps=(mode==="pair"?gateState.pairIds:gateState.trioIds).map(gateGet);
+  if(ps.every(Boolean)){
+   const dialogue=gateV12Conversation(ps,mode);
+   if(dialogue)content+="\n## 게이트 현장 교신 · "+dialogue.title+"\n"+dialogue.lines.map(line=>line.name+" ("+line.role+"): "+line.text).join("\n");
+  }
+ }
  gateClipboard(content,"AI 분석 패키지를 복사했습니다.");
 }
 
