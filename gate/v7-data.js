@@ -1,7 +1,7 @@
 'use strict';
 const GATE_V7_VERSION="gate-operation-v7";
 const GATE_V7_QUESTIONS=[
-{axis:0,text:"낯선 게이트에서 작은 환경 변화가 발생하면, 당장 눈앞의 목표보다 그 변화의 원인을 먼저 확인하는 편입니다."},
+{axis:0,text:"게이트의 관측 정보가 예상과 다르면, 원인을 확인하기 위해 진입 계획을 조정할 수 있습니다."},
 {axis:1,text:"정보가 전부 모이지 않았더라도, 작전의 목표와 현재 위험을 비교해 대응 순서를 정할 수 있습니다."},
 {axis:2,text:"작전 진행이 멈춰 있을 때에는 누군가의 지시를 기다리기보다 자신이 맡을 수 있는 행동을 먼저 시작합니다."},
 {axis:3,text:"위험을 발견하면 본인이 확인한 사실과 추측을 구분해 동행자에게 전달합니다."},
@@ -28,7 +28,7 @@ function gateV7Scenarios(role){
   return GATE_SCENARIOS.common.slice(0,4).concat((GATE_SCENARIOS[role]||[]).slice(0,4));
 }
 function gateV7Valid(p){
- return !!(p&&p.version===GATE_V7_VERSION&&typeof p.id==="string"&&p.id.length>=4&&typeof p.name==="string"&&p.name.length>0&&p.name.length<=40&&["센티넬","가이드"].includes(p.role)&&Array.isArray(p.axes)&&p.axes.length===12&&p.axes.every(n=>Number.isFinite(n)&&n>=1&&n<=10)&&Array.isArray(p.choices)&&p.choices.length===8&&p.choices.every(n=>Number.isInteger(n)&&n>=0&&n<=3)&&Array.isArray(p.facets)&&p.facets.length===12);
+ return !!(p&&p.version===GATE_V7_VERSION&&typeof p.id==="string"&&/^[\w.-]{4,90}$/.test(p.id)&&typeof p.name==="string"&&p.name.length>0&&p.name.length<=40&&["센티넬","가이드"].includes(p.role)&&Array.isArray(p.axes)&&p.axes.length===12&&p.axes.every(n=>Number.isFinite(n)&&n>=1&&n<=10)&&Array.isArray(p.choices)&&p.choices.length===8&&p.choices.every(n=>Number.isInteger(n)&&n>=0&&n<=3)&&Array.isArray(p.facets)&&p.facets.length===12);
 }
 function gateV7Mean(xs){return xs.reduce((a,b)=>a+b,0)/(xs.length||1)}
 function gateV7Score(answers,choices,role,clarifiers){
