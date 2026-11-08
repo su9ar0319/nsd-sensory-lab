@@ -53,7 +53,7 @@ function contextualCardVariation(a,b,results){
  const lingering=x[5]>=y[5]?a:b,rested=lingering===a?b:a;
  const louder=x[1]*y[0]>=y[1]*x[0]?a:b,listener=louder===a?b:a;
  const guide=[a,b].find(p=>p.role==="가이드")||a;
- const sentinel=[a,b].find(p=>p.role==="센티넬");
+ const sentinel=[a,b].find(p=>p.role==="센티넬")||{name:"지원 대상"};
  const shared=i=>a.choices?.[i]===b.choices?.[i];
  const packs={
   warning:{
