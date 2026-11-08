@@ -69,7 +69,8 @@ function gateSolo(p){
   {title:"10 / 재진입을 둘러싼 긴장",text:`사후 회복 ${gateFixed(a[11])}점과 자원 관리 ${gateFixed(a[7])}점은 다른 질문에 대한 답입니다. 다시 움직일 수 있는가와 지금 움직여야 하는가는 구분해야 합니다. '${gateChoice(p,15)}'라는 마지막 직군별 선택이 미래의 동행 조건을 바꿉니다.`}
  ];
  const scenarios=[0,1,3,5,8,12,15].map(i=>({title:gateScenarios(p.role)[i].title,choice:gateChoice(p,i),text:`${gateScenarios(p.role)[i].story} 이 인물은 '${gateChoice(p,i)}'를 선택했습니다. ${GATE_AXES[gateScenarios(p.role)[i].opts[p.choices[i]].axis].name}에 가중치를 두는 판단입니다. 실제 현장에서는 동료의 다른 판단과 만나 장점이나 위험으로 이어질 수 있습니다.`}));
- return {signature:s,quick,deep,scenarios,strong:hi.map(i=>({i,score:a[i]})),weak:low.map(i=>({i,score:a[i]}))};
+ const axisReadings=GATE_AXES.map((d,i)=>({title:d.name,score:a[i],text:gatePick(GATE_NARRATIVES.solo[i][a[i]<4.5?0:a[i]>=6.8?2:1],p.id,p.name,p.role,"axis",i,gateFixed(a[i]))}));
+ return {signature:s,quick,deep,scenarios,axisReadings,strong:hi.map(i=>({i,score:a[i]})),weak:low.map(i=>({i,score:a[i]}))};
 }
 
 function gateDirection(a,b){
@@ -111,6 +112,7 @@ function gatePair(a,b){
  {weight:Math.abs(x[10]-y[10])*5+27,title:"철수 시점의 어긋남",trigger:`${x[10]>=y[10]?a.name:b.name}이(가) 철수를 준비하지만 상대는 아직 임무를 진행할 수 있다고 판단할 때입니다.`,chain:`철수와 돌파가 동시에 시작되면 후방 지원과 정찰을 누가 담당할지 불명확해질 수 있습니다.`,mitigation:`재진입 가능성보다 안전한 이탈 경로 확보를 공통 확인 항목으로 정합니다.`}
  ];
  if(guide)debuff.push({weight:63,title:"공명 고갈을 늦게 발견하는 위험",trigger:`${guide.name}에게 요청이 몰리며 가이딩 잔량의 감소가 숨겨질 때입니다.`,chain:`센티넬의 부하도가 낮아져도 가이드의 잔량이 자동으로 회복되는 것은 아닙니다. 계속 지원하면 공명 고갈 위험이 높아질 수 있습니다.`,mitigation:`가이딩 전후 잔량과 추가 지원 가능 여부를 따로 확인합니다.`});
+ synergy.forEach((card,i)=>{card.action+=" "+gatePick(GATE_NARRATIVES.pair[i],a.id,b.id,"pair-synergy",i,gateFixed(x[4]-y[4]));});
  const resources=`${a.role==="센티넬"?`${a.name}의 부하도 전조와 폭주 위험`:`${a.name}의 가이딩 잔량과 공명 고갈 위험`} / ${b.role==="센티넬"?`${b.name}의 부하도 전조와 폭주 위험`:`${b.name}의 가이딩 잔량과 공명 고갈 위험`}을 별도로 기록합니다. 현재 자원 상태는 설문만으로 확정할 수 없으므로 실제 작전 전 확인이 필요합니다.`;
  return {a:a.name,b:b.name,directions:[ab,ba],synergies:sorted(synergy,4),debuffs:sorted(debuff,4),resources,rankLabel:gateMean([x[4],y[4],x[9],y[9]])>=6.7?"조율 우세":gateMean([x[5],y[5],x[2],y[2]])>=7.1?"돌파 우세":"변동형",scenes:[0,5,10].map(i=>({title:["진입 직후","자원 소모가 커질 때","작전 종료 여부"][ [0,5,10].indexOf(i)],text:`${a.name}은(는) '${gateChoice(a,i)}', ${b.name}은(는) '${gateChoice(b,i)}'를 선택했습니다. 서로 다른 판단을 연결할 공통 신호가 필요합니다.`}))};
 }
@@ -160,7 +162,8 @@ function gateTrio(ps){
   cohesion=Math.round(gateClamp(cohesion+(successStep?3:-3)+(aligned?2:0)));
   const actor=ps[stage%3],roleText=stage===0?`정보가 먼저 모이면 ${lead.name}이(가) 초기 역할을 확정하고 ${detect.name}이(가) 확인할 신호를 좁힙니다.`:stage===1?`${detect.name}의 정찰이 첫 진입의 리듬을 정합니다. 관찰 범위가 겹치지 않도록 다른 대원은 후방을 살필 수 있습니다.`:stage===2?`처음 확인되지 않은 기척이 드러납니다. ${detect.name}이(가) 포착한 정보가 ${lead.name}에게 전달되는 순서가 중요합니다.`:stage===3?`행동이 엇갈리면 ${lead.name}은(는) 기존 배치를 유지할지 다른 방법을 택할지 선택해야 합니다.`:stage===4?`${sustain.name}은(는) 자원 사용의 한계를 확인합니다. 높은 부하도나 낮은 잔량은 위험을 높일 수 있습니다.`:stage===5?`목표를 이어갈지 철수할지 ${lead.name}이(가) 근거를 정리하고 각자의 의사를 확인해야 합니다.`:`작전이 끝나도 ${sustain.name}의 사후 상태 점검은 별개로 진행해야 합니다.`;
   const consequence=critical?`자원 임계 상태에 가까운 대원이 감지되어 후속 단계의 위험에 추가 영향을 줍니다.`:successStep?`이 단계의 판단이 일정 부분 맞아떨어져 다음 단계의 위협이 낮아지는 흐름입니다.`:`판단이 엇갈리거나 현장의 압박이 높아져 다음 단계에 부담이 남습니다.`;
-  stages.push({index:stage+1,title:GATE_STAGES[stage],beforeThreat:currentThreat,pressure,afterThreat:threat,cohesion,success:successStep,critical,summary:roleText,consequence,actions:ps.map((p,i)=>({name:p.name,choice:choices[i]})),resources:localResource,lead:actor.name});
+  const stageDetail=gatePick(GATE_NARRATIVES.stage[stage][successStep?0:1],ps.map(p=>p.id).join(","),"gate-stage",stage,pressure,successStep?"success":"risk");
+  stages.push({index:stage+1,title:GATE_STAGES[stage],beforeThreat:currentThreat,pressure,afterThreat:threat,cohesion,success:successStep,critical,summary:roleText+" "+stageDetail,consequence,actions:ps.map((p,i)=>({name:p.name,choice:choices[i]})),resources:localResource,lead:actor.name});
  }
  const last=stages.at(-1),finalResources=state;
  const outcome=finalResources.some(p=>p.role==="센티넬"?p.value>=92:p.value<=8)?"긴급 철수 우선":success>=5&&last.afterThreat<58?"작전 목표 확보 가능":success>=3?"조건부 임무 종료":"재평가 및 철수 권장";
