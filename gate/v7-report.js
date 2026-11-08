@@ -65,7 +65,7 @@ function gateV7Reader(p){
  const r=gateV7Paragraphs(p),h=gateEsc,pan=(title,body)=>'<section class="gate-v7-panel"><h4>'+h(title)+'</h4><p>'+h(body)+'</p></section>',chapter=(tag,title)=>'<div class="gate-v7-chapter"><small>'+tag+'</small><h3>'+title+'</h3></div>';
  const evidence=GATE_AXES.map((a,i)=>'<span class="gate-v7-chip">'+h(a.name)+' '+gateFixed(p.axes[i])+'</span>').join("");
  const external='<p>감각 보고서 '+(r.sensory?"연결됨":"미연결 또는 현재 비공개")+' · 색채 보고서 '+(r.chroma?"연결됨":"미연결 또는 현재 비공개")+'</p>';
- return '<section class="surface gate-v7-report" id="gatePersonal"><div class="eyebrow">NSD / PERSONAL OPERATIONAL REPORT · V7</div><div class="gate-v7-cover"><small>'+h(p.role)+' / INDIVIDUAL GATE ANALYSIS</small><h2>'+h(p.name)+' · '+h(r.title)+'</h2><p>'+h(r.intro)+'</p></div>'+
+ return '<section class="surface gate-v7-report" id="gatePersonal"><div class="eyebrow">NSD / INDIVIDUAL REPORT · GATE · V7</div><div class="gate-v7-cover"><small>'+h(p.role)+' / INDIVIDUAL GATE ANALYSIS</small><h2>'+h(p.name)+' · '+h(r.title)+'</h2><p>'+h(r.intro)+'</p></div>'+
  chapter("01 / MOTIVATION","왜 그런 선택을 하는가")+pan("판단을 움직이는 중심 원리",r.core)+
  chapter("02 / IN THE FIELD","게이트 현장에서 보이는 행동")+'<div class="gate-v7-scenes">'+r.scenes.map((s,i)=>pan("SCENE "+String(i+1).padStart(2,"0")+" · "+s.title,s.text)).join("")+'</div>'+
  chapter("03 / INNER CONFLICT","강점이 약점으로 바뀌는 순간")+pan("판단의 균열과 관계의 오해",r.conflict)+
