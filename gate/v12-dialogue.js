@@ -302,3 +302,7 @@ function gateV12DialogueHTML(ps,group){
 }
 function gateV12PairBlock(a,b){return gateV12DialogueHTML([a,b],"pair")}
 function gateV12TrioBlock(ps){return gateV12DialogueHTML(ps,"trio")}
+
+// A shared pair/trio link may be rendered before the final dialogue script loads.
+if(typeof gateRender==="function"&&typeof gateState!=="undefined"&&
+   (gateState.tab==="pair"||gateState.tab==="trio"))gateRender();
