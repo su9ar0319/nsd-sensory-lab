@@ -124,7 +124,7 @@ async function gateV7LoadExternal(){
   const cfg=window.NSD_GATE_FIREBASE_CONFIG||window.NSD_SENSORY_FIREBASE_CONFIG||window.NSD_FIREBASE_CONFIG;
   if(!cfg?.apiKey||!cfg?.projectId)throw Error("Firebase 설정이 없습니다.");
   const ver="12.19.0",[appLib,authLib,fireLib]=await Promise.all([import("https://www.gstatic.com/firebasejs/"+ver+"/firebase-app.js"),import("https://www.gstatic.com/firebasejs/"+ver+"/firebase-auth.js"),import("https://www.gstatic.com/firebasejs/"+ver+"/firebase-firestore.js")]);
-  let app=appLib.getApps().find(x=>x.name==="nsd-gate-lab");if(!app)app=appLib.initializeApp(cfg,"nsd-gate-lab");
+  let app=appLib.getApps().find(x=>x.name==="nsd-gate-public-reader-v7");if(!app)app=appLib.initializeApp(cfg,"nsd-gate-public-reader-v7");
   const auth=authLib.getAuth(app);if(!auth.currentUser)await authLib.signInAnonymously(auth);
   const db=fireLib.getFirestore(app),paths={sensory:"sensoryPublicProfiles",chroma:"publicProfiles"};
   const [sense,color]=await Promise.all(["sensory","chroma"].map(type=>fireLib.getDocs(fireLib.query(fireLib.collection(db,paths[type]),fireLib.where("isPublic","==",true)))));
