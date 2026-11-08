@@ -54,7 +54,7 @@ function gateV9Synergy(a,b,card){
   const first=a.axes[0]>=b.axes[0]?a:b,other=first===a?b:a;
   info={title:"엇갈린 진입 정보를 처리하는 분업",
   condition:"게이트 입구에서 두 종류의 위험 신호가 동시에 확인되어 진입 순서를 정해야 할 때입니다.",
-  action:gateV9Part(first.name,"은")+" "+gateV9Action(first,1)+". "+gateV9Part(other.name,"은")+" "+gateV9Action(other,0)+". 한쪽이 변화의 위치를 좁히는 동안 다른 쪽은 바로 실행할 대응을 확정하면 첫 진입의 지연을 줄일 수 있습니다.",
+  action:gateV9Part(first.name,"은")+" 진입 지점의 새 신호를 "+GATE_AXES[gateV8Choice(first,1).choice.axis].name+"에 따라 처리하고, "+gateV9Part(other.name,"은")+" 충돌한 브리핑에서 실행할 행동을 정리합니다. 단서를 찾는 과정과 실제 출발 허가를 나누면 첫 진입의 지연을 줄일 수 있습니다.",
   break:"서로 확인했다는 신호 없이 각자 다른 출입 경로로 들어가면 합류 지점을 잃을 수 있습니다."};
  }else if(c.includes("역할 교대")){
   const change=a.axes[8]>=b.axes[8]?a:b,stay=change===a?b:a;
@@ -66,19 +66,19 @@ function gateV9Synergy(a,b,card){
   const help=a.axes[6]>=b.axes[6]?a:b,other=help===a?b:a;
   info={title:"위험 대원 보호와 임무 지속의 분리",
   condition:"한 대원에게 위협이 집중되지만 아직 모든 목표를 포기할 필요는 없는 상황입니다.",
-  action:gateV9Part(help.name,"은")+" "+gateV9Action(help,3)+". "+gateV9Part(other.name,"은")+" "+gateV9Action(other,2)+". 안전 확보를 맡은 사람과 목표를 이어갈 사람을 분리하면 구조 때문에 전열 전체가 무너지는 일을 피할 수 있습니다.",
+  action:gateV9Part(help.name,"은")+" 지원의 동의 범위를 확인하고 대원의 위험 구역 이탈을 돕습니다. "+gateV9Part(other.name,"은")+" 빈 전열과 남은 목표를 관리합니다. 안전 확보를 맡은 사람과 목표를 이어갈 사람을 분리하면 구조 때문에 전열 전체가 무너지는 일을 피할 수 있습니다.",
   break:"동료를 지킨다는 이유로 의사를 확인하지 않고 전열에서 이탈시키거나, 목표 담당까지 동시에 자리를 떠나면 작전이 흔들립니다."};
  }else if(c.includes("여력 보존")){
   const manager=a.axes[7]>=b.axes[7]?a:b,other=manager===a?b:a;
   info={title:"연속 전투에 대비한 자원 배분",
   condition:"첫 위험을 처리했지만 다음 구역의 위협과 귀환에 필요한 여력이 아직 남아 있는 상황입니다.",
-  action:gateV9Part(manager.name,"은")+" "+gateV9Action(manager,7)+". "+gateV9Part(other.name,"은")+" "+gateV9Action(other,5)+". 다음 교전까지 필요한 자원과 즉시 사용할 자원을 별도 항목으로 관리하면 지원 요청이 몰리는 순간에도 선택지가 남습니다.",
+  action:gateV9Part(manager.name,"은")+" 후속 구역에 남길 자원의 한도를 정하고 "+gateV9Part(other.name,"은")+" 당장 필요한 대응이 그 한도를 넘지 않는지 확인합니다. 이 구분이 유지되면 연속된 위협 속에서도 대체 수단을 선택할 여지가 생깁니다.",
   break:"한 번의 수습에 성공했다는 이유로 같은 강도의 지원을 반복하면 다음 위험 구간에서 여력이 부족해집니다."};
  }else{
   const guide=[a,b].find(p=>p.role==="가이드"),sentinel=[a,b].find(p=>p.role==="센티넬");
   info={title:"부하도 상승과 가이딩 잔량의 교차 압박",
   condition:"센티넬의 부하도 전조가 커지는 동시에 가이드에게 다음 지원 요청까지 들어온 상황입니다.",
-  action:guide&&sentinel?gateV9Part(sentinel.name,"은")+" "+gateV9Action(sentinel,4)+". "+gateV9Part(guide.name,"은")+" "+gateV9Action(guide,5)+". 직접 가이딩을 수행할지, 위험 구역에서 일단 벗어날지 순서대로 결정합니다.":"각자의 위험 수준과 남은 자원에 맞춰 역할을 다시 배정합니다.",
+  action:guide&&sentinel?gateV9Part(sentinel.name,"은")+" 부하도 상승의 전조를 공유하고 "+gateV9Part(guide.name,"은")+" 다음 가이딩 요청까지 감당할 잔량을 확인합니다. 지원을 수행할지, 한 구역 물러나 위험을 낮출지 순서를 정하면 한 사람에게 부담이 몰리는 상황을 줄일 수 있습니다.":"각자의 위험 수준과 남은 자원에 맞춰 역할을 다시 배정합니다.",
   break:"지원 효과만 확인하고 다음 가이딩을 계속 요청하면 가이딩 잔량이 먼저 바닥날 수 있습니다."};
  }
  return {...card,...info};
@@ -88,7 +88,7 @@ function gateV9Debuff(a,b,card){
  if(card.title.includes("행동이 확인")){
   v={title:"미확인 위험 구역으로의 선행 진입",
   trigger:"경로 안전이 확인되기 전에 한 대원이 먼저 통과하려는 순간입니다.",
-  chain:gateV9Part(a.name,"은")+" "+gateV9Action(a,1)+". "+gateV9Part(b.name,"은")+" "+gateV9Action(b,1)+". 신호의 해석이 달라도 진입 신호는 하나여야 하며, 먼저 움직인 대원이 다른 쪽의 후퇴 경로를 막을 수 있습니다.",
+  chain:gateV9Part(a.name,"과")+" "+b.name+"의 진입 판단이 달라지면 먼저 이동한 대원이 경로를 확보한 줄 알지만 뒤따르는 대원은 위험을 계속 확인할 수 있습니다. 진입 신호가 두 개로 갈리는 순간 후퇴할 길도 막힐 수 있습니다.",
   mitigation:"위험 신호를 확인할 대원과 최초 진입할 대원을 나누고, 두 사람 모두 확인한 뒤 출발하도록 합니다."};
  }else if(card.title.includes("위험 허용")){
   const breaker=a.axes[5]>=b.axes[5]?a:b,care=breaker===a?b:a;
@@ -142,9 +142,9 @@ function gateV9ReverseDirection(from,to,original){
   {title:"상대의 진입 결정을 받아들이는 조건",
    text:"먼저 움직인 대원의 판단을 받아들일 때 "+f+" "+gateV9Action(from,0)+". "+t+" "+gateV9Action(to,4)+". 두 기준을 잇기 위해서는 진입에 필요한 최소 단서와 위험 경고를 누가 최종 확인할지 정해야 합니다."},
   {title:"막힌 통로에서 요구되는 지원",
-   text:f+" "+forward+"입니다. 예고되지 않은 길막이나 우회 요청이 들어오면 "+gateV9Action(from,1)+". 이때 "+gateV9Part(to.name,"이")+" 후방을 지키는 동안 앞쪽 대원은 현재 위치와 새 통로의 진입 가능 여부를 짧게 전달해야 합니다."},
+   text:f+" "+forward+"입니다. 예고되지 않은 길막이나 우회 요청이 들어오면 이동 가능한 우회로와 돌아갈 수 있는 통로를 동시에 확인해야 합니다. 이때 "+gateV9Part(to.name,"이")+" 후방을 지키는 동안 앞쪽 대원은 현재 위치와 새 통로의 진입 가능 여부를 짧게 전달해야 합니다."},
   {title:"지원 범위를 다시 정해야 하는 순간",
-   text:"부하도나 가이딩 잔량이 빠르게 변하면 "+f+" "+gateV9Action(from,5)+". 반대편에서는 "+t+" "+gateV9Action(to,7)+". 즉각 필요한 대응과 다음 구역을 위해 남길 자원을 분리하지 않으면 먼저 지원한 대원에게 부담이 계속 몰리게 됩니다."},
+   text:"부하도나 가이딩 잔량이 빠르게 변하면 "+f+" 먼저 지원 가능한 범위를 설명하고 "+t+" 지금 단계에서 남겨야 할 후속 대응 자원을 확인할 필요가 있습니다. 즉각 필요한 대응과 다음 구역을 위해 남길 자원을 분리하지 않으면 먼저 지원한 대원에게 부담이 계속 몰리게 됩니다."},
   {title:"귀환 시 지켜야 할 한 가지 기준",
    text:gateV9Part(from.name,"은")+" "+exit+"입니다. "+gateV9Part(to.name,"과")+" 한 팀으로 움직이려면 마지막 목표를 확인할 사람, 복귀 경로를 열어 둘 사람, 철수 조건을 선언할 사람의 역할을 미리 나누는 편이 좋습니다. 단순히 더 오래 버틸 수 있는 쪽을 기준으로 삼지 않는 것이 중요합니다."}
  ];
