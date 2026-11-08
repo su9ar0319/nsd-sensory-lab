@@ -198,5 +198,5 @@ function gateTrio(ps){
  {title:"동시에 시작되는 두 가지 행동",trigger:"두 명이 다른 신호를 기준으로 동시에 움직이고 나머지 한 명이 뒤늦게 상황을 확인할 때입니다.",chain:"지휘와 실행 사이의 보고가 끊기면 세 사람의 동선이 겹칩니다.",counter:"변경된 목표를 실행 전에 한 문장으로 공유합니다."},
  {title:"작전 종료 후 숨은 피로",trigger:`사후 회복 지표 차이가 ${gateFixed(Math.max(...ps.map(p=>p.axes[11]))-Math.min(...ps.map(p=>p.axes[11])))}점인 세 사람이 같은 시간에 재투입을 요청받을 때입니다.`,chain:"임무 종료 사실을 자원 회복의 완료와 혼동하면 다음 게이트에서 위험이 더 빠르게 커질 수 있습니다.",counter:"회복 가능 여부와 다음 작전에 필요한 자원 조건을 대원별로 확인합니다."}
  ];
- return {roles,pairs,stages,synergies:trioSynergies,debuffs:trioDebuffs,finalResources,outcome,success,threat:last.afterThreat,cohesion:last.cohesion,notice:"아래 자원 지표는 설문 응답으로 만든 가상 작전 모델입니다. 실제 게임의 부하도·가이딩 잔량 수치를 예측하거나 대체하지 않습니다."};
+ return {roles,pairs,stages,synergies:trioSynergies,debuffs:trioDebuffs,finalResources,outcome,success,threat:last.afterThreat,cohesion:last.cohesion,notice:"일곱 단계의 작전 흐름을 통해 대원별 자원 부담과 판단의 차이를 살펴볼 수 있습니다. 다음 진입에 앞서 각자의 한계와 역할을 다시 조율하는 편이 좋습니다."};
 }
