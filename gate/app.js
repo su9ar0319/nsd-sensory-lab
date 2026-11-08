@@ -160,6 +160,7 @@ function gateRenderPair(){
   <div class="chapter"><span>03 / RISK</span><h3>작전 실패로 이어지는 위험 연쇄</h3></div>${gateAnalyticCards(r.debuffs,"negative")}
   <div class="chapter"><span>04 / RESOURCE</span><h3>직군과 자원 관리</h3></div><div class="sub-report">${gateEsc(r.resources)}</div>
   <div class="chapter"><span>05 / FIELD SCENES</span><h3>세 가지 게이트 위험 대응</h3></div><div class="analysis-grid">${r.scenes.map((o,i)=>`<article class="analysis-card"><span class="label">CASE ${i+1}</span><h4>${gateEsc(o.title)}</h4><p>${gateEsc(o.text)}</p></article>`).join("")}</div>
+  ${typeof gateV12PairBlock==="function"?gateV12PairBlock(a,b):""}
   <div class="row actions"><button class="btn primary" onclick="gateCopyAI('pair')">AI 분석 패키지 복사</button><button class="btn light" onclick="gateShareMode('pair')">조합 링크 복사</button><button class="btn light" onclick="window.print()">인쇄 · PDF</button></div></section>`;
  }
  return `<section class="surface"><div class="eyebrow">PAIR TACTICAL ANALYSIS</div><h2>2인 전술 동행 분석</h2><p class="muted">같은 게이트에서도 A→B와 B→A가 먼저 요구하는 행동은 다릅니다. 진입로 확보, 전열 충돌, 자원 압박, 철수 결정을 양방향으로 분석합니다.</p><div class="select-grid">${gateSelect("대원 A",0,gateState.pairIds[0],"gatePairChange")}${gateSelect("대원 B",1,gateState.pairIds[1],"gatePairChange")}</div>${!a||!b?'<p class="empty">두 캐릭터를 선택해 주세요. 기록이 없다면 먼저 게이트 설문을 진행하세요.</p>':a.id===b.id?'<p class="empty">서로 다른 캐릭터 두 명을 선택해 주세요.</p>':""}</section>${result}`;
@@ -178,6 +179,7 @@ function gateRenderTrio(){
   <div class="chapter"><span>04 / SYNERGY</span><h3>3인 작전의 시너지</h3></div>${gateAnalyticCards(r.synergies,"positive")}
   <div class="chapter"><span>05 / RISK CASCADE</span><h3>3인 작전의 위험 연쇄</h3></div>${gateAnalyticCards(r.debuffs,"negative")}
   <div class="chapter"><span>06 / FINAL ASSESSMENT</span><h3>최종 작전 평가</h3></div><div class="final-assessment"><b>${gateEsc(r.outcome)}</b><p>${gateEsc(r.notice)}</p><div class="resource-grid">${r.finalResources.map(x=>`<div><small>${gateEsc(x.name)} / ${x.role==="센티넬"?"부하도":"가이딩 잔량"}</small><div class="resource-bar"><i style="width:${x.value}%"></i></div><span>${x.value}/100</span></div>`).join("")}</div></div>
+  ${typeof gateV12TrioBlock==="function"?gateV12TrioBlock(ps):""}
   <div class="row actions"><button class="btn primary" onclick="gateCopyAI('trio')">AI 분석 패키지 복사</button><button class="btn light" onclick="gateShareMode('trio')">조합 링크 복사</button><button class="btn light" onclick="window.print()">인쇄 · PDF</button></div></section>`;
  }
  return `<section class="surface"><div class="eyebrow">GATE OPERATION / THREE OPERATIVES</div><h2>3인 작전 시뮬레이션</h2><p class="muted">세 대원에게 초기 역할을 배치하고 진입부터 귀환까지 7단계의 위험·자원 변화를 이어 계산합니다.</p><div class="select-grid">${[0,1,2].map(i=>gateSelect(`대원 ${i+1}`,i,gateState.trioIds[i],"gateTrioChange")).join("")}</div>${!ps.every(Boolean)||new Set(ps.filter(Boolean).map(p=>p.id)).size!==3?'<p class="empty">서로 다른 캐릭터 세 명이 필요합니다. 먼저 기록을 만들거나 공유용 JSON을 가져와 주세요.</p>':""}</section>${result}`;
