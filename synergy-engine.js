@@ -53,7 +53,7 @@ function contextualCardVariation(a,b,results){
  const lingering=x[5]>=y[5]?a:b,rested=lingering===a?b:a;
  const louder=x[1]*y[0]>=y[1]*x[0]?a:b,listener=louder===a?b:a;
  const guide=[a,b].find(p=>p.role==="가이드")||a;
- const sentinel=[a,b].find(p=>p.role==="센티넬")||b;
+ const sentinel=[a,b].find(p=>p.role==="센티넬");
  const shared=i=>a.choices?.[i]===b.choices?.[i];
  const packs={
   warning:{
@@ -396,7 +396,7 @@ function contextualCardVariation(a,b,results){
     end:[
      `${guide.name}이(가) 남은 잔량을 말하기 전에 다음 가이딩의 강도와 순서가 이미 정해질 때입니다.`,
      `${guide.name}의 이전 지원 성공을 이유로 피로 누적을 확인하지 않을 때입니다.`,
-     `${sentinel.name}의 부하도 변화만 살피고 ${guide.name}의 가이딩 잔량 소모는 보고에서 빠질 때입니다.`,
+     `${sentinel?sentinel.name+"의 부하도 변화":"외부 지원 대상의 상태"}만 살피고 ${guide.name}의 가이딩 잔량 소모는 보고에서 빠질 때입니다.`,
      `${guide.name}이(가) 지원을 줄이거나 교대를 요청할 여지가 없어 공명 고갈 전조를 늦게 알릴 때입니다.`,
      `가이딩을 이어갈 수 없게 된 뒤에야 다른 동료에게 역할을 넘기는 계획을 세울 때입니다.`
     ]
